@@ -4,10 +4,9 @@
 // 	protoc        v3.21.12
 // source: comment.proto
 
-package comment
+package pd
 
 import (
-	common "github.com/uzak0209/CHAP_Grpc/backend/api/generated/common"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -462,11 +461,12 @@ const file_comment_proto_rawDesc = "" +
 	"\acontent\x18\x02 \x01(\tR\acontent\"5\n" +
 	"\x14DeleteCommentRequest\x12\x1d\n" +
 	"\n" +
-	"comment_id\x18\x01 \x01(\tR\tcommentId2\xbc\x02\n" +
+	"comment_id\x18\x01 \x01(\tR\tcommentId2\x92\x03\n" +
 	"\x0eCommentService\x12v\n" +
-	"\x15GetCommentsByThreadID\x12-.chap.comment.v1.GetCommentsByThreadIDRequest\x1a..chap.comment.v1.GetCommentsByThreadIDResponse\x12X\n" +
+	"\x15GetCommentsByThreadID\x12-.chap.comment.v1.GetCommentsByThreadIDRequest\x1a..chap.comment.v1.GetCommentsByThreadIDResponse\x12T\n" +
+	"\vEditComment\x12#.chap.comment.v1.EditCommentRequest\x1a .chap.common.v1.StandardResponse\x12X\n" +
 	"\rCreateComment\x12%.chap.comment.v1.CreateCommentRequest\x1a .chap.common.v1.StandardResponse\x12X\n" +
-	"\rDeleteComment\x12%.chap.comment.v1.DeleteCommentRequest\x1a .chap.common.v1.StandardResponseB=Z;github.com/uzak0209/CHAP_Grpc/backend/api/generated/commentb\x06proto3"
+	"\rDeleteComment\x12%.chap.comment.v1.DeleteCommentRequest\x1a .chap.common.v1.StandardResponseB1Z/github.com/uzak0209/CHAP_Grpc/backend/api/pd;pdb\x06proto3"
 
 var (
 	file_comment_proto_rawDescOnce sync.Once
@@ -488,18 +488,20 @@ var file_comment_proto_goTypes = []any{
 	(*CreateCommentRequest)(nil),          // 3: chap.comment.v1.CreateCommentRequest
 	(*EditCommentRequest)(nil),            // 4: chap.comment.v1.EditCommentRequest
 	(*DeleteCommentRequest)(nil),          // 5: chap.comment.v1.DeleteCommentRequest
-	(*common.StandardResponse)(nil),       // 6: chap.common.v1.StandardResponse
+	(*StandardResponse)(nil),              // 6: chap.common.v1.StandardResponse
 }
 var file_comment_proto_depIdxs = []int32{
 	0, // 0: chap.comment.v1.GetCommentsByThreadIDResponse.comments:type_name -> chap.comment.v1.Comment
 	1, // 1: chap.comment.v1.CommentService.GetCommentsByThreadID:input_type -> chap.comment.v1.GetCommentsByThreadIDRequest
-	3, // 2: chap.comment.v1.CommentService.CreateComment:input_type -> chap.comment.v1.CreateCommentRequest
-	5, // 3: chap.comment.v1.CommentService.DeleteComment:input_type -> chap.comment.v1.DeleteCommentRequest
-	2, // 4: chap.comment.v1.CommentService.GetCommentsByThreadID:output_type -> chap.comment.v1.GetCommentsByThreadIDResponse
-	6, // 5: chap.comment.v1.CommentService.CreateComment:output_type -> chap.common.v1.StandardResponse
-	6, // 6: chap.comment.v1.CommentService.DeleteComment:output_type -> chap.common.v1.StandardResponse
-	4, // [4:7] is the sub-list for method output_type
-	1, // [1:4] is the sub-list for method input_type
+	4, // 2: chap.comment.v1.CommentService.EditComment:input_type -> chap.comment.v1.EditCommentRequest
+	3, // 3: chap.comment.v1.CommentService.CreateComment:input_type -> chap.comment.v1.CreateCommentRequest
+	5, // 4: chap.comment.v1.CommentService.DeleteComment:input_type -> chap.comment.v1.DeleteCommentRequest
+	2, // 5: chap.comment.v1.CommentService.GetCommentsByThreadID:output_type -> chap.comment.v1.GetCommentsByThreadIDResponse
+	6, // 6: chap.comment.v1.CommentService.EditComment:output_type -> chap.common.v1.StandardResponse
+	6, // 7: chap.comment.v1.CommentService.CreateComment:output_type -> chap.common.v1.StandardResponse
+	6, // 8: chap.comment.v1.CommentService.DeleteComment:output_type -> chap.common.v1.StandardResponse
+	5, // [5:9] is the sub-list for method output_type
+	1, // [1:5] is the sub-list for method input_type
 	1, // [1:1] is the sub-list for extension type_name
 	1, // [1:1] is the sub-list for extension extendee
 	0, // [0:1] is the sub-list for field type_name
@@ -510,6 +512,7 @@ func file_comment_proto_init() {
 	if File_comment_proto != nil {
 		return
 	}
+	file_common_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

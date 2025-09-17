@@ -2,12 +2,13 @@ syntax = "proto3";
 
 package chap.comment.v1;
 
-option go_package = "github.com/uzak0209/CHAP_Grpc/backend/api/generated/comment";
+option go_package = "github.com/uzak0209/CHAP_Grpc/backend/api/pd;pd";
 
 import "common.proto";
 service CommentService {
   // コメント操作
   rpc GetCommentsByThreadID(GetCommentsByThreadIDRequest) returns (GetCommentsByThreadIDResponse);
+  rpc EditComment(EditCommentRequest) returns (chap.common.v1.StandardResponse);
   rpc CreateComment(CreateCommentRequest) returns (chap.common.v1.StandardResponse);
   rpc DeleteComment(DeleteCommentRequest) returns (chap.common.v1.StandardResponse);
 }

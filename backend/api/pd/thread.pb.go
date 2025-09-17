@@ -4,11 +4,9 @@
 // 	protoc        v3.21.12
 // source: thread.proto
 
-package thread
+package pd
 
 import (
-	comment "github.com/uzak0209/CHAP_Grpc/backend/api/generated/comment"
-	common "github.com/uzak0209/CHAP_Grpc/backend/api/generated/common"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -70,7 +68,7 @@ func (x *GetThreadByIDRequest) GetThreadId() string {
 type GetThreadByIDResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Thread        *Thread                `protobuf:"bytes,1,opt,name=thread,proto3" json:"thread,omitempty"`
-	Comment       []*comment.Comment     `protobuf:"bytes,2,rep,name=comment,proto3" json:"comment,omitempty"`
+	Comment       []*Comment             `protobuf:"bytes,2,rep,name=comment,proto3" json:"comment,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -112,7 +110,7 @@ func (x *GetThreadByIDResponse) GetThread() *Thread {
 	return nil
 }
 
-func (x *GetThreadByIDResponse) GetComment() []*comment.Comment {
+func (x *GetThreadByIDResponse) GetComment() []*Comment {
 	if x != nil {
 		return x.Comment
 	}
@@ -579,7 +577,7 @@ const file_thread_proto_rawDesc = "" +
 	"\fCreateThread\x12#.chap.thread.v1.CreateThreadRequest\x1a .chap.common.v1.StandardResponse\x12Q\n" +
 	"\n" +
 	"EditThread\x12!.chap.thread.v1.EditThreadRequest\x1a .chap.common.v1.StandardResponse\x12U\n" +
-	"\fDeleteThread\x12#.chap.thread.v1.DeleteThreadRequest\x1a .chap.common.v1.StandardResponseB<Z:github.com/uzak0209/CHAP_Grpc/backend/api/generated/threadb\x06proto3"
+	"\fDeleteThread\x12#.chap.thread.v1.DeleteThreadRequest\x1a .chap.common.v1.StandardResponseB1Z/github.com/uzak0209/CHAP_Grpc/backend/api/pd;pdb\x06proto3"
 
 var (
 	file_thread_proto_rawDescOnce sync.Once
@@ -595,16 +593,16 @@ func file_thread_proto_rawDescGZIP() []byte {
 
 var file_thread_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
 var file_thread_proto_goTypes = []any{
-	(*GetThreadByIDRequest)(nil),    // 0: chap.thread.v1.GetThreadByIDRequest
-	(*GetThreadByIDResponse)(nil),   // 1: chap.thread.v1.GetThreadByIDResponse
-	(*Thread)(nil),                  // 2: chap.thread.v1.Thread
-	(*GetThreadsRequest)(nil),       // 3: chap.thread.v1.GetThreadsRequest
-	(*GetThreadsResponse)(nil),      // 4: chap.thread.v1.GetThreadsResponse
-	(*CreateThreadRequest)(nil),     // 5: chap.thread.v1.CreateThreadRequest
-	(*EditThreadRequest)(nil),       // 6: chap.thread.v1.EditThreadRequest
-	(*DeleteThreadRequest)(nil),     // 7: chap.thread.v1.DeleteThreadRequest
-	(*comment.Comment)(nil),         // 8: chap.comment.v1.Comment
-	(*common.StandardResponse)(nil), // 9: chap.common.v1.StandardResponse
+	(*GetThreadByIDRequest)(nil),  // 0: chap.thread.v1.GetThreadByIDRequest
+	(*GetThreadByIDResponse)(nil), // 1: chap.thread.v1.GetThreadByIDResponse
+	(*Thread)(nil),                // 2: chap.thread.v1.Thread
+	(*GetThreadsRequest)(nil),     // 3: chap.thread.v1.GetThreadsRequest
+	(*GetThreadsResponse)(nil),    // 4: chap.thread.v1.GetThreadsResponse
+	(*CreateThreadRequest)(nil),   // 5: chap.thread.v1.CreateThreadRequest
+	(*EditThreadRequest)(nil),     // 6: chap.thread.v1.EditThreadRequest
+	(*DeleteThreadRequest)(nil),   // 7: chap.thread.v1.DeleteThreadRequest
+	(*Comment)(nil),               // 8: chap.comment.v1.Comment
+	(*StandardResponse)(nil),      // 9: chap.common.v1.StandardResponse
 }
 var file_thread_proto_depIdxs = []int32{
 	2, // 0: chap.thread.v1.GetThreadByIDResponse.thread:type_name -> chap.thread.v1.Thread
@@ -632,6 +630,8 @@ func file_thread_proto_init() {
 	if File_thread_proto != nil {
 		return
 	}
+	file_common_proto_init()
+	file_comment_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

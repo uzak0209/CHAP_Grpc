@@ -4,7 +4,7 @@
 // 	protoc        v3.21.12
 // source: common.proto
 
-package common
+package pd
 
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
@@ -80,7 +80,7 @@ const file_common_proto_rawDesc = "" +
 	"\fcommon.proto\x12\x0echap.common.v1\"F\n" +
 	"\x10StandardResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessageB<Z:github.com/uzak0209/CHAP_Grpc/backend/api/generated/commonb\x06proto3"
+	"\amessage\x18\x02 \x01(\tR\amessageB1Z/github.com/uzak0209/CHAP_Grpc/backend/api/pd;pdb\x06proto3"
 
 var (
 	file_common_proto_rawDescOnce sync.Once

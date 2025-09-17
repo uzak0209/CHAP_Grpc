@@ -4,11 +4,10 @@
 // - protoc             v3.21.12
 // source: thread.proto
 
-package thread
+package pd
 
 import (
 	context "context"
-	common "github.com/uzak0209/CHAP_Grpc/backend/api/generated/common"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -34,9 +33,9 @@ type ThreadServiceClient interface {
 	// スレッド操作
 	GetThreadsByID(ctx context.Context, in *GetThreadByIDRequest, opts ...grpc.CallOption) (*GetThreadByIDResponse, error)
 	GetThreads(ctx context.Context, in *GetThreadsRequest, opts ...grpc.CallOption) (*GetThreadsResponse, error)
-	CreateThread(ctx context.Context, in *CreateThreadRequest, opts ...grpc.CallOption) (*common.StandardResponse, error)
-	EditThread(ctx context.Context, in *EditThreadRequest, opts ...grpc.CallOption) (*common.StandardResponse, error)
-	DeleteThread(ctx context.Context, in *DeleteThreadRequest, opts ...grpc.CallOption) (*common.StandardResponse, error)
+	CreateThread(ctx context.Context, in *CreateThreadRequest, opts ...grpc.CallOption) (*StandardResponse, error)
+	EditThread(ctx context.Context, in *EditThreadRequest, opts ...grpc.CallOption) (*StandardResponse, error)
+	DeleteThread(ctx context.Context, in *DeleteThreadRequest, opts ...grpc.CallOption) (*StandardResponse, error)
 }
 
 type threadServiceClient struct {
@@ -67,9 +66,9 @@ func (c *threadServiceClient) GetThreads(ctx context.Context, in *GetThreadsRequ
 	return out, nil
 }
 
-func (c *threadServiceClient) CreateThread(ctx context.Context, in *CreateThreadRequest, opts ...grpc.CallOption) (*common.StandardResponse, error) {
+func (c *threadServiceClient) CreateThread(ctx context.Context, in *CreateThreadRequest, opts ...grpc.CallOption) (*StandardResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(common.StandardResponse)
+	out := new(StandardResponse)
 	err := c.cc.Invoke(ctx, ThreadService_CreateThread_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -77,9 +76,9 @@ func (c *threadServiceClient) CreateThread(ctx context.Context, in *CreateThread
 	return out, nil
 }
 
-func (c *threadServiceClient) EditThread(ctx context.Context, in *EditThreadRequest, opts ...grpc.CallOption) (*common.StandardResponse, error) {
+func (c *threadServiceClient) EditThread(ctx context.Context, in *EditThreadRequest, opts ...grpc.CallOption) (*StandardResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(common.StandardResponse)
+	out := new(StandardResponse)
 	err := c.cc.Invoke(ctx, ThreadService_EditThread_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -87,9 +86,9 @@ func (c *threadServiceClient) EditThread(ctx context.Context, in *EditThreadRequ
 	return out, nil
 }
 
-func (c *threadServiceClient) DeleteThread(ctx context.Context, in *DeleteThreadRequest, opts ...grpc.CallOption) (*common.StandardResponse, error) {
+func (c *threadServiceClient) DeleteThread(ctx context.Context, in *DeleteThreadRequest, opts ...grpc.CallOption) (*StandardResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(common.StandardResponse)
+	out := new(StandardResponse)
 	err := c.cc.Invoke(ctx, ThreadService_DeleteThread_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -104,9 +103,9 @@ type ThreadServiceServer interface {
 	// スレッド操作
 	GetThreadsByID(context.Context, *GetThreadByIDRequest) (*GetThreadByIDResponse, error)
 	GetThreads(context.Context, *GetThreadsRequest) (*GetThreadsResponse, error)
-	CreateThread(context.Context, *CreateThreadRequest) (*common.StandardResponse, error)
-	EditThread(context.Context, *EditThreadRequest) (*common.StandardResponse, error)
-	DeleteThread(context.Context, *DeleteThreadRequest) (*common.StandardResponse, error)
+	CreateThread(context.Context, *CreateThreadRequest) (*StandardResponse, error)
+	EditThread(context.Context, *EditThreadRequest) (*StandardResponse, error)
+	DeleteThread(context.Context, *DeleteThreadRequest) (*StandardResponse, error)
 	mustEmbedUnimplementedThreadServiceServer()
 }
 
@@ -123,13 +122,13 @@ func (UnimplementedThreadServiceServer) GetThreadsByID(context.Context, *GetThre
 func (UnimplementedThreadServiceServer) GetThreads(context.Context, *GetThreadsRequest) (*GetThreadsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetThreads not implemented")
 }
-func (UnimplementedThreadServiceServer) CreateThread(context.Context, *CreateThreadRequest) (*common.StandardResponse, error) {
+func (UnimplementedThreadServiceServer) CreateThread(context.Context, *CreateThreadRequest) (*StandardResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateThread not implemented")
 }
-func (UnimplementedThreadServiceServer) EditThread(context.Context, *EditThreadRequest) (*common.StandardResponse, error) {
+func (UnimplementedThreadServiceServer) EditThread(context.Context, *EditThreadRequest) (*StandardResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method EditThread not implemented")
 }
-func (UnimplementedThreadServiceServer) DeleteThread(context.Context, *DeleteThreadRequest) (*common.StandardResponse, error) {
+func (UnimplementedThreadServiceServer) DeleteThread(context.Context, *DeleteThreadRequest) (*StandardResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteThread not implemented")
 }
 func (UnimplementedThreadServiceServer) mustEmbedUnimplementedThreadServiceServer() {}

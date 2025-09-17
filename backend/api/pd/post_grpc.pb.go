@@ -4,11 +4,10 @@
 // - protoc             v3.21.12
 // source: post.proto
 
-package post
+package pd
 
 import (
 	context "context"
-	common "github.com/uzak0209/CHAP_Grpc/backend/api/generated/common"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -31,10 +30,10 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type PostServiceClient interface {
 	// 投稿操作
-	GetPosts(ctx context.Context, in *GetPostsByUserIDRequest, opts ...grpc.CallOption) (*GetPostsByUserIDResponse, error)
-	EditPost(ctx context.Context, in *EditPostRequest, opts ...grpc.CallOption) (*common.StandardResponse, error)
-	CreatePost(ctx context.Context, in *CreatePostRequest, opts ...grpc.CallOption) (*common.StandardResponse, error)
-	DeletePost(ctx context.Context, in *DeletePostRequest, opts ...grpc.CallOption) (*common.StandardResponse, error)
+	GetPosts(ctx context.Context, in *GetPostsRequest, opts ...grpc.CallOption) (*GetPostsResponse, error)
+	EditPost(ctx context.Context, in *EditPostRequest, opts ...grpc.CallOption) (*StandardResponse, error)
+	CreatePost(ctx context.Context, in *CreatePostRequest, opts ...grpc.CallOption) (*StandardResponse, error)
+	DeletePost(ctx context.Context, in *DeletePostRequest, opts ...grpc.CallOption) (*StandardResponse, error)
 }
 
 type postServiceClient struct {
@@ -45,9 +44,9 @@ func NewPostServiceClient(cc grpc.ClientConnInterface) PostServiceClient {
 	return &postServiceClient{cc}
 }
 
-func (c *postServiceClient) GetPosts(ctx context.Context, in *GetPostsByUserIDRequest, opts ...grpc.CallOption) (*GetPostsByUserIDResponse, error) {
+func (c *postServiceClient) GetPosts(ctx context.Context, in *GetPostsRequest, opts ...grpc.CallOption) (*GetPostsResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetPostsByUserIDResponse)
+	out := new(GetPostsResponse)
 	err := c.cc.Invoke(ctx, PostService_GetPosts_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -55,9 +54,9 @@ func (c *postServiceClient) GetPosts(ctx context.Context, in *GetPostsByUserIDRe
 	return out, nil
 }
 
-func (c *postServiceClient) EditPost(ctx context.Context, in *EditPostRequest, opts ...grpc.CallOption) (*common.StandardResponse, error) {
+func (c *postServiceClient) EditPost(ctx context.Context, in *EditPostRequest, opts ...grpc.CallOption) (*StandardResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(common.StandardResponse)
+	out := new(StandardResponse)
 	err := c.cc.Invoke(ctx, PostService_EditPost_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -65,9 +64,9 @@ func (c *postServiceClient) EditPost(ctx context.Context, in *EditPostRequest, o
 	return out, nil
 }
 
-func (c *postServiceClient) CreatePost(ctx context.Context, in *CreatePostRequest, opts ...grpc.CallOption) (*common.StandardResponse, error) {
+func (c *postServiceClient) CreatePost(ctx context.Context, in *CreatePostRequest, opts ...grpc.CallOption) (*StandardResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(common.StandardResponse)
+	out := new(StandardResponse)
 	err := c.cc.Invoke(ctx, PostService_CreatePost_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -75,9 +74,9 @@ func (c *postServiceClient) CreatePost(ctx context.Context, in *CreatePostReques
 	return out, nil
 }
 
-func (c *postServiceClient) DeletePost(ctx context.Context, in *DeletePostRequest, opts ...grpc.CallOption) (*common.StandardResponse, error) {
+func (c *postServiceClient) DeletePost(ctx context.Context, in *DeletePostRequest, opts ...grpc.CallOption) (*StandardResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(common.StandardResponse)
+	out := new(StandardResponse)
 	err := c.cc.Invoke(ctx, PostService_DeletePost_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -90,10 +89,10 @@ func (c *postServiceClient) DeletePost(ctx context.Context, in *DeletePostReques
 // for forward compatibility.
 type PostServiceServer interface {
 	// 投稿操作
-	GetPosts(context.Context, *GetPostsByUserIDRequest) (*GetPostsByUserIDResponse, error)
-	EditPost(context.Context, *EditPostRequest) (*common.StandardResponse, error)
-	CreatePost(context.Context, *CreatePostRequest) (*common.StandardResponse, error)
-	DeletePost(context.Context, *DeletePostRequest) (*common.StandardResponse, error)
+	GetPosts(context.Context, *GetPostsRequest) (*GetPostsResponse, error)
+	EditPost(context.Context, *EditPostRequest) (*StandardResponse, error)
+	CreatePost(context.Context, *CreatePostRequest) (*StandardResponse, error)
+	DeletePost(context.Context, *DeletePostRequest) (*StandardResponse, error)
 	mustEmbedUnimplementedPostServiceServer()
 }
 
@@ -104,16 +103,16 @@ type PostServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedPostServiceServer struct{}
 
-func (UnimplementedPostServiceServer) GetPosts(context.Context, *GetPostsByUserIDRequest) (*GetPostsByUserIDResponse, error) {
+func (UnimplementedPostServiceServer) GetPosts(context.Context, *GetPostsRequest) (*GetPostsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetPosts not implemented")
 }
-func (UnimplementedPostServiceServer) EditPost(context.Context, *EditPostRequest) (*common.StandardResponse, error) {
+func (UnimplementedPostServiceServer) EditPost(context.Context, *EditPostRequest) (*StandardResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method EditPost not implemented")
 }
-func (UnimplementedPostServiceServer) CreatePost(context.Context, *CreatePostRequest) (*common.StandardResponse, error) {
+func (UnimplementedPostServiceServer) CreatePost(context.Context, *CreatePostRequest) (*StandardResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreatePost not implemented")
 }
-func (UnimplementedPostServiceServer) DeletePost(context.Context, *DeletePostRequest) (*common.StandardResponse, error) {
+func (UnimplementedPostServiceServer) DeletePost(context.Context, *DeletePostRequest) (*StandardResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeletePost not implemented")
 }
 func (UnimplementedPostServiceServer) mustEmbedUnimplementedPostServiceServer() {}
@@ -138,7 +137,7 @@ func RegisterPostServiceServer(s grpc.ServiceRegistrar, srv PostServiceServer) {
 }
 
 func _PostService_GetPosts_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetPostsByUserIDRequest)
+	in := new(GetPostsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -150,7 +149,7 @@ func _PostService_GetPosts_Handler(srv interface{}, ctx context.Context, dec fun
 		FullMethod: PostService_GetPosts_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PostServiceServer).GetPosts(ctx, req.(*GetPostsByUserIDRequest))
+		return srv.(PostServiceServer).GetPosts(ctx, req.(*GetPostsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }

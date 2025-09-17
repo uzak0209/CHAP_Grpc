@@ -4,11 +4,10 @@
 // - protoc             v3.21.12
 // source: user.proto
 
-package user
+package pd
 
 import (
 	context "context"
-	common "github.com/uzak0209/CHAP_Grpc/backend/api/generated/common"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -34,11 +33,11 @@ const (
 type UserServiceClient interface {
 	// ユーザー操作
 	GetUserByID(ctx context.Context, in *GetUserByIDRequest, opts ...grpc.CallOption) (*GetUserByIDResponse, error)
-	CreateUser(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*common.StandardResponse, error)
-	EditUser(ctx context.Context, in *EditUserRequest, opts ...grpc.CallOption) (*common.StandardResponse, error)
-	DeleteUser(ctx context.Context, in *DeleteUserRequest, opts ...grpc.CallOption) (*common.StandardResponse, error)
-	FollowUser(ctx context.Context, in *FollowUserRequest, opts ...grpc.CallOption) (*common.StandardResponse, error)
-	UnfollowUser(ctx context.Context, in *UnfollowUserRequest, opts ...grpc.CallOption) (*common.StandardResponse, error)
+	CreateUser(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*StandardResponse, error)
+	EditUser(ctx context.Context, in *EditUserRequest, opts ...grpc.CallOption) (*StandardResponse, error)
+	DeleteUser(ctx context.Context, in *DeleteUserRequest, opts ...grpc.CallOption) (*StandardResponse, error)
+	FollowUser(ctx context.Context, in *FollowUserRequest, opts ...grpc.CallOption) (*StandardResponse, error)
+	UnfollowUser(ctx context.Context, in *UnfollowUserRequest, opts ...grpc.CallOption) (*StandardResponse, error)
 }
 
 type userServiceClient struct {
@@ -59,9 +58,9 @@ func (c *userServiceClient) GetUserByID(ctx context.Context, in *GetUserByIDRequ
 	return out, nil
 }
 
-func (c *userServiceClient) CreateUser(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*common.StandardResponse, error) {
+func (c *userServiceClient) CreateUser(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*StandardResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(common.StandardResponse)
+	out := new(StandardResponse)
 	err := c.cc.Invoke(ctx, UserService_CreateUser_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -69,9 +68,9 @@ func (c *userServiceClient) CreateUser(ctx context.Context, in *CreateUserReques
 	return out, nil
 }
 
-func (c *userServiceClient) EditUser(ctx context.Context, in *EditUserRequest, opts ...grpc.CallOption) (*common.StandardResponse, error) {
+func (c *userServiceClient) EditUser(ctx context.Context, in *EditUserRequest, opts ...grpc.CallOption) (*StandardResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(common.StandardResponse)
+	out := new(StandardResponse)
 	err := c.cc.Invoke(ctx, UserService_EditUser_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -79,9 +78,9 @@ func (c *userServiceClient) EditUser(ctx context.Context, in *EditUserRequest, o
 	return out, nil
 }
 
-func (c *userServiceClient) DeleteUser(ctx context.Context, in *DeleteUserRequest, opts ...grpc.CallOption) (*common.StandardResponse, error) {
+func (c *userServiceClient) DeleteUser(ctx context.Context, in *DeleteUserRequest, opts ...grpc.CallOption) (*StandardResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(common.StandardResponse)
+	out := new(StandardResponse)
 	err := c.cc.Invoke(ctx, UserService_DeleteUser_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -89,9 +88,9 @@ func (c *userServiceClient) DeleteUser(ctx context.Context, in *DeleteUserReques
 	return out, nil
 }
 
-func (c *userServiceClient) FollowUser(ctx context.Context, in *FollowUserRequest, opts ...grpc.CallOption) (*common.StandardResponse, error) {
+func (c *userServiceClient) FollowUser(ctx context.Context, in *FollowUserRequest, opts ...grpc.CallOption) (*StandardResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(common.StandardResponse)
+	out := new(StandardResponse)
 	err := c.cc.Invoke(ctx, UserService_FollowUser_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -99,9 +98,9 @@ func (c *userServiceClient) FollowUser(ctx context.Context, in *FollowUserReques
 	return out, nil
 }
 
-func (c *userServiceClient) UnfollowUser(ctx context.Context, in *UnfollowUserRequest, opts ...grpc.CallOption) (*common.StandardResponse, error) {
+func (c *userServiceClient) UnfollowUser(ctx context.Context, in *UnfollowUserRequest, opts ...grpc.CallOption) (*StandardResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(common.StandardResponse)
+	out := new(StandardResponse)
 	err := c.cc.Invoke(ctx, UserService_UnfollowUser_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -115,11 +114,11 @@ func (c *userServiceClient) UnfollowUser(ctx context.Context, in *UnfollowUserRe
 type UserServiceServer interface {
 	// ユーザー操作
 	GetUserByID(context.Context, *GetUserByIDRequest) (*GetUserByIDResponse, error)
-	CreateUser(context.Context, *CreateUserRequest) (*common.StandardResponse, error)
-	EditUser(context.Context, *EditUserRequest) (*common.StandardResponse, error)
-	DeleteUser(context.Context, *DeleteUserRequest) (*common.StandardResponse, error)
-	FollowUser(context.Context, *FollowUserRequest) (*common.StandardResponse, error)
-	UnfollowUser(context.Context, *UnfollowUserRequest) (*common.StandardResponse, error)
+	CreateUser(context.Context, *CreateUserRequest) (*StandardResponse, error)
+	EditUser(context.Context, *EditUserRequest) (*StandardResponse, error)
+	DeleteUser(context.Context, *DeleteUserRequest) (*StandardResponse, error)
+	FollowUser(context.Context, *FollowUserRequest) (*StandardResponse, error)
+	UnfollowUser(context.Context, *UnfollowUserRequest) (*StandardResponse, error)
 	mustEmbedUnimplementedUserServiceServer()
 }
 
@@ -133,19 +132,19 @@ type UnimplementedUserServiceServer struct{}
 func (UnimplementedUserServiceServer) GetUserByID(context.Context, *GetUserByIDRequest) (*GetUserByIDResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUserByID not implemented")
 }
-func (UnimplementedUserServiceServer) CreateUser(context.Context, *CreateUserRequest) (*common.StandardResponse, error) {
+func (UnimplementedUserServiceServer) CreateUser(context.Context, *CreateUserRequest) (*StandardResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateUser not implemented")
 }
-func (UnimplementedUserServiceServer) EditUser(context.Context, *EditUserRequest) (*common.StandardResponse, error) {
+func (UnimplementedUserServiceServer) EditUser(context.Context, *EditUserRequest) (*StandardResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method EditUser not implemented")
 }
-func (UnimplementedUserServiceServer) DeleteUser(context.Context, *DeleteUserRequest) (*common.StandardResponse, error) {
+func (UnimplementedUserServiceServer) DeleteUser(context.Context, *DeleteUserRequest) (*StandardResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteUser not implemented")
 }
-func (UnimplementedUserServiceServer) FollowUser(context.Context, *FollowUserRequest) (*common.StandardResponse, error) {
+func (UnimplementedUserServiceServer) FollowUser(context.Context, *FollowUserRequest) (*StandardResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method FollowUser not implemented")
 }
-func (UnimplementedUserServiceServer) UnfollowUser(context.Context, *UnfollowUserRequest) (*common.StandardResponse, error) {
+func (UnimplementedUserServiceServer) UnfollowUser(context.Context, *UnfollowUserRequest) (*StandardResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UnfollowUser not implemented")
 }
 func (UnimplementedUserServiceServer) mustEmbedUnimplementedUserServiceServer() {}

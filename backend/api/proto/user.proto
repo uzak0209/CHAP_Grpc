@@ -1,6 +1,6 @@
 syntax = "proto3";
 package chap.user.v1;
-option go_package = "github.com/uzak0209/CHAP_Grpc/backend/api/generated/user";
+option go_package = "github.com/uzak0209/CHAP_Grpc/backend/api/pd;pd";
 import "common.proto";
 service UserService {
   // ユーザー操作

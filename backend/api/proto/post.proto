@@ -1,10 +1,10 @@
 syntax = "proto3";
 package chap.post.v1;
-option go_package = "github.com/uzak0209/CHAP_Grpc/backend/api/generated/post";
+option go_package = "github.com/uzak0209/CHAP_Grpc/backend/api/pd;pd";
 import "common.proto";
 service PostService {
   // 投稿操作
-  rpc GetPosts(GetPostsByUserIDRequest) returns (GetPostsByUserIDResponse);
+  rpc GetPosts(GetPostsRequest) returns (GetPostsResponse);
   rpc EditPost(EditPostRequest) returns (chap.common.v1.StandardResponse);
   rpc CreatePost(CreatePostRequest) returns (chap.common.v1.StandardResponse);
   rpc DeletePost(DeletePostRequest) returns (chap.common.v1.StandardResponse);
@@ -22,6 +22,13 @@ message Post{
     double lat =10;
     double lng =11;
     repeated string likes=12;
+}
+message GetPostsRequest {
+  double lat = 1;
+  double lng = 2;
+}
+message GetPostsResponse {
+  repeated Post posts = 1;
 }
 message GetPostsByUserIDRequest {
   string user_id = 1;

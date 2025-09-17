@@ -4,11 +4,10 @@
 // - protoc             v3.21.12
 // source: comment.proto
 
-package comment
+package pd
 
 import (
 	context "context"
-	common "github.com/uzak0209/CHAP_Grpc/backend/api/generated/common"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -21,6 +20,7 @@ const _ = grpc.SupportPackageIsVersion9
 
 const (
 	CommentService_GetCommentsByThreadID_FullMethodName = "/chap.comment.v1.CommentService/GetCommentsByThreadID"
+	CommentService_EditComment_FullMethodName           = "/chap.comment.v1.CommentService/EditComment"
 	CommentService_CreateComment_FullMethodName         = "/chap.comment.v1.CommentService/CreateComment"
 	CommentService_DeleteComment_FullMethodName         = "/chap.comment.v1.CommentService/DeleteComment"
 )
@@ -31,8 +31,9 @@ const (
 type CommentServiceClient interface {
 	// コメント操作
 	GetCommentsByThreadID(ctx context.Context, in *GetCommentsByThreadIDRequest, opts ...grpc.CallOption) (*GetCommentsByThreadIDResponse, error)
-	CreateComment(ctx context.Context, in *CreateCommentRequest, opts ...grpc.CallOption) (*common.StandardResponse, error)
-	DeleteComment(ctx context.Context, in *DeleteCommentRequest, opts ...grpc.CallOption) (*common.StandardResponse, error)
+	EditComment(ctx context.Context, in *EditCommentRequest, opts ...grpc.CallOption) (*StandardResponse, error)
+	CreateComment(ctx context.Context, in *CreateCommentRequest, opts ...grpc.CallOption) (*StandardResponse, error)
+	DeleteComment(ctx context.Context, in *DeleteCommentRequest, opts ...grpc.CallOption) (*StandardResponse, error)
 }
 
 type commentServiceClient struct {
@@ -53,9 +54,19 @@ func (c *commentServiceClient) GetCommentsByThreadID(ctx context.Context, in *Ge
 	return out, nil
 }
 
-func (c *commentServiceClient) CreateComment(ctx context.Context, in *CreateCommentRequest, opts ...grpc.CallOption) (*common.StandardResponse, error) {
+func (c *commentServiceClient) EditComment(ctx context.Context, in *EditCommentRequest, opts ...grpc.CallOption) (*StandardResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(common.StandardResponse)
+	out := new(StandardResponse)
+	err := c.cc.Invoke(ctx, CommentService_EditComment_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *commentServiceClient) CreateComment(ctx context.Context, in *CreateCommentRequest, opts ...grpc.CallOption) (*StandardResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(StandardResponse)
 	err := c.cc.Invoke(ctx, CommentService_CreateComment_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -63,9 +74,9 @@ func (c *commentServiceClient) CreateComment(ctx context.Context, in *CreateComm
 	return out, nil
 }
 
-func (c *commentServiceClient) DeleteComment(ctx context.Context, in *DeleteCommentRequest, opts ...grpc.CallOption) (*common.StandardResponse, error) {
+func (c *commentServiceClient) DeleteComment(ctx context.Context, in *DeleteCommentRequest, opts ...grpc.CallOption) (*StandardResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(common.StandardResponse)
+	out := new(StandardResponse)
 	err := c.cc.Invoke(ctx, CommentService_DeleteComment_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -79,8 +90,9 @@ func (c *commentServiceClient) DeleteComment(ctx context.Context, in *DeleteComm
 type CommentServiceServer interface {
 	// コメント操作
 	GetCommentsByThreadID(context.Context, *GetCommentsByThreadIDRequest) (*GetCommentsByThreadIDResponse, error)
-	CreateComment(context.Context, *CreateCommentRequest) (*common.StandardResponse, error)
-	DeleteComment(context.Context, *DeleteCommentRequest) (*common.StandardResponse, error)
+	EditComment(context.Context, *EditCommentRequest) (*StandardResponse, error)
+	CreateComment(context.Context, *CreateCommentRequest) (*StandardResponse, error)
+	DeleteComment(context.Context, *DeleteCommentRequest) (*StandardResponse, error)
 	mustEmbedUnimplementedCommentServiceServer()
 }
 
@@ -94,10 +106,13 @@ type UnimplementedCommentServiceServer struct{}
 func (UnimplementedCommentServiceServer) GetCommentsByThreadID(context.Context, *GetCommentsByThreadIDRequest) (*GetCommentsByThreadIDResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetCommentsByThreadID not implemented")
 }
-func (UnimplementedCommentServiceServer) CreateComment(context.Context, *CreateCommentRequest) (*common.StandardResponse, error) {
+func (UnimplementedCommentServiceServer) EditComment(context.Context, *EditCommentRequest) (*StandardResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method EditComment not implemented")
+}
+func (UnimplementedCommentServiceServer) CreateComment(context.Context, *CreateCommentRequest) (*StandardResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateComment not implemented")
 }
-func (UnimplementedCommentServiceServer) DeleteComment(context.Context, *DeleteCommentRequest) (*common.StandardResponse, error) {
+func (UnimplementedCommentServiceServer) DeleteComment(context.Context, *DeleteCommentRequest) (*StandardResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteComment not implemented")
 }
 func (UnimplementedCommentServiceServer) mustEmbedUnimplementedCommentServiceServer() {}
@@ -135,6 +150,24 @@ func _CommentService_GetCommentsByThreadID_Handler(srv interface{}, ctx context.
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(CommentServiceServer).GetCommentsByThreadID(ctx, req.(*GetCommentsByThreadIDRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CommentService_EditComment_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(EditCommentRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CommentServiceServer).EditComment(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CommentService_EditComment_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CommentServiceServer).EditComment(ctx, req.(*EditCommentRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -185,6 +218,10 @@ var CommentService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetCommentsByThreadID",
 			Handler:    _CommentService_GetCommentsByThreadID_Handler,
+		},
+		{
+			MethodName: "EditComment",
+			Handler:    _CommentService_EditComment_Handler,
 		},
 		{
 			MethodName: "CreateComment",

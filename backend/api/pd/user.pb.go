@@ -4,10 +4,9 @@
 // 	protoc        v3.21.12
 // source: user.proto
 
-package user
+package pd
 
 import (
-	common "github.com/uzak0209/CHAP_Grpc/backend/api/generated/common"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -518,7 +517,7 @@ const file_user_proto_rawDesc = "" +
 	"DeleteUser\x12\x1f.chap.user.v1.DeleteUserRequest\x1a .chap.common.v1.StandardResponse\x12O\n" +
 	"\n" +
 	"FollowUser\x12\x1f.chap.user.v1.FollowUserRequest\x1a .chap.common.v1.StandardResponse\x12S\n" +
-	"\fUnfollowUser\x12!.chap.user.v1.UnfollowUserRequest\x1a .chap.common.v1.StandardResponseB:Z8github.com/uzak0209/CHAP_Grpc/backend/api/generated/userb\x06proto3"
+	"\fUnfollowUser\x12!.chap.user.v1.UnfollowUserRequest\x1a .chap.common.v1.StandardResponseB1Z/github.com/uzak0209/CHAP_Grpc/backend/api/pd;pdb\x06proto3"
 
 var (
 	file_user_proto_rawDescOnce sync.Once
@@ -534,15 +533,15 @@ func file_user_proto_rawDescGZIP() []byte {
 
 var file_user_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
 var file_user_proto_goTypes = []any{
-	(*User)(nil),                    // 0: chap.user.v1.User
-	(*GetUserByIDRequest)(nil),      // 1: chap.user.v1.GetUserByIDRequest
-	(*GetUserByIDResponse)(nil),     // 2: chap.user.v1.GetUserByIDResponse
-	(*CreateUserRequest)(nil),       // 3: chap.user.v1.CreateUserRequest
-	(*EditUserRequest)(nil),         // 4: chap.user.v1.EditUserRequest
-	(*DeleteUserRequest)(nil),       // 5: chap.user.v1.DeleteUserRequest
-	(*FollowUserRequest)(nil),       // 6: chap.user.v1.FollowUserRequest
-	(*UnfollowUserRequest)(nil),     // 7: chap.user.v1.UnfollowUserRequest
-	(*common.StandardResponse)(nil), // 8: chap.common.v1.StandardResponse
+	(*User)(nil),                // 0: chap.user.v1.User
+	(*GetUserByIDRequest)(nil),  // 1: chap.user.v1.GetUserByIDRequest
+	(*GetUserByIDResponse)(nil), // 2: chap.user.v1.GetUserByIDResponse
+	(*CreateUserRequest)(nil),   // 3: chap.user.v1.CreateUserRequest
+	(*EditUserRequest)(nil),     // 4: chap.user.v1.EditUserRequest
+	(*DeleteUserRequest)(nil),   // 5: chap.user.v1.DeleteUserRequest
+	(*FollowUserRequest)(nil),   // 6: chap.user.v1.FollowUserRequest
+	(*UnfollowUserRequest)(nil), // 7: chap.user.v1.UnfollowUserRequest
+	(*StandardResponse)(nil),    // 8: chap.common.v1.StandardResponse
 }
 var file_user_proto_depIdxs = []int32{
 	0, // 0: chap.user.v1.GetUserByIDResponse.user:type_name -> chap.user.v1.User
@@ -570,6 +569,7 @@ func file_user_proto_init() {
 	if File_user_proto != nil {
 		return
 	}
+	file_common_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
