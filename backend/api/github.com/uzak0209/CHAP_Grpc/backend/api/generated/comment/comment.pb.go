@@ -7,7 +7,7 @@
 package comment
 
 import (
-	common "backend/api/generated/common"
+	common "github.com/uzak0209/CHAP_Grpc/backend/api/generated/common"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -466,7 +466,7 @@ const file_comment_proto_rawDesc = "" +
 	"\x0eCommentService\x12v\n" +
 	"\x15GetCommentsByThreadID\x12-.chap.comment.v1.GetCommentsByThreadIDRequest\x1a..chap.comment.v1.GetCommentsByThreadIDResponse\x12X\n" +
 	"\rCreateComment\x12%.chap.comment.v1.CreateCommentRequest\x1a .chap.common.v1.StandardResponse\x12X\n" +
-	"\rDeleteComment\x12%.chap.comment.v1.DeleteCommentRequest\x1a .chap.common.v1.StandardResponseB\x1fZ\x1dbackend/api/generated/commentb\x06proto3"
+	"\rDeleteComment\x12%.chap.comment.v1.DeleteCommentRequest\x1a .chap.common.v1.StandardResponseB=Z;github.com/uzak0209/CHAP_Grpc/backend/api/generated/commentb\x06proto3"
 
 var (
 	file_comment_proto_rawDescOnce sync.Once

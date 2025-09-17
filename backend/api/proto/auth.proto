@@ -1,6 +1,6 @@
 syntax = "proto3";
 package chap.auth.v1;
-option go_package = "/backend/api/generated/auth";
+option go_package = "github.com/uzak0209/CHAP_Grpc/backend/api/generated/auth";
 service AuthService {
   // 認証操作
   rpc SignUp(SignUpRequest) returns (SignInResponse);

@@ -7,8 +7,8 @@
 package thread
 
 import (
-	comment "backend/api/generated/comment"
-	common "backend/api/generated/common"
+	comment "github.com/uzak0209/CHAP_Grpc/backend/api/generated/comment"
+	common "github.com/uzak0209/CHAP_Grpc/backend/api/generated/common"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -579,7 +579,7 @@ const file_thread_proto_rawDesc = "" +
 	"\fCreateThread\x12#.chap.thread.v1.CreateThreadRequest\x1a .chap.common.v1.StandardResponse\x12Q\n" +
 	"\n" +
 	"EditThread\x12!.chap.thread.v1.EditThreadRequest\x1a .chap.common.v1.StandardResponse\x12U\n" +
-	"\fDeleteThread\x12#.chap.thread.v1.DeleteThreadRequest\x1a .chap.common.v1.StandardResponseB\x1eZ\x1cbackend/api/generated/threadb\x06proto3"
+	"\fDeleteThread\x12#.chap.thread.v1.DeleteThreadRequest\x1a .chap.common.v1.StandardResponseB<Z:github.com/uzak0209/CHAP_Grpc/backend/api/generated/threadb\x06proto3"
 
 var (
 	file_thread_proto_rawDescOnce sync.Once

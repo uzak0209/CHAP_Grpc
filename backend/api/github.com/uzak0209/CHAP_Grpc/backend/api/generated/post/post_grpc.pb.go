@@ -7,8 +7,8 @@
 package post
 
 import (
-	common "backend/api/generated/common"
 	context "context"
+	common "github.com/uzak0209/CHAP_Grpc/backend/api/generated/common"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"

@@ -1,6 +1,6 @@
 syntax = "proto3";
 package chap.post.v1;
-option go_package = "backend/api/generated/post";
+option go_package = "github.com/uzak0209/CHAP_Grpc/backend/api/generated/post";
 import "common.proto";
 service PostService {
   // 投稿操作

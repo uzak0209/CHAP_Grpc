@@ -7,7 +7,7 @@
 package post
 
 import (
-	common "backend/api/generated/common"
+	common "github.com/uzak0209/CHAP_Grpc/backend/api/generated/common"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -459,7 +459,7 @@ const file_post_proto_rawDesc = "" +
 	"\n" +
 	"CreatePost\x12\x1f.chap.post.v1.CreatePostRequest\x1a .chap.common.v1.StandardResponse\x12O\n" +
 	"\n" +
-	"DeletePost\x12\x1f.chap.post.v1.DeletePostRequest\x1a .chap.common.v1.StandardResponseB\x1cZ\x1abackend/api/generated/postb\x06proto3"
+	"DeletePost\x12\x1f.chap.post.v1.DeletePostRequest\x1a .chap.common.v1.StandardResponseB:Z8github.com/uzak0209/CHAP_Grpc/backend/api/generated/postb\x06proto3"
 
 var (
 	file_post_proto_rawDescOnce sync.Once

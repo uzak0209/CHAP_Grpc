@@ -7,7 +7,7 @@
 package user
 
 import (
-	common "backend/api/generated/common"
+	common "github.com/uzak0209/CHAP_Grpc/backend/api/generated/common"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -518,7 +518,7 @@ const file_user_proto_rawDesc = "" +
 	"DeleteUser\x12\x1f.chap.user.v1.DeleteUserRequest\x1a .chap.common.v1.StandardResponse\x12O\n" +
 	"\n" +
 	"FollowUser\x12\x1f.chap.user.v1.FollowUserRequest\x1a .chap.common.v1.StandardResponse\x12S\n" +
-	"\fUnfollowUser\x12!.chap.user.v1.UnfollowUserRequest\x1a .chap.common.v1.StandardResponseB\x1cZ\x1abackend/api/generated/userb\x06proto3"
+	"\fUnfollowUser\x12!.chap.user.v1.UnfollowUserRequest\x1a .chap.common.v1.StandardResponseB:Z8github.com/uzak0209/CHAP_Grpc/backend/api/generated/userb\x06proto3"
 
 var (
 	file_user_proto_rawDescOnce sync.Once

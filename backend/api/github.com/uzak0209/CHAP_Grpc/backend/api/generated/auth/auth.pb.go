@@ -203,7 +203,7 @@ const file_auth_proto_rawDesc = "" +
 	"\x05token\x18\x03 \x01(\tR\x05token2\x97\x01\n" +
 	"\vAuthService\x12C\n" +
 	"\x06SignUp\x12\x1b.chap.auth.v1.SignUpRequest\x1a\x1c.chap.auth.v1.SignInResponse\x12C\n" +
-	"\x06SignIn\x12\x1b.chap.auth.v1.SignInRequest\x1a\x1c.chap.auth.v1.SignInResponseB\x1dZ\x1b/backend/api/generated/authb\x06proto3"
+	"\x06SignIn\x12\x1b.chap.auth.v1.SignInRequest\x1a\x1c.chap.auth.v1.SignInResponseB:Z8github.com/uzak0209/CHAP_Grpc/backend/api/generated/authb\x06proto3"
 
 var (
 	file_auth_proto_rawDescOnce sync.Once

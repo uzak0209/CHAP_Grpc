@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package chap.comment.v1;
 
-option go_package = "backend/api/generated/comment";
+option go_package = "github.com/uzak0209/CHAP_Grpc/backend/api/generated/comment";
 
 import "common.proto";
 service CommentService {

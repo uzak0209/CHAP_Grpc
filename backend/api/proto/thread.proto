@@ -1,6 +1,6 @@
 syntax = "proto3";
 package chap.thread.v1;
-option go_package = "backend/api/generated/thread";
+option go_package = "github.com/uzak0209/CHAP_Grpc/backend/api/generated/thread";
 import "common.proto";
 import "comment.proto";
 service ThreadService {
