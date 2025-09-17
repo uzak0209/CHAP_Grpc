@@ -1,0 +1,45 @@
+syntax = "proto3";
+package chap.post.v1;
+option go_package = "backend/api/generated/post";
+import "common.proto";
+service PostService {
+  // 投稿操作
+  rpc GetPosts(GetPostsByUserIDRequest) returns (GetPostsByUserIDResponse);
+  rpc EditPost(EditPostRequest) returns (chap.common.v1.StandardResponse);
+  rpc CreatePost(CreatePostRequest) returns (chap.common.v1.StandardResponse);
+  rpc DeletePost(DeletePostRequest) returns (chap.common.v1.StandardResponse);
+}
+message Post{
+    string id =1;
+    string user_name =2;
+    string user_id =3;
+    string user_image =4;
+    string content =5;
+    string image=6;
+    int32 like_count =7;
+    string created_at =8;
+    string updated_at =9;
+    double lat =10;
+    double lng =11;
+    repeated string likes=12;
+}
+message GetPostsByUserIDRequest {
+  string user_id = 1;
+}
+message GetPostsByUserIDResponse {
+  repeated Post posts = 1;
+}
+message CreatePostRequest{
+    string content =1;
+    string image=2;
+    double lat =3;
+    double lng =4;
+}
+message EditPostRequest {
+  string post_id = 1;
+  string content = 2;
+  string image=3;
+}
+message DeletePostRequest {
+  string post_id = 1;
+}

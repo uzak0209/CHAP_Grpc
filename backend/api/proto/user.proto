@@ -1,0 +1,49 @@
+syntax = "proto3";
+package chap.user.v1;
+option go_package = "backend/api/generated/user";
+import "common.proto";
+service UserService {
+  // ユーザー操作
+  rpc GetUserByID(GetUserByIDRequest) returns (GetUserByIDResponse);
+  rpc CreateUser(CreateUserRequest) returns (chap.common.v1.StandardResponse);
+  rpc EditUser(EditUserRequest) returns (chap.common.v1.StandardResponse);
+  rpc DeleteUser(DeleteUserRequest) returns (chap.common.v1.StandardResponse);
+  rpc FollowUser(FollowUserRequest) returns (chap.common.v1.StandardResponse);
+  rpc UnfollowUser(UnfollowUserRequest) returns (chap.common.v1.StandardResponse);
+}
+message User{
+    string id =1;
+    string name =2;
+    string details =3;
+    string image =4;
+    string created_at =6;
+    string updated_at =7;
+    int32 follower_count =8;
+    int32 following_count =9;
+    repeated string followers=10;
+    repeated string followings=11;
+}
+message GetUserByIDRequest {
+  string user_id = 1;
+}
+message GetUserByIDResponse {
+  User user = 1;
+}
+message CreateUserRequest{
+    string name =1;
+    string image =2;
+}
+message EditUserRequest {
+  string user_id = 1;
+  string name = 2;
+  string details = 3;
+  string image = 4;
+}
+message DeleteUserRequest {
+}
+message FollowUserRequest {
+  string target_user_id = 2;
+}
+message UnfollowUserRequest {
+  string target_user_id = 2;
+}
