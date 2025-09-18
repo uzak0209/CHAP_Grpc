@@ -1,0 +1,156 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, master, dev ]
+  pull_request:
+    branches: [ main, master, dev ]
+
+env:
+  GO_VERSION: "1.21"
+  POSTGRES_VERSION: "15"
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: testpassword
+          POSTGRES_USER: testuser
+          POSTGRES_DB: chap_grpc_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5433:5432
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: ${{ env.GO_VERSION }}
+
+    - name: Cache Go modules
+      uses: actions/cache@v3
+      with:
+        path: ~/go/pkg/mod
+        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-
+
+    - name: Install dependencies
+      run: |
+        cd backend
+        go mod download
+        go mod tidy
+
+    - name: Install protobuf compiler
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y protobuf-compiler
+        go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+        go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+
+    - name: Generate protobuf code
+      run: |
+        cd backend/api
+        protoc --proto_path=proto --go_out=paths=source_relative:pd --go-grpc_out=paths=source_relative:pd proto/*.proto
+
+    - name: Run tests
+      env:
+        DB_DSN: "postgresql://testuser:testpassword@localhost:5433/chap_grpc_test?sslmode=disable"
+        JWT_SECRET: "test-jwt-secret-for-ci"
+      run: |
+        cd backend
+        go test -v ./...
+
+    - name: Run integration tests
+      env:
+        DB_DSN: "postgresql://testuser:testpassword@localhost:5433/chap_grpc_test?sslmode=disable"
+        JWT_SECRET: "test-jwt-secret-for-ci"
+      run: |
+        cd backend
+        # Start server in background
+        go run main.go &
+        SERVER_PID=$!
+        
+        # Wait for server to start
+        sleep 10
+        
+        # Install grpcurl for testing
+        curl -sSL "https://github.com/fullstorydev/grpcurl/releases/download/v1.8.9/grpcurl_1.8.9_linux_x86_64.tar.gz" | tar -xz -C /tmp
+        sudo mv /tmp/grpcurl /usr/local/bin/
+        
+        # Test server is running
+        grpcurl -plaintext localhost:50051 list || exit 1
+        
+        # Test user registration
+        grpcurl -plaintext -d '{"email": "ci-test@example.com", "password": "testpass123"}' localhost:50051 chap.auth.v1.AuthService/SignUp || exit 1
+        
+        # Clean up
+        kill $SERVER_PID
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    needs: test
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: ${{ env.GO_VERSION }}
+
+    - name: Install protobuf compiler
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y protobuf-compiler
+        go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+        go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+
+    - name: Generate protobuf code
+      run: |
+        cd backend/api
+        protoc --proto_path=proto --go_out=paths=source_relative:pd --go-grpc_out=paths=source_relative:pd proto/*.proto
+
+    - name: Build application
+      run: |
+        cd backend
+        go build -v -o ../bin/chap-grpc-server ./main.go
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: chap-grpc-server
+        path: bin/chap-grpc-server
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: ${{ env.GO_VERSION }}
+
+    - name: Run golangci-lint
+      uses: golangci/golangci-lint-action@v3
+      with:
+        version: latest
+        working-directory: backend

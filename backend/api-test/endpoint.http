@@ -1,0 +1,225 @@
+### CHAP gRPC API Test Endpoints
+### gRPC Server: localhost:50051
+### Make sure the server is running: go run main.go
+
+###############################################################################
+### 1. Health Check - List Available Services
+###############################################################################
+
+# @name healthCheck
+grpcurl -plaintext localhost:50051 list
+
+###############################################################################
+### 2. Auth Service - User Registration
+###############################################################################
+
+# @name userSignUp
+grpcurl -plaintext -d '{
+  "email": "testuser@example.com", 
+  "password": "testpassword123"
+}' localhost:50051 chap.auth.v1.AuthService/SignUp
+
+###############################################################################
+### 3. Auth Service - User Login (Get JWT Token)
+###############################################################################
+
+# @name userLogin
+grpcurl -plaintext -d '{
+  "email": "testuser@example.com", 
+  "password": "testpassword123"
+}' localhost:50051 chap.auth.v1.AuthService/SignIn
+
+# Expected Response:
+# {
+#   "success": true,
+#   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+# }
+# Copy the token for use in authenticated requests
+
+###############################################################################
+### 4. User Service - Create User Profile (JWT Required via Metadata)
+###############################################################################
+
+# @name createUserProfile
+# Replace YOUR_JWT_TOKEN with actual token from login response
+# Note: gRPC uses metadata headers for authentication, not HTTP cookies
+grpcurl -plaintext \
+  -H "authorization: Bearer YOUR_JWT_TOKEN" \
+  -d '{
+    "name": "Test User",
+    "description": "This is a test user profile",
+    "image": "https://example.com/avatar.jpg"
+  }' localhost:50051 chap.user.v1.UserService/CreateUser
+
+###############################################################################
+### How to use JWT with gRPC (NOT cookies!)
+###############################################################################
+
+# gRPC doesn't support HTTP cookies. Instead, use metadata headers:
+# 1. Get JWT token from SignIn/SignUp response
+# 2. Include it in subsequent requests using -H "authorization: Bearer TOKEN"
+# 3. Server extracts token from metadata and validates it
+
+# Example with actual token:
+# grpcurl -plaintext \
+#   -H "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiMTIzIiwiZXhwIjoxNjM5NTMyNDAwfQ.xxx" \
+#   -d '{"name": "Test User"}' \
+#   localhost:50051 chap.user.v1.UserService/CreateUser
+
+###############################################################################
+### 5. User Service - Get User by ID
+###############################################################################
+
+# @name getUserByID
+# Replace USER_ID with actual user ID from previous responses
+grpcurl -plaintext \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -d '{
+    "userId": "USER_ID"
+  }' localhost:50051 chap.user.v1.UserService/GetUserByID
+
+###############################################################################
+### 6. User Service - Update User Profile
+###############################################################################
+
+# @name updateUserProfile
+grpcurl -plaintext \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -d '{
+    "userId": "USER_ID",
+    "name": "Updated Test User",
+    "description": "Updated description",
+    "image": "https://example.com/new-avatar.jpg"
+  }' localhost:50051 chap.user.v1.UserService/UpdateUser
+
+###############################################################################
+### 7. Post Service - Create Post
+###############################################################################
+
+# @name createPost
+grpcurl -plaintext \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -d '{
+    "title": "My First Post",
+    "content": "This is the content of my first post",
+    "userId": "USER_ID"
+  }' localhost:50051 chap.post.v1.PostService/CreatePost
+
+###############################################################################
+### 8. Comment Service - Create Comment
+###############################################################################
+
+# @name createComment
+grpcurl -plaintext \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -d '{
+    "postId": "POST_ID",
+    "userId": "USER_ID",
+    "content": "This is a test comment"
+  }' localhost:50051 chap.comment.v1.CommentService/CreateComment
+
+###############################################################################
+### 9. Thread Service - Create Thread
+###############################################################################
+
+# @name createThread
+grpcurl -plaintext \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -d '{
+    "title": "Discussion Thread",
+    "content": "Let\'s discuss this topic",
+    "userId": "USER_ID"
+  }' localhost:50051 chap.thread.v1.ThreadService/CreateThread
+
+###############################################################################
+### 10. User Service - Delete User (Cleanup)
+###############################################################################
+
+# @name deleteUser
+grpcurl -plaintext \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -d '{
+    "userId": "USER_ID"
+  }' localhost:50051 chap.user.v1.UserService/DeleteUser
+
+###############################################################################
+### Additional Test Users for Complex Scenarios
+###############################################################################
+
+### Register Second Test User
+# @name userSignUp2
+grpcurl -plaintext -d '{
+  "email": "testuser2@example.com", 
+  "password": "testpassword456"
+}' localhost:50051 chap.auth.v1.AuthService/SignUp
+
+### Login Second Test User
+# @name userLogin2
+grpcurl -plaintext -d '{
+  "email": "testuser2@example.com", 
+  "password": "testpassword456"
+}' localhost:50051 chap.auth.v1.AuthService/SignIn
+
+###############################################################################
+### Service Descriptions (for reference)
+###############################################################################
+
+### Get Auth Service Description
+grpcurl -plaintext localhost:50051 describe chap.auth.v1.AuthService
+
+### Get User Service Description  
+grpcurl -plaintext localhost:50051 describe chap.user.v1.UserService
+
+### Get Post Service Description
+grpcurl -plaintext localhost:50051 describe chap.post.v1.PostService
+
+### Get Comment Service Description
+grpcurl -plaintext localhost:50051 describe chap.comment.v1.CommentService
+
+### Get Thread Service Description
+grpcurl -plaintext localhost:50051 describe chap.thread.v1.ThreadService
+
+###############################################################################
+### Message Structure Descriptions
+###############################################################################
+
+### SignUp Request Structure
+grpcurl -plaintext localhost:50051 describe chap.auth.v1.SignUpRequest
+
+### SignIn Request Structure  
+grpcurl -plaintext localhost:50051 describe chap.auth.v1.SignInRequest
+
+### SignIn Response Structure
+grpcurl -plaintext localhost:50051 describe chap.auth.v1.SignInResponse
+
+###############################################################################
+### Quick Test Script
+###############################################################################
+
+# Run this sequence to test the full flow:
+# 1. Start server: go run main.go
+# 2. Register user: grpcurl -plaintext -d '{"email": "quicktest@example.com", "password": "test123"}' localhost:50051 chap.auth.v1.AuthService/SignUp
+# 3. Login: grpcurl -plaintext -d '{"email": "quicktest@example.com", "password": "test123"}' localhost:50051 chap.auth.v1.AuthService/SignIn
+# 4. Copy JWT token from response
+# 5. Use token in subsequent authenticated requests
+
+###############################################################################
+### Error Testing
+###############################################################################
+
+### Test Invalid Login
+grpcurl -plaintext -d '{
+  "email": "invalid@example.com", 
+  "password": "wrongpassword"
+}' localhost:50051 chap.auth.v1.AuthService/SignIn
+
+### Test Duplicate Registration
+grpcurl -plaintext -d '{
+  "email": "testuser@example.com", 
+  "password": "testpassword123"
+}' localhost:50051 chap.auth.v1.AuthService/SignUp
+
+### Test Missing Fields
+grpcurl -plaintext -d '{
+  "email": ""
+}' localhost:50051 chap.auth.v1.AuthService/SignUp

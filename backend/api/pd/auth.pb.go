@@ -7,11 +7,12 @@
 package pd
 
 import (
-	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
-	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
+
+	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
+	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 )
 
 const (
@@ -133,7 +134,7 @@ func (x *SignInRequest) GetPassword() string {
 	return ""
 }
 
-type SignInResponse struct {
+type AuthResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
 	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
@@ -142,20 +143,20 @@ type SignInResponse struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *SignInResponse) Reset() {
-	*x = SignInResponse{}
+func (x *AuthResponse) Reset() {
+	*x = AuthResponse{}
 	mi := &file_auth_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *SignInResponse) String() string {
+func (x *AuthResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*SignInResponse) ProtoMessage() {}
+func (*AuthResponse) ProtoMessage() {}
 
-func (x *SignInResponse) ProtoReflect() protoreflect.Message {
+func (x *AuthResponse) ProtoReflect() protoreflect.Message {
 	mi := &file_auth_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -168,25 +169,25 @@ func (x *SignInResponse) ProtoReflect() protoreflect.Message {
 }
 
 // Deprecated: Use SignInResponse.ProtoReflect.Descriptor instead.
-func (*SignInResponse) Descriptor() ([]byte, []int) {
+func (*AuthResponse) Descriptor() ([]byte, []int) {
 	return file_auth_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *SignInResponse) GetSuccess() bool {
+func (x *AuthResponse) GetSuccess() bool {
 	if x != nil {
 		return x.Success
 	}
 	return false
 }
 
-func (x *SignInResponse) GetMessage() string {
+func (x *AuthResponse) GetMessage() string {
 	if x != nil {
 		return x.Message
 	}
 	return ""
 }
 
-func (x *SignInResponse) GetToken() string {
+func (x *AuthResponse) GetToken() string {
 	if x != nil {
 		return x.Token
 	}
@@ -228,9 +229,9 @@ func file_auth_proto_rawDescGZIP() []byte {
 
 var file_auth_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
 var file_auth_proto_goTypes = []any{
-	(*SignUpRequest)(nil),  // 0: chap.auth.v1.SignUpRequest
-	(*SignInRequest)(nil),  // 1: chap.auth.v1.SignInRequest
-	(*SignInResponse)(nil), // 2: chap.auth.v1.SignInResponse
+	(*SignUpRequest)(nil), // 0: chap.auth.v1.SignUpRequest
+	(*SignInRequest)(nil), // 1: chap.auth.v1.SignInRequest
+	(*AuthResponse)(nil),  // 2: chap.auth.v1.SignInResponse
 }
 var file_auth_proto_depIdxs = []int32{
 	0, // 0: chap.auth.v1.AuthService.SignUp:input_type -> chap.auth.v1.SignUpRequest

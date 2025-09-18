@@ -4,6 +4,7 @@ import (
 	pd "CHAP_Grpc/backend/api/pd"
 	"CHAP_Grpc/backend/infra/model"
 	"CHAP_Grpc/backend/infra/repository"
+	"CHAP_Grpc/backend/utils"
 	context "context"
 	"log"
 
@@ -25,26 +26,36 @@ func NewAuthServer() *AuthServer {
 }
 
 // 例: Loginメソッドの実装
-func (s *AuthServer) Login(ctx context.Context, req *pd.SignInRequest) (*pd.SignInResponse, error) {
+func (s *AuthServer) Login(ctx context.Context, req *pd.SignInRequest) (*pd.AuthResponse, error) {
 	log.Println("Login called")
 
 	// リポジトリからユーザー情報を取得
 	auth, err := s.authRepo.GetAuthByEmail(req.Email)
 	if err != nil {
 		log.Printf("Login error: %v", err)
-		return &pd.SignInResponse{Success: false}, nil
+		return &pd.AuthResponse{Success: false}, nil
 	}
 
 	// パスワード検証（実際はハッシュ化されたパスワードとの比較）
 	if auth.Password != req.Password {
 		log.Println("Invalid password")
-		return &pd.SignInResponse{Success: false}, nil
+		return &pd.AuthResponse{Success: false}, nil
 	}
 
-	return &pd.SignInResponse{Success: true}, nil
+	// JWT トークンを生成
+	token, err := utils.GenerateJWT(auth.UserID.String())
+	if err != nil {
+		log.Printf("JWT generation error: %v", err)
+		return &pd.AuthResponse{Success: false}, nil
+	}
+
+	return &pd.AuthResponse{
+		Success: true,
+		Token:   token,
+	}, nil
 }
 
-func (s *AuthServer) SignUp(ctx context.Context, req *pd.SignUpRequest) (*pd.SignInResponse, error) {
+func (s *AuthServer) SignUp(ctx context.Context, req *pd.SignUpRequest) (*pd.AuthResponse, error) {
 	log.Println("SignUp called")
 
 	// まず新しいユーザーを作成
@@ -56,7 +67,7 @@ func (s *AuthServer) SignUp(ctx context.Context, req *pd.SignUpRequest) (*pd.Sig
 
 	if err := s.userRepo.Create(ctx, user); err != nil {
 		log.Printf("SignUp - CreateUser error: %v", err)
-		return &pd.SignInResponse{Success: false}, nil
+		return &pd.AuthResponse{Success: false}, nil
 	}
 
 	// 次に認証情報を作成
@@ -69,8 +80,18 @@ func (s *AuthServer) SignUp(ctx context.Context, req *pd.SignUpRequest) (*pd.Sig
 
 	if err := s.authRepo.CreateAuth(auth); err != nil {
 		log.Printf("SignUp - CreateAuth error: %v", err)
-		return &pd.SignInResponse{Success: false}, nil
+		return &pd.AuthResponse{Success: false}, nil
 	}
 
-	return &pd.SignInResponse{Success: true}, nil
+	// JWT トークンを生成
+	token, err := utils.GenerateJWT(user.ID.String())
+	if err != nil {
+		log.Printf("JWT generation error: %v", err)
+		return &pd.AuthResponse{Success: false}, nil
+	}
+
+	return &pd.AuthResponse{
+		Success: true,
+		Token:   token,
+	}, nil
 }

@@ -5,6 +5,7 @@ import (
 	"net"
 
 	"CHAP_Grpc/backend/api/pd"
+	"CHAP_Grpc/backend/middleware"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
@@ -45,7 +46,10 @@ func StartServer() error {
 		return err
 	}
 
-	grpcServer := grpc.NewServer()
+	// 認証ミドルウェアを追加
+	grpcServer := grpc.NewServer(
+		grpc.UnaryInterceptor(middleware.AuthInterceptor),
+	)
 	RegisterAllServices(grpcServer)
 
 	// リフレクションを有効にする

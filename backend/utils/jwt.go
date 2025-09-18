@@ -11,12 +11,26 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
+const (
+	ONEWEEK = 168 // 7 days * 24 hours
+)
+
 type Claims struct {
 	UserID string `json:"user_id"`
 	jwt.RegisteredClaims
 }
 
-var jwtSecret = os.Getenv("JWT_SECRET") // 実際は環境変数から取得
+// getJWTSecret は環境変数からJWTシークレットを取得し、[]byteで返す
+func getJWTSecret() []byte {
+	secret := os.Getenv("JWT_SECRET")
+	if secret == "" {
+		// デフォルト値（本番環境では必ず環境変数を設定すること）
+		secret = "default-jwt-secret-change-in-production"
+	}
+	return []byte(secret)
+}
+
+var jwtSecret = getJWTSecret()
 
 func ExtractUserIDFromContext(ctx context.Context) (string, error) {
 	md, ok := metadata.FromIncomingContext(ctx)
@@ -53,7 +67,7 @@ func GenerateJWT(userID string) (string, error) {
 	claims := Claims{
 		UserID: userID,
 		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(ONEWEEK * time.Hour)),
 		},
 	}
 
