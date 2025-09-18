@@ -2,7 +2,7 @@ package model
 
 import "github.com/google/uuid"
 
-type PostLike struct {
+type PostLikeDBModel struct {
 	ID     uuid.UUID   `gorm:"primaryKey;type:varchar(36)"`
 	PostID uuid.UUID   `gorm:"type:varchar(36);index;not null"`
 	Post   PostDBModel `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`

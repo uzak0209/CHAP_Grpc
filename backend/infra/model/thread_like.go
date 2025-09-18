@@ -2,7 +2,7 @@ package model
 
 import "github.com/google/uuid"
 
-type ThreadLike struct {
+type ThreadLikeDBModel struct {
 	ID       uuid.UUID     `gorm:"primaryKey;type:varchar(36)"`
 	ThreadID uuid.UUID     `gorm:"type:varchar(36);index;not null"`
 	Thread   ThreadDBModel `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`

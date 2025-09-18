@@ -25,7 +25,7 @@ type User struct {
 	state          protoimpl.MessageState `protogen:"open.v1"`
 	Id             string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	Name           string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Details        string                 `protobuf:"bytes,3,opt,name=details,proto3" json:"details,omitempty"`
+	Description    string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
 	Image          string                 `protobuf:"bytes,4,opt,name=image,proto3" json:"image,omitempty"`
 	CreatedAt      string                 `protobuf:"bytes,6,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	UpdatedAt      string                 `protobuf:"bytes,7,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
@@ -81,9 +81,9 @@ func (x *User) GetName() string {
 	return ""
 }
 
-func (x *User) GetDetails() string {
+func (x *User) GetDescription() string {
 	if x != nil {
-		return x.Details
+		return x.Description
 	}
 	return ""
 }
@@ -229,6 +229,7 @@ type CreateUserRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	Image         string                 `protobuf:"bytes,2,opt,name=image,proto3" json:"image,omitempty"`
+	Description   string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -277,11 +278,18 @@ func (x *CreateUserRequest) GetImage() string {
 	return ""
 }
 
+func (x *CreateUserRequest) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
 type EditUserRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
 	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Details       string                 `protobuf:"bytes,3,opt,name=details,proto3" json:"details,omitempty"`
+	Description   string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
 	Image         string                 `protobuf:"bytes,4,opt,name=image,proto3" json:"image,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -331,9 +339,9 @@ func (x *EditUserRequest) GetName() string {
 	return ""
 }
 
-func (x *EditUserRequest) GetDetails() string {
+func (x *EditUserRequest) GetDescription() string {
 	if x != nil {
-		return x.Details
+		return x.Description
 	}
 	return ""
 }
@@ -474,11 +482,11 @@ var File_user_proto protoreflect.FileDescriptor
 const file_user_proto_rawDesc = "" +
 	"\n" +
 	"\n" +
-	"user.proto\x12\fchap.user.v1\x1a\fcommon.proto\"\xa6\x02\n" +
+	"user.proto\x12\fchap.user.v1\x1a\fcommon.proto\"\xae\x02\n" +
 	"\x04User\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
-	"\x04name\x18\x02 \x01(\tR\x04name\x12\x18\n" +
-	"\adetails\x18\x03 \x01(\tR\adetails\x12\x14\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12 \n" +
+	"\vdescription\x18\x03 \x01(\tR\vdescription\x12\x14\n" +
 	"\x05image\x18\x04 \x01(\tR\x05image\x12\x1d\n" +
 	"\n" +
 	"created_at\x18\x06 \x01(\tR\tcreatedAt\x12\x1d\n" +
@@ -494,14 +502,15 @@ const file_user_proto_rawDesc = "" +
 	"\x12GetUserByIDRequest\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\"=\n" +
 	"\x13GetUserByIDResponse\x12&\n" +
-	"\x04user\x18\x01 \x01(\v2\x12.chap.user.v1.UserR\x04user\"=\n" +
+	"\x04user\x18\x01 \x01(\v2\x12.chap.user.v1.UserR\x04user\"_\n" +
 	"\x11CreateUserRequest\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12\x14\n" +
-	"\x05image\x18\x02 \x01(\tR\x05image\"n\n" +
+	"\x05image\x18\x02 \x01(\tR\x05image\x12 \n" +
+	"\vdescription\x18\x03 \x01(\tR\vdescription\"v\n" +
 	"\x0fEditUserRequest\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x12\n" +
-	"\x04name\x18\x02 \x01(\tR\x04name\x12\x18\n" +
-	"\adetails\x18\x03 \x01(\tR\adetails\x12\x14\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12 \n" +
+	"\vdescription\x18\x03 \x01(\tR\vdescription\x12\x14\n" +
 	"\x05image\x18\x04 \x01(\tR\x05image\"\x13\n" +
 	"\x11DeleteUserRequest\"9\n" +
 	"\x11FollowUserRequest\x12$\n" +

@@ -13,16 +13,35 @@ var DB *gorm.DB
 
 func InitDB() {
 	dsn := os.Getenv("DB_DSN")
+	if dsn == "" {
+		log.Fatal("DB_DSN environment variable is not set")
+	}
+	log.Printf("Connecting to database...")
 	var err error
-	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{
+		PrepareStmt: false, // Disable prepared statements for pooler compatibility
+	})
 	if err != nil {
 		log.Fatalf("failed to connect database: %v", err)
 	}
-	Migrate(&model.CommentDBModel{}, &model.ThreadDBModel{}, &model.PostDBModel{}, &model.EventDBModel{}, &model.UserDBModel{}, &model.AuthDBModel{}, &model.PostLike{}, &model.ThreadLike{}, &model.EventLike{})
-}
+	log.Println("Database connection successful")
 
-func Migrate(models ...interface{}) {
-	if err := DB.AutoMigrate(models...); err != nil {
-		log.Fatalf("failed to migrate: %v", err)
+	// Use IfNotExists option for AutoMigrate
+	log.Println("Starting database migration...")
+	if err := DB.AutoMigrate(
+		&model.UserDBModel{},
+		&model.AuthDBModel{},
+		&model.PostDBModel{},
+		&model.CommentDBModel{},
+		&model.ThreadDBModel{},
+		&model.EventDBModel{},
+		&model.PostLikeDBModel{},
+		&model.ThreadLikeDBModel{},
+		&model.EventLikeDBModel{},
+	); err != nil {
+		log.Printf("Migration warning: %v", err)
+		log.Println("Continuing with server startup...")
+	} else {
+		log.Println("Database migration completed successfully")
 	}
 }

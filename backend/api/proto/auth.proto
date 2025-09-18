@@ -9,6 +9,7 @@ service AuthService {
 message SignUpRequest{
     string email =1;
     string password =2;
+    string name =3;
 }
 message SignInRequest{
     string email =1;

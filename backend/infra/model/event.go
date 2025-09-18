@@ -21,7 +21,7 @@ type EventDBModel struct {
 	CreatedAt time.Time      `gorm:"autoCreateTime"`
 	UpdatedAt time.Time      `gorm:"autoUpdateTime"`
 	DeletedAt gorm.DeletedAt `gorm:"index"`
-	EventDate time.Time      `gorm:"type:datetime;not null"`
+	EventDate time.Time      `gorm:"type:timestamp;not null"`
 	Title     string         `gorm:"type:varchar(255);not null"`
 	Valid     bool           `gorm:"default:true"`
 }

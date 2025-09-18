@@ -1,12 +1,17 @@
 package repository
 
 import (
+	"CHAP_Grpc/backend/api/pd"
 	"CHAP_Grpc/backend/infra/db"
 	"CHAP_Grpc/backend/infra/model"
 	"context"
 )
 
 type UserRepository struct{}
+
+func NewUserRepository() *UserRepository {
+	return &UserRepository{}
+}
 
 func (r *UserRepository) Create(ctx context.Context, user *model.UserDBModel) error {
 	return db.DB.WithContext(ctx).Create(user).Error
@@ -19,9 +24,28 @@ func (r *UserRepository) GetByID(ctx context.Context, id string) (*model.UserDBM
 }
 
 func (r *UserRepository) Update(ctx context.Context, user *model.UserDBModel) error {
-	return db.DB.WithContext(ctx).Save(user).Error
+	return db.DB.WithContext(ctx).Model(user).Select("name", "description", "image").Updates(user).Error
 }
 
 func (r *UserRepository) Delete(ctx context.Context, id string) error {
 	return db.DB.WithContext(ctx).Delete(&model.UserDBModel{}, "id = ?", id).Error
+}
+
+func (r *UserRepository) CalcFollowRelations(ctx context.Context, res *pd.GetUserByIDResponse) error {
+	var followers []model.UserFollowerDBModel
+	if err := db.DB.WithContext(ctx).Where("following_id = ?", res.User.Id).Find(&followers).Error; err != nil {
+		return err
+	}
+	for _, f := range followers {
+		res.User.Followers = append(res.User.Followers, f.FollowerID.String())
+	}
+
+	var followings []model.UserFollowingDBModel
+	if err := db.DB.WithContext(ctx).Where("follower_id = ?", res.User.Id).Find(&followings).Error; err != nil {
+		return err
+	}
+	for _, f := range followings {
+		res.User.Followings = append(res.User.Followings, f.FollowingID.String())
+	}
+	return nil
 }
