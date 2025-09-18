@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 
-	"CHAP_Grpc/backend/api/handler"
+	"CHAP_Grpc/backend/handler"
 )
 
 func main() {

@@ -14,7 +14,7 @@ type AuthServer struct {
 // 例: Loginメソッドの実装
 func (s *AuthServer) Login(ctx context.Context, req *pd.SignInRequest) (*pd.SignInResponse, error) {
 	log.Println("Login called")
-	// TODO: 実際の認証処理を実装
+
 	return &pd.SignInResponse{Success: true}, nil
 }
 
