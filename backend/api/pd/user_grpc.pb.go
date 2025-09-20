@@ -20,7 +20,6 @@ const _ = grpc.SupportPackageIsVersion9
 
 const (
 	UserService_GetUserByID_FullMethodName  = "/chap.user.v1.UserService/GetUserByID"
-	UserService_CreateUser_FullMethodName   = "/chap.user.v1.UserService/CreateUser"
 	UserService_EditUser_FullMethodName     = "/chap.user.v1.UserService/EditUser"
 	UserService_DeleteUser_FullMethodName   = "/chap.user.v1.UserService/DeleteUser"
 	UserService_FollowUser_FullMethodName   = "/chap.user.v1.UserService/FollowUser"
@@ -33,7 +32,6 @@ const (
 type UserServiceClient interface {
 	// ユーザー操作
 	GetUserByID(ctx context.Context, in *GetUserByIDRequest, opts ...grpc.CallOption) (*GetUserByIDResponse, error)
-	CreateUser(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*StandardResponse, error)
 	EditUser(ctx context.Context, in *EditUserRequest, opts ...grpc.CallOption) (*StandardResponse, error)
 	DeleteUser(ctx context.Context, in *DeleteUserRequest, opts ...grpc.CallOption) (*StandardResponse, error)
 	FollowUser(ctx context.Context, in *FollowUserRequest, opts ...grpc.CallOption) (*StandardResponse, error)
@@ -52,16 +50,6 @@ func (c *userServiceClient) GetUserByID(ctx context.Context, in *GetUserByIDRequ
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(GetUserByIDResponse)
 	err := c.cc.Invoke(ctx, UserService_GetUserByID_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *userServiceClient) CreateUser(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*StandardResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(StandardResponse)
-	err := c.cc.Invoke(ctx, UserService_CreateUser_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -114,7 +102,6 @@ func (c *userServiceClient) UnfollowUser(ctx context.Context, in *UnfollowUserRe
 type UserServiceServer interface {
 	// ユーザー操作
 	GetUserByID(context.Context, *GetUserByIDRequest) (*GetUserByIDResponse, error)
-	CreateUser(context.Context, *CreateUserRequest) (*StandardResponse, error)
 	EditUser(context.Context, *EditUserRequest) (*StandardResponse, error)
 	DeleteUser(context.Context, *DeleteUserRequest) (*StandardResponse, error)
 	FollowUser(context.Context, *FollowUserRequest) (*StandardResponse, error)
@@ -131,9 +118,6 @@ type UnimplementedUserServiceServer struct{}
 
 func (UnimplementedUserServiceServer) GetUserByID(context.Context, *GetUserByIDRequest) (*GetUserByIDResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUserByID not implemented")
-}
-func (UnimplementedUserServiceServer) CreateUser(context.Context, *CreateUserRequest) (*StandardResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CreateUser not implemented")
 }
 func (UnimplementedUserServiceServer) EditUser(context.Context, *EditUserRequest) (*StandardResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method EditUser not implemented")
@@ -182,24 +166,6 @@ func _UserService_GetUserByID_Handler(srv interface{}, ctx context.Context, dec 
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(UserServiceServer).GetUserByID(ctx, req.(*GetUserByIDRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _UserService_CreateUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CreateUserRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(UserServiceServer).CreateUser(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: UserService_CreateUser_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).CreateUser(ctx, req.(*CreateUserRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -286,10 +252,6 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetUserByID",
 			Handler:    _UserService_GetUserByID_Handler,
-		},
-		{
-			MethodName: "CreateUser",
-			Handler:    _UserService_CreateUser_Handler,
 		},
 		{
 			MethodName: "EditUser",

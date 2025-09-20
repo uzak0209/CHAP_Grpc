@@ -7,12 +7,11 @@
 package pd
 
 import (
+	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
+	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
-
-	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
-	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 )
 
 const (
@@ -168,7 +167,7 @@ func (x *AuthResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use SignInResponse.ProtoReflect.Descriptor instead.
+// Deprecated: Use AuthResponse.ProtoReflect.Descriptor instead.
 func (*AuthResponse) Descriptor() ([]byte, []int) {
 	return file_auth_proto_rawDescGZIP(), []int{2}
 }
@@ -206,14 +205,14 @@ const file_auth_proto_rawDesc = "" +
 	"\x04name\x18\x03 \x01(\tR\x04name\"A\n" +
 	"\rSignInRequest\x12\x14\n" +
 	"\x05email\x18\x01 \x01(\tR\x05email\x12\x1a\n" +
-	"\bpassword\x18\x02 \x01(\tR\bpassword\"Z\n" +
-	"\x0eSignInResponse\x12\x18\n" +
+	"\bpassword\x18\x02 \x01(\tR\bpassword\"X\n" +
+	"\fAuthResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12\x14\n" +
-	"\x05token\x18\x03 \x01(\tR\x05token2\x97\x01\n" +
-	"\vAuthService\x12C\n" +
-	"\x06SignUp\x12\x1b.chap.auth.v1.SignUpRequest\x1a\x1c.chap.auth.v1.SignInResponse\x12C\n" +
-	"\x06SignIn\x12\x1b.chap.auth.v1.SignInRequest\x1a\x1c.chap.auth.v1.SignInResponseB1Z/github.com/uzak0209/CHAP_Grpc/backend/api/pd;pdb\x06proto3"
+	"\x05token\x18\x03 \x01(\tR\x05token2\x93\x01\n" +
+	"\vAuthService\x12A\n" +
+	"\x06SignUp\x12\x1b.chap.auth.v1.SignUpRequest\x1a\x1a.chap.auth.v1.AuthResponse\x12A\n" +
+	"\x06SignIn\x12\x1b.chap.auth.v1.SignInRequest\x1a\x1a.chap.auth.v1.AuthResponseB1Z/github.com/uzak0209/CHAP_Grpc/backend/api/pd;pdb\x06proto3"
 
 var (
 	file_auth_proto_rawDescOnce sync.Once
@@ -231,13 +230,13 @@ var file_auth_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
 var file_auth_proto_goTypes = []any{
 	(*SignUpRequest)(nil), // 0: chap.auth.v1.SignUpRequest
 	(*SignInRequest)(nil), // 1: chap.auth.v1.SignInRequest
-	(*AuthResponse)(nil),  // 2: chap.auth.v1.SignInResponse
+	(*AuthResponse)(nil),  // 2: chap.auth.v1.AuthResponse
 }
 var file_auth_proto_depIdxs = []int32{
 	0, // 0: chap.auth.v1.AuthService.SignUp:input_type -> chap.auth.v1.SignUpRequest
 	1, // 1: chap.auth.v1.AuthService.SignIn:input_type -> chap.auth.v1.SignInRequest
-	2, // 2: chap.auth.v1.AuthService.SignUp:output_type -> chap.auth.v1.SignInResponse
-	2, // 3: chap.auth.v1.AuthService.SignIn:output_type -> chap.auth.v1.SignInResponse
+	2, // 2: chap.auth.v1.AuthService.SignUp:output_type -> chap.auth.v1.AuthResponse
+	2, // 3: chap.auth.v1.AuthService.SignIn:output_type -> chap.auth.v1.AuthResponse
 	2, // [2:4] is the sub-list for method output_type
 	0, // [0:2] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name

@@ -225,66 +225,6 @@ func (x *GetUserByIDResponse) GetUser() *User {
 	return nil
 }
 
-type CreateUserRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	Image         string                 `protobuf:"bytes,2,opt,name=image,proto3" json:"image,omitempty"`
-	Description   string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *CreateUserRequest) Reset() {
-	*x = CreateUserRequest{}
-	mi := &file_user_proto_msgTypes[3]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *CreateUserRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*CreateUserRequest) ProtoMessage() {}
-
-func (x *CreateUserRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[3]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use CreateUserRequest.ProtoReflect.Descriptor instead.
-func (*CreateUserRequest) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{3}
-}
-
-func (x *CreateUserRequest) GetName() string {
-	if x != nil {
-		return x.Name
-	}
-	return ""
-}
-
-func (x *CreateUserRequest) GetImage() string {
-	if x != nil {
-		return x.Image
-	}
-	return ""
-}
-
-func (x *CreateUserRequest) GetDescription() string {
-	if x != nil {
-		return x.Description
-	}
-	return ""
-}
-
 type EditUserRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
@@ -297,7 +237,7 @@ type EditUserRequest struct {
 
 func (x *EditUserRequest) Reset() {
 	*x = EditUserRequest{}
-	mi := &file_user_proto_msgTypes[4]
+	mi := &file_user_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -309,7 +249,7 @@ func (x *EditUserRequest) String() string {
 func (*EditUserRequest) ProtoMessage() {}
 
 func (x *EditUserRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[4]
+	mi := &file_user_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -322,7 +262,7 @@ func (x *EditUserRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use EditUserRequest.ProtoReflect.Descriptor instead.
 func (*EditUserRequest) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{4}
+	return file_user_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *EditUserRequest) GetUserId() string {
@@ -361,7 +301,7 @@ type DeleteUserRequest struct {
 
 func (x *DeleteUserRequest) Reset() {
 	*x = DeleteUserRequest{}
-	mi := &file_user_proto_msgTypes[5]
+	mi := &file_user_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -373,7 +313,7 @@ func (x *DeleteUserRequest) String() string {
 func (*DeleteUserRequest) ProtoMessage() {}
 
 func (x *DeleteUserRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[5]
+	mi := &file_user_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -386,7 +326,7 @@ func (x *DeleteUserRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteUserRequest.ProtoReflect.Descriptor instead.
 func (*DeleteUserRequest) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{5}
+	return file_user_proto_rawDescGZIP(), []int{4}
 }
 
 type FollowUserRequest struct {
@@ -398,7 +338,7 @@ type FollowUserRequest struct {
 
 func (x *FollowUserRequest) Reset() {
 	*x = FollowUserRequest{}
-	mi := &file_user_proto_msgTypes[6]
+	mi := &file_user_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -410,7 +350,7 @@ func (x *FollowUserRequest) String() string {
 func (*FollowUserRequest) ProtoMessage() {}
 
 func (x *FollowUserRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[6]
+	mi := &file_user_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -423,7 +363,7 @@ func (x *FollowUserRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FollowUserRequest.ProtoReflect.Descriptor instead.
 func (*FollowUserRequest) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{6}
+	return file_user_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *FollowUserRequest) GetTargetUserId() string {
@@ -442,7 +382,7 @@ type UnfollowUserRequest struct {
 
 func (x *UnfollowUserRequest) Reset() {
 	*x = UnfollowUserRequest{}
-	mi := &file_user_proto_msgTypes[7]
+	mi := &file_user_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -454,7 +394,7 @@ func (x *UnfollowUserRequest) String() string {
 func (*UnfollowUserRequest) ProtoMessage() {}
 
 func (x *UnfollowUserRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[7]
+	mi := &file_user_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -467,7 +407,7 @@ func (x *UnfollowUserRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UnfollowUserRequest.ProtoReflect.Descriptor instead.
 func (*UnfollowUserRequest) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{7}
+	return file_user_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *UnfollowUserRequest) GetTargetUserId() string {
@@ -502,11 +442,7 @@ const file_user_proto_rawDesc = "" +
 	"\x12GetUserByIDRequest\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\"=\n" +
 	"\x13GetUserByIDResponse\x12&\n" +
-	"\x04user\x18\x01 \x01(\v2\x12.chap.user.v1.UserR\x04user\"_\n" +
-	"\x11CreateUserRequest\x12\x12\n" +
-	"\x04name\x18\x01 \x01(\tR\x04name\x12\x14\n" +
-	"\x05image\x18\x02 \x01(\tR\x05image\x12 \n" +
-	"\vdescription\x18\x03 \x01(\tR\vdescription\"v\n" +
+	"\x04user\x18\x01 \x01(\v2\x12.chap.user.v1.UserR\x04user\"v\n" +
 	"\x0fEditUserRequest\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12 \n" +
@@ -516,11 +452,9 @@ const file_user_proto_rawDesc = "" +
 	"\x11FollowUserRequest\x12$\n" +
 	"\x0etarget_user_id\x18\x02 \x01(\tR\ftargetUserId\";\n" +
 	"\x13UnfollowUserRequest\x12$\n" +
-	"\x0etarget_user_id\x18\x02 \x01(\tR\ftargetUserId2\xf6\x03\n" +
+	"\x0etarget_user_id\x18\x02 \x01(\tR\ftargetUserId2\xa5\x03\n" +
 	"\vUserService\x12R\n" +
-	"\vGetUserByID\x12 .chap.user.v1.GetUserByIDRequest\x1a!.chap.user.v1.GetUserByIDResponse\x12O\n" +
-	"\n" +
-	"CreateUser\x12\x1f.chap.user.v1.CreateUserRequest\x1a .chap.common.v1.StandardResponse\x12K\n" +
+	"\vGetUserByID\x12 .chap.user.v1.GetUserByIDRequest\x1a!.chap.user.v1.GetUserByIDResponse\x12K\n" +
 	"\bEditUser\x12\x1d.chap.user.v1.EditUserRequest\x1a .chap.common.v1.StandardResponse\x12O\n" +
 	"\n" +
 	"DeleteUser\x12\x1f.chap.user.v1.DeleteUserRequest\x1a .chap.common.v1.StandardResponse\x12O\n" +
@@ -540,34 +474,31 @@ func file_user_proto_rawDescGZIP() []byte {
 	return file_user_proto_rawDescData
 }
 
-var file_user_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
+var file_user_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
 var file_user_proto_goTypes = []any{
 	(*User)(nil),                // 0: chap.user.v1.User
 	(*GetUserByIDRequest)(nil),  // 1: chap.user.v1.GetUserByIDRequest
 	(*GetUserByIDResponse)(nil), // 2: chap.user.v1.GetUserByIDResponse
-	(*CreateUserRequest)(nil),   // 3: chap.user.v1.CreateUserRequest
-	(*EditUserRequest)(nil),     // 4: chap.user.v1.EditUserRequest
-	(*DeleteUserRequest)(nil),   // 5: chap.user.v1.DeleteUserRequest
-	(*FollowUserRequest)(nil),   // 6: chap.user.v1.FollowUserRequest
-	(*UnfollowUserRequest)(nil), // 7: chap.user.v1.UnfollowUserRequest
-	(*StandardResponse)(nil),    // 8: chap.common.v1.StandardResponse
+	(*EditUserRequest)(nil),     // 3: chap.user.v1.EditUserRequest
+	(*DeleteUserRequest)(nil),   // 4: chap.user.v1.DeleteUserRequest
+	(*FollowUserRequest)(nil),   // 5: chap.user.v1.FollowUserRequest
+	(*UnfollowUserRequest)(nil), // 6: chap.user.v1.UnfollowUserRequest
+	(*StandardResponse)(nil),    // 7: chap.common.v1.StandardResponse
 }
 var file_user_proto_depIdxs = []int32{
 	0, // 0: chap.user.v1.GetUserByIDResponse.user:type_name -> chap.user.v1.User
 	1, // 1: chap.user.v1.UserService.GetUserByID:input_type -> chap.user.v1.GetUserByIDRequest
-	3, // 2: chap.user.v1.UserService.CreateUser:input_type -> chap.user.v1.CreateUserRequest
-	4, // 3: chap.user.v1.UserService.EditUser:input_type -> chap.user.v1.EditUserRequest
-	5, // 4: chap.user.v1.UserService.DeleteUser:input_type -> chap.user.v1.DeleteUserRequest
-	6, // 5: chap.user.v1.UserService.FollowUser:input_type -> chap.user.v1.FollowUserRequest
-	7, // 6: chap.user.v1.UserService.UnfollowUser:input_type -> chap.user.v1.UnfollowUserRequest
-	2, // 7: chap.user.v1.UserService.GetUserByID:output_type -> chap.user.v1.GetUserByIDResponse
-	8, // 8: chap.user.v1.UserService.CreateUser:output_type -> chap.common.v1.StandardResponse
-	8, // 9: chap.user.v1.UserService.EditUser:output_type -> chap.common.v1.StandardResponse
-	8, // 10: chap.user.v1.UserService.DeleteUser:output_type -> chap.common.v1.StandardResponse
-	8, // 11: chap.user.v1.UserService.FollowUser:output_type -> chap.common.v1.StandardResponse
-	8, // 12: chap.user.v1.UserService.UnfollowUser:output_type -> chap.common.v1.StandardResponse
-	7, // [7:13] is the sub-list for method output_type
-	1, // [1:7] is the sub-list for method input_type
+	3, // 2: chap.user.v1.UserService.EditUser:input_type -> chap.user.v1.EditUserRequest
+	4, // 3: chap.user.v1.UserService.DeleteUser:input_type -> chap.user.v1.DeleteUserRequest
+	5, // 4: chap.user.v1.UserService.FollowUser:input_type -> chap.user.v1.FollowUserRequest
+	6, // 5: chap.user.v1.UserService.UnfollowUser:input_type -> chap.user.v1.UnfollowUserRequest
+	2, // 6: chap.user.v1.UserService.GetUserByID:output_type -> chap.user.v1.GetUserByIDResponse
+	7, // 7: chap.user.v1.UserService.EditUser:output_type -> chap.common.v1.StandardResponse
+	7, // 8: chap.user.v1.UserService.DeleteUser:output_type -> chap.common.v1.StandardResponse
+	7, // 9: chap.user.v1.UserService.FollowUser:output_type -> chap.common.v1.StandardResponse
+	7, // 10: chap.user.v1.UserService.UnfollowUser:output_type -> chap.common.v1.StandardResponse
+	6, // [6:11] is the sub-list for method output_type
+	1, // [1:6] is the sub-list for method input_type
 	1, // [1:1] is the sub-list for extension type_name
 	1, // [1:1] is the sub-list for extension extendee
 	0, // [0:1] is the sub-list for field type_name
@@ -585,7 +516,7 @@ func file_user_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_user_proto_rawDesc), len(file_user_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   8,
+			NumMessages:   7,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

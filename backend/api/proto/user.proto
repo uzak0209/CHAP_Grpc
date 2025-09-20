@@ -5,7 +5,6 @@ import "common.proto";
 service UserService {
   // ユーザー操作
   rpc GetUserByID(GetUserByIDRequest) returns (GetUserByIDResponse);
-  rpc CreateUser(CreateUserRequest) returns (chap.common.v1.StandardResponse);
   rpc EditUser(EditUserRequest) returns (chap.common.v1.StandardResponse);
   rpc DeleteUser(DeleteUserRequest) returns (chap.common.v1.StandardResponse);
   rpc FollowUser(FollowUserRequest) returns (chap.common.v1.StandardResponse);
@@ -29,11 +28,7 @@ message GetUserByIDRequest {
 message GetUserByIDResponse {
   User user = 1;
 }
-message CreateUserRequest{
-    string name =1;
-    string image =2;
-    string description =3;
-}
+
 message EditUserRequest {
   string user_id = 1;
   string name = 2;

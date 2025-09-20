@@ -102,25 +102,6 @@ func (s *UserServer) DeleteUser(ctx context.Context, req *pd.DeleteUserRequest) 
 	return &pd.StandardResponse{Success: true}, nil
 }
 
-func (s *UserServer) CreateUser(ctx context.Context, req *pd.CreateUserRequest) (*pd.StandardResponse, error) {
-	log.Println("CreateUser called")
-
-	user := &model.UserDBModel{
-		ID:          uuid.New(),
-		Name:        req.Name,
-		Description: req.Description,
-		Image:       req.Image,
-		Valid:       true,
-	}
-
-	if err := s.userRepo.Create(ctx, user); err != nil {
-		log.Printf("CreateUser error: %v", err)
-		return &pd.StandardResponse{Success: false}, err
-	}
-
-	return &pd.StandardResponse{Success: true}, nil
-}
-
 func (s *UserServer) FollowUser(ctx context.Context, req *pd.FollowUserRequest) (*pd.StandardResponse, error) {
 	log.Println("FollowUser called")
 	// TODO: 実際のユーザーフォロー処理を実装
