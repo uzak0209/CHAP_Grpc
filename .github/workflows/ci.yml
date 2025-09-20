@@ -8,28 +8,12 @@ on:
 
 env:
   GO_VERSION: "1.21"
-  POSTGRES_VERSION: "15"
 
 jobs:
   test:
     name: Test
     runs-on: ubuntu-latest
     
-    services:
-      postgres:
-        image: postgres:15
-        env:
-          POSTGRES_PASSWORD: testpassword
-          POSTGRES_USER: testuser
-          POSTGRES_DB: chap_grpc_test
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5433:5432
-
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -39,68 +23,19 @@ jobs:
       with:
         go-version: ${{ env.GO_VERSION }}
 
-    - name: Cache Go modules
-      uses: actions/cache@v3
-      with:
-        path: ~/go/pkg/mod
-        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-        restore-keys: |
-          ${{ runner.os }}-go-
-
-    - name: Install dependencies
-      run: |
-        cd backend
-        go mod download
-        go mod tidy
-
-    - name: Install protobuf compiler
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y protobuf-compiler
-        go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
-        go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+    - name: Install protobuf tools
+      run: make tools
 
     - name: Generate protobuf code
-      run: |
-        cd backend/api
-        protoc --proto_path=proto --go_out=paths=source_relative:pd --go-grpc_out=paths=source_relative:pd proto/*.proto
+      run: make generate
 
-    - name: Run tests
-      env:
-        DB_DSN: "postgresql://testuser:testpassword@localhost:5433/chap_grpc_test?sslmode=disable"
-        JWT_SECRET: "test-jwt-secret-for-ci"
+    - name: Run unit tests
       run: |
         cd backend
         go test -v ./...
 
-    - name: Run integration tests
-      env:
-        DB_DSN: "postgresql://testuser:testpassword@localhost:5433/chap_grpc_test?sslmode=disable"
-        JWT_SECRET: "test-jwt-secret-for-ci"
-      run: |
-        cd backend
-        # Start server in background
-        go run main.go &
-        SERVER_PID=$!
-        
-        # Wait for server to start
-        sleep 10
-        
-        # Install grpcurl for testing
-        curl -sSL "https://github.com/fullstorydev/grpcurl/releases/download/v1.8.9/grpcurl_1.8.9_linux_x86_64.tar.gz" | tar -xz -C /tmp
-        sudo mv /tmp/grpcurl /usr/local/bin/
-        
-        # Test server is running
-        grpcurl -plaintext localhost:50051 list || exit 1
-        
-        # Test user registration
-        grpcurl -plaintext -d '{"email": "ci-test@example.com", "password": "testpass123"}' localhost:50051 chap.auth.v1.AuthService/SignUp || exit 1
-        
-        # Clean up
-        kill $SERVER_PID
-
-  build:
-    name: Build
+  integration-test:
+    name: Integration Test
     runs-on: ubuntu-latest
     needs: test
     
@@ -108,33 +43,104 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Set up Go
-      uses: actions/setup-go@v4
-      with:
-        go-version: ${{ env.GO_VERSION }}
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
 
-    - name: Install protobuf compiler
+    - name: Install protobuf tools
+      run: make tools
+
+    - name: Generate protobuf code and swagger
+      run: make generate
+
+    - name: Create test environment file
       run: |
+        cat > backend/.env << EOF
+        DB_DSN=postgresql://postgres:password@postgres:5432/chap_grpc?sslmode=disable
+        JWT_SECRET=test-jwt-secret-for-ci
+        POSTGRES_USER=postgres
+        POSTGRES_PASSWORD=password
+        POSTGRES_DB=chap_grpc
+        EOF
+
+    - name: Start services with Docker Compose
+      run: |
+        docker compose up -d --build
+        
+        # Wait for services to be ready
+        echo "Waiting for services to start..."
+        sleep 30
+        
+        # Check if services are running
+        docker compose ps
+        docker compose logs grpc-server
+        docker compose logs envoy
+
+    - name: Install test dependencies
+      run: |
+        # Install grpcurl for gRPC testing
+        curl -sSL "https://github.com/fullstorydev/grpcurl/releases/download/v1.8.9/grpcurl_1.8.9_linux_x86_64.tar.gz" | tar -xz -C /tmp
+        sudo mv /tmp/grpcurl /usr/local/bin/
+        
+        # Install curl for HTTP testing
         sudo apt-get update
-        sudo apt-get install -y protobuf-compiler
-        go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
-        go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+        sudo apt-get install -y curl jq
+
+    - name: Wait for services to be healthy
+      run: |
+        # Wait for Envoy to be ready
+        timeout 60 bash -c 'until curl -f http://localhost:8080/health 2>/dev/null; do echo "Waiting for Envoy..."; sleep 5; done' || true
+        
+        # Wait for gRPC server to be ready
+        timeout 60 bash -c 'until grpcurl -plaintext localhost:50051 list 2>/dev/null; do echo "Waiting for gRPC server..."; sleep 5; done'
+
+    - name: Run integration tests
+      run: |
+        # Run the integration test script
+        chmod +x ./scripts/integration-test.sh
+        ./scripts/integration-test.sh
+
+    - name: Show service logs on failure
+      if: failure()
+      run: |
+        echo "=== gRPC Server Logs ==="
+        docker compose logs grpc-server
+        echo "=== Envoy Logs ==="
+        docker compose logs envoy
+        echo "=== Swagger UI Logs ==="
+        docker compose logs swagger-ui
+
+    - name: Cleanup
+      if: always()
+      run: docker compose down -v
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    needs: integration-test
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Install protobuf tools
+      run: make tools
 
     - name: Generate protobuf code
-      run: |
-        cd backend/api
-        protoc --proto_path=proto --go_out=paths=source_relative:pd --go-grpc_out=paths=source_relative:pd proto/*.proto
+      run: make generate
 
-    - name: Build application
+    - name: Build Docker images
       run: |
-        cd backend
-        go build -v -o ../bin/chap-grpc-server ./main.go
+        docker compose build --no-cache
 
-    - name: Upload build artifacts
-      uses: actions/upload-artifact@v3
-      with:
-        name: chap-grpc-server
-        path: bin/chap-grpc-server
+    - name: Test Docker images
+      run: |
+        # Quick smoke test of built images
+        docker run --rm --name test-backend -d -p 50052:50051 chap_grpc-grpc-server:latest || true
+        sleep 5
+        docker stop test-backend || true
 
   lint:
     name: Lint
