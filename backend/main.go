@@ -8,6 +8,7 @@ import (
 )
 
 func main() {
+	log.Print("Starting applitiaa.")
 	log.Println("Initializing database...")
 	db.InitDB()
 	log.Println("Database initialized successfully")

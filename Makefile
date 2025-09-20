@@ -1,33 +1,49 @@
-# Makefile (Linux向け、コマンドはタブでインデント)
-.PHONY: proto swagger generate clean tools dev
+// filepath: /home/kazuk/CHAP_Grpc/Makefile
+.PHONY: help dev dev-down dev-logs prod prod-down clean generate
 
-# Proto files generation
-proto:
-	protoc --proto_path=backend/api/proto \
-		--go_out=paths=source_relative:backend/api/pd \
-		--go-grpc_out=paths=source_relative:backend/api/pd \
-		backend/api/proto/*.proto
+help:
+	@echo "Available commands:"
+	@echo "  dev        - Start development environment with hot reload"
+	@echo "  dev-down   - Stop development environment"
+	@echo "  dev-logs   - Show development logs"
+	@echo "  prod       - Start production environment"
+	@echo "  prod-down  - Stop production environment"
+	@echo "  clean      - Clean up containers and volumes"
+	@echo "  generate   - Generate protobuf files"
 
-# Swagger/OpenAPI generation
-swagger:
-	mkdir -p docs
-	protoc --proto_path=backend/api/proto \
-		--openapiv2_out=docs \
-		--openapiv2_opt=logtostderr=true \
-		--openapiv2_opt=json_names_for_fields=false \
-		backend/api/proto/*.proto
+# Development with hot reload
+dev:
+	@echo "Starting development environment with hot reload..."
+	docker compose -f docker-compose.dev.yml up --build
 
-# Generate both proto and swagger
-generate: proto swagger
+dev-down:
+	@echo "Stopping development environment..."
+	docker compose -f docker-compose.yml down
 
-# Clean generated files
+dev-logs:
+	@echo "Showing development logs..."
+	docker compose -f docker-compose.yml logs -f grpc-server
+
+# Production
+prod:
+	@echo "Starting production environment..."
+	docker compose up -d --build
+
+prod-down:
+	@echo "Stopping production environment..."
+	docker compose down
+
+# Clean up
 clean:
-	rm -rf backend/api/pd/*.pb.go
-	rm -rf docs/*.swagger.json
+	@echo "Cleaning up containers and volumes..."
+	docker compose -f docker-compose.dev.yml down -v
+	docker compose down -v
+	docker system prune -f
 
-# Install required tools
-tools:
-	go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
-	go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
-	go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@latest
-
+# Generate protobuf files (if needed)
+generate:
+	@echo "Generating protobuf files..."
+	cd backend && protoc --proto_path=api/proto \
+		--go_out=api/pd --go_opt=paths=source_relative \
+		--go-grpc_out=api/pd --go-grpc_opt=paths=source_relative \
+		api/proto/*.proto

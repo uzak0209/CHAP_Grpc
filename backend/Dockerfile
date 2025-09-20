@@ -1,44 +1,27 @@
-# backend/Dockerfile
-FROM golang:1.23-alpine AS builder
+FROM golang:1.25-alpine
+
+# Install git and useful tools
+RUN apk add --no-cache git inotify-tools
 
 WORKDIR /app
 
-# Go modulesファイルをコピーして依存関係をダウンロード
+# Install air for hot reloading
+RUN go install github.com/cosmtrek/air@v1.49.0
+
+# Copy go mod files first for better caching
 COPY go.mod go.sum ./
 RUN go mod download
 
-# ソースコードを明示的にコピー
-COPY *.go ./
-COPY handler/ ./handler/
-COPY infra/ ./infra/
-COPY utils/ ./utils/
-COPY api/ ./api/
-COPY middleware/ ./middleware/
-COPY .env ./
+# Copy source code
+COPY . .
 
-# デバッグ: コピーされたファイルを確認
-RUN echo "=== Files in /app ==="
-RUN ls -la /app
-RUN echo "=== Go files in /app ==="
-RUN find /app -name "*.go" -type f
-RUN echo "=== Directory structure ==="
-RUN find /app -type d
+# Make sure tmp directory exists with correct permissions
+RUN mkdir -p tmp && chmod 755 tmp
 
-# アプリケーションをビルド
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main .
+# Set environment variable for air debugging
+ENV AIR_DEBUG=1
 
-# 本番用の軽量イメージ
-FROM alpine:latest
-
-RUN apk --no-cache add ca-certificates
-WORKDIR /root/
-
-# ビルドしたバイナリをコピー
-COPY --from=builder /app/main .
-COPY --from=builder /app/.env .
-
-# ポートを公開
 EXPOSE 50051
 
-# アプリケーションを実行
-CMD ["./main"]
+# Use air with debug flag
+CMD ["sh", "-c", "echo 'Air config:' && cat .air.toml && echo 'Starting air...' && air -c .air.toml -d"]
