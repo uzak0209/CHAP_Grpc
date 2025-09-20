@@ -1,0 +1,33 @@
+# docker-compose.yml
+version: '3.8'
+
+services:
+  envoy:
+    build:
+      context: ./envoy
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"  # HTTP/gRPC-Web
+      - "9901:9901"  # Envoy admin
+    networks:
+      - grpc-network
+    depends_on:
+      - grpc-server
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  grpc-server:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "50051:50051"
+    networks:
+      - grpc-network
+    environment:
+      - DB_DSN=${DB_DSN}
+      - JWT_SECRET=${JWT_SECRET}
+
+networks:
+  grpc-network:
+    driver: bridge
