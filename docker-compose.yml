@@ -1,33 +1,37 @@
-# docker-compose.yml
-version: '3.8'
-
 services:
-  envoy:
-    build:
-      context: ./envoy
-      dockerfile: Dockerfile
+  grpc-server:
+    build: ./backend
     ports:
-      - "8080:8080"  # HTTP/gRPC-Web
-      - "9901:9901"  # Envoy admin
+      - "50051:50051"
+    env_file:
+      - ./backend/.env
+    restart: on-failure
     networks:
       - grpc-network
+
+  envoy:
+    build: ./envoy
+    ports:
+      - "8080:8080"
+      - "9901:9901"
     depends_on:
       - grpc-server
     extra_hosts:
       - "host.docker.internal:host-gateway"
-
-  grpc-server:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    ports:
-      - "50051:50051"
     networks:
       - grpc-network
-    environment:
-      - DB_DSN=${DB_DSN}
-      - JWT_SECRET=${JWT_SECRET}
 
+
+  swagger-ui:
+    build:
+      context: ./docs
+      dockerfile: Dockerfile.swagger
+    ports:
+      - "3000:8080"
+    environment:
+      - SWAGGER_JSON=/swagger.json
+    networks:
+      - grpc-network
 networks:
   grpc-network:
     driver: bridge
