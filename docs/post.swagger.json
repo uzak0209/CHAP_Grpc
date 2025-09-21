@@ -53,7 +53,9 @@
         "tags": [
           "PostService"
         ]
-      },
+      }
+    },
+    "/api/v1/posts/create": {
       "post": {
         "operationId": "PostService_CreatePost",
         "responses": {
@@ -85,7 +87,7 @@
         ]
       }
     },
-    "/api/v1/posts/{postId}": {
+    "/api/v1/posts/delete/{postId}": {
       "delete": {
         "operationId": "PostService_DeletePost",
         "responses": {
@@ -113,7 +115,9 @@
         "tags": [
           "PostService"
         ]
-      },
+      }
+    },
+    "/api/v1/posts/edit": {
       "put": {
         "operationId": "PostService_EditPost",
         "responses": {
@@ -132,17 +136,11 @@
         },
         "parameters": [
           {
-            "name": "postId",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
             "name": "body",
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/PostServiceEditPostBody"
+              "$ref": "#/definitions/v1EditPostRequest"
             }
           }
         ],
@@ -151,7 +149,7 @@
         ]
       }
     },
-    "/api/v1/users/{userId}/posts": {
+    "/api/v1/posts/{userId}/posts": {
       "get": {
         "operationId": "PostService_GetPostsByUserID",
         "responses": {
@@ -183,17 +181,6 @@
     }
   },
   "definitions": {
-    "PostServiceEditPostBody": {
-      "type": "object",
-      "properties": {
-        "content": {
-          "type": "string"
-        },
-        "image": {
-          "type": "string"
-        }
-      }
-    },
     "protobufAny": {
       "type": "object",
       "properties": {
@@ -238,6 +225,20 @@
         "lng": {
           "type": "number",
           "format": "double"
+        }
+      }
+    },
+    "v1EditPostRequest": {
+      "type": "object",
+      "properties": {
+        "postId": {
+          "type": "string"
+        },
+        "content": {
+          "type": "string"
+        },
+        "image": {
+          "type": "string"
         }
       }
     },

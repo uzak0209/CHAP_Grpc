@@ -140,21 +140,12 @@ func request_PostService_EditPost_0(ctx context.Context, marshaler runtime.Marsh
 	var (
 		protoReq EditPostRequest
 		metadata runtime.ServerMetadata
-		err      error
 	)
 	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 	if req.Body != nil {
 		_, _ = io.Copy(io.Discard, req.Body)
-	}
-	val, ok := pathParams["post_id"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "post_id")
-	}
-	protoReq.PostId, err = runtime.String(val)
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "post_id", err)
 	}
 	msg, err := client.EditPost(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
@@ -164,18 +155,9 @@ func local_request_PostService_EditPost_0(ctx context.Context, marshaler runtime
 	var (
 		protoReq EditPostRequest
 		metadata runtime.ServerMetadata
-		err      error
 	)
 	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
-	}
-	val, ok := pathParams["post_id"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "post_id")
-	}
-	protoReq.PostId, err = runtime.String(val)
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "post_id", err)
 	}
 	msg, err := server.EditPost(ctx, &protoReq)
 	return msg, metadata, err
@@ -252,7 +234,7 @@ func RegisterPostServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/chap.post.v1.PostService/GetPostsByUserID", runtime.WithHTTPPathPattern("/api/v1/users/{user_id}/posts"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/chap.post.v1.PostService/GetPostsByUserID", runtime.WithHTTPPathPattern("/api/v1/posts/{user_id}/posts"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -272,7 +254,7 @@ func RegisterPostServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/chap.post.v1.PostService/CreatePost", runtime.WithHTTPPathPattern("/api/v1/posts"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/chap.post.v1.PostService/CreatePost", runtime.WithHTTPPathPattern("/api/v1/posts/create"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -292,7 +274,7 @@ func RegisterPostServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/chap.post.v1.PostService/EditPost", runtime.WithHTTPPathPattern("/api/v1/posts/{post_id}"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/chap.post.v1.PostService/EditPost", runtime.WithHTTPPathPattern("/api/v1/posts/edit"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -312,7 +294,7 @@ func RegisterPostServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/chap.post.v1.PostService/DeletePost", runtime.WithHTTPPathPattern("/api/v1/posts/{post_id}"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/chap.post.v1.PostService/DeletePost", runtime.WithHTTPPathPattern("/api/v1/posts/delete/{post_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -387,7 +369,7 @@ func RegisterPostServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/chap.post.v1.PostService/GetPostsByUserID", runtime.WithHTTPPathPattern("/api/v1/users/{user_id}/posts"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/chap.post.v1.PostService/GetPostsByUserID", runtime.WithHTTPPathPattern("/api/v1/posts/{user_id}/posts"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -404,7 +386,7 @@ func RegisterPostServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/chap.post.v1.PostService/CreatePost", runtime.WithHTTPPathPattern("/api/v1/posts"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/chap.post.v1.PostService/CreatePost", runtime.WithHTTPPathPattern("/api/v1/posts/create"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -421,7 +403,7 @@ func RegisterPostServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/chap.post.v1.PostService/EditPost", runtime.WithHTTPPathPattern("/api/v1/posts/{post_id}"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/chap.post.v1.PostService/EditPost", runtime.WithHTTPPathPattern("/api/v1/posts/edit"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -438,7 +420,7 @@ func RegisterPostServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/chap.post.v1.PostService/DeletePost", runtime.WithHTTPPathPattern("/api/v1/posts/{post_id}"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/chap.post.v1.PostService/DeletePost", runtime.WithHTTPPathPattern("/api/v1/posts/delete/{post_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -456,10 +438,10 @@ func RegisterPostServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux
 
 var (
 	pattern_PostService_GetPosts_0         = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v1", "posts"}, ""))
-	pattern_PostService_GetPostsByUserID_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"api", "v1", "users", "user_id", "posts"}, ""))
-	pattern_PostService_CreatePost_0       = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v1", "posts"}, ""))
-	pattern_PostService_EditPost_0         = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"api", "v1", "posts", "post_id"}, ""))
-	pattern_PostService_DeletePost_0       = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"api", "v1", "posts", "post_id"}, ""))
+	pattern_PostService_GetPostsByUserID_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 2}, []string{"api", "v1", "posts", "user_id"}, ""))
+	pattern_PostService_CreatePost_0       = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "posts", "create"}, ""))
+	pattern_PostService_EditPost_0         = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "posts", "edit"}, ""))
+	pattern_PostService_DeletePost_0       = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"api", "v1", "posts", "delete", "post_id"}, ""))
 )
 
 var (

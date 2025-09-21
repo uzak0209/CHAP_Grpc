@@ -20,19 +20,19 @@ service ThreadService {
   }
   rpc CreateThread(CreateThreadRequest) returns (chap.common.v1.StandardResponse) {
     option (google.api.http) = {
-      post: "/api/v1/threads"
+      post: "/api/v1/threads/create"
       body: "*"
     };
   }
   rpc EditThread(EditThreadRequest) returns (chap.common.v1.StandardResponse) {
     option (google.api.http) = {
-      put: "/api/v1/threads/{thread_id}"
+      put: "/api/v1/threads/edit"
       body: "*"
     };
   }
   rpc DeleteThread(DeleteThreadRequest) returns (chap.common.v1.StandardResponse) {
     option (google.api.http) = {
-      delete: "/api/v1/threads/{thread_id}"
+      delete: "/api/v1/threads/delete/{thread_id}"
     };
   }
 }

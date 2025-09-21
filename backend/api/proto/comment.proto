@@ -11,24 +11,24 @@ service CommentService {
   // コメント操作
   rpc GetCommentsByThreadID(GetCommentsByThreadIDRequest) returns (GetCommentsByThreadIDResponse) {
     option (google.api.http) = {
-      get: "/api/v1/threads/{thread_id}/comments"
+      get: "/api/v1/comments/{thread_id}"
     };
   }
   rpc CreateComment(CreateCommentRequest) returns (chap.common.v1.StandardResponse) {
     option (google.api.http) = {
-      post: "/api/v1/threads/{thread_id}/comments"
+      post: "/api/v1/comments/create"
       body: "*"
     };
   }
   rpc EditComment(EditCommentRequest) returns (chap.common.v1.StandardResponse) {
     option (google.api.http) = {
-      put: "/api/v1/comments/{comment_id}"
+      put: "/api/v1/comments/edit"
       body: "*"
     };
   }
   rpc DeleteComment(DeleteCommentRequest) returns (chap.common.v1.StandardResponse) {
     option (google.api.http) = {
-      delete: "/api/v1/comments/{comment_id}"
+      delete: "/api/v1/comments/delete/{comment_id}"
     };
   }
 }

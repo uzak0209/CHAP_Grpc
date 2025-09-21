@@ -52,7 +52,9 @@
         "tags": [
           "ThreadService"
         ]
-      },
+      }
+    },
+    "/api/v1/threads/create": {
       "post": {
         "operationId": "ThreadService_CreateThread",
         "responses": {
@@ -76,6 +78,68 @@
             "required": true,
             "schema": {
               "$ref": "#/definitions/v1CreateThreadRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ThreadService"
+        ]
+      }
+    },
+    "/api/v1/threads/delete/{threadId}": {
+      "delete": {
+        "operationId": "ThreadService_DeleteThread",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1StandardResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "threadId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ThreadService"
+        ]
+      }
+    },
+    "/api/v1/threads/edit": {
+      "put": {
+        "operationId": "ThreadService_EditThread",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1StandardResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1EditThreadRequest"
             }
           }
         ],
@@ -113,85 +177,10 @@
         "tags": [
           "ThreadService"
         ]
-      },
-      "delete": {
-        "operationId": "ThreadService_DeleteThread",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1StandardResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "threadId",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "ThreadService"
-        ]
-      },
-      "put": {
-        "operationId": "ThreadService_EditThread",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1StandardResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "threadId",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/ThreadServiceEditThreadBody"
-            }
-          }
-        ],
-        "tags": [
-          "ThreadService"
-        ]
       }
     }
   },
   "definitions": {
-    "ThreadServiceEditThreadBody": {
-      "type": "object",
-      "properties": {
-        "content": {
-          "type": "string"
-        },
-        "image": {
-          "type": "string"
-        }
-      }
-    },
     "protobufAny": {
       "type": "object",
       "properties": {
@@ -289,6 +278,20 @@
         "lng": {
           "type": "number",
           "format": "double"
+        }
+      }
+    },
+    "v1EditThreadRequest": {
+      "type": "object",
+      "properties": {
+        "threadId": {
+          "type": "string"
+        },
+        "content": {
+          "type": "string"
+        },
+        "image": {
+          "type": "string"
         }
       }
     },

@@ -570,15 +570,15 @@ const file_thread_proto_rawDesc = "" +
 	"\acontent\x18\x02 \x01(\tR\acontent\x12\x14\n" +
 	"\x05image\x18\x03 \x01(\tR\x05image\"2\n" +
 	"\x13DeleteThreadRequest\x12\x1b\n" +
-	"\tthread_id\x18\x01 \x01(\tR\bthreadId2\xec\x04\n" +
+	"\tthread_id\x18\x01 \x01(\tR\bthreadId2\xf4\x04\n" +
 	"\rThreadService\x12\x82\x01\n" +
 	"\x0eGetThreadsByID\x12$.chap.thread.v1.GetThreadByIDRequest\x1a%.chap.thread.v1.GetThreadByIDResponse\"#\x82\xd3\xe4\x93\x02\x1d\x12\x1b/api/v1/threads/{thread_id}\x12l\n" +
 	"\n" +
-	"GetThreads\x12!.chap.thread.v1.GetThreadsRequest\x1a\".chap.thread.v1.GetThreadsResponse\"\x17\x82\xd3\xe4\x93\x02\x11\x12\x0f/api/v1/threads\x12q\n" +
-	"\fCreateThread\x12#.chap.thread.v1.CreateThreadRequest\x1a .chap.common.v1.StandardResponse\"\x1a\x82\xd3\xe4\x93\x02\x14:\x01*\"\x0f/api/v1/threads\x12y\n" +
+	"GetThreads\x12!.chap.thread.v1.GetThreadsRequest\x1a\".chap.thread.v1.GetThreadsResponse\"\x17\x82\xd3\xe4\x93\x02\x11\x12\x0f/api/v1/threads\x12x\n" +
+	"\fCreateThread\x12#.chap.thread.v1.CreateThreadRequest\x1a .chap.common.v1.StandardResponse\"!\x82\xd3\xe4\x93\x02\x1b:\x01*\"\x16/api/v1/threads/create\x12r\n" +
 	"\n" +
-	"EditThread\x12!.chap.thread.v1.EditThreadRequest\x1a .chap.common.v1.StandardResponse\"&\x82\xd3\xe4\x93\x02 :\x01*\x1a\x1b/api/v1/threads/{thread_id}\x12z\n" +
-	"\fDeleteThread\x12#.chap.thread.v1.DeleteThreadRequest\x1a .chap.common.v1.StandardResponse\"#\x82\xd3\xe4\x93\x02\x1d*\x1b/api/v1/threads/{thread_id}B1Z/github.com/uzak0209/CHAP_Grpc/backend/api/pd;pdb\x06proto3"
+	"EditThread\x12!.chap.thread.v1.EditThreadRequest\x1a .chap.common.v1.StandardResponse\"\x1f\x82\xd3\xe4\x93\x02\x19:\x01*\x1a\x14/api/v1/threads/edit\x12\x81\x01\n" +
+	"\fDeleteThread\x12#.chap.thread.v1.DeleteThreadRequest\x1a .chap.common.v1.StandardResponse\"*\x82\xd3\xe4\x93\x02$*\"/api/v1/threads/delete/{thread_id}B1Z/github.com/uzak0209/CHAP_Grpc/backend/api/pd;pdb\x06proto3"
 
 var (
 	file_thread_proto_rawDescOnce sync.Once

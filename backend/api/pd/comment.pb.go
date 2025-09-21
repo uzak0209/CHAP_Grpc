@@ -462,12 +462,12 @@ const file_comment_proto_rawDesc = "" +
 	"\acontent\x18\x02 \x01(\tR\acontent\"5\n" +
 	"\x14DeleteCommentRequest\x12\x1d\n" +
 	"\n" +
-	"comment_id\x18\x01 \x01(\tR\tcommentId2\xc4\x04\n" +
-	"\x0eCommentService\x12\xa4\x01\n" +
-	"\x15GetCommentsByThreadID\x12-.chap.comment.v1.GetCommentsByThreadIDRequest\x1a..chap.comment.v1.GetCommentsByThreadIDResponse\",\x82\xd3\xe4\x93\x02&\x12$/api/v1/threads/{thread_id}/comments\x12\x89\x01\n" +
-	"\rCreateComment\x12%.chap.comment.v1.CreateCommentRequest\x1a .chap.common.v1.StandardResponse\"/\x82\xd3\xe4\x93\x02):\x01*\"$/api/v1/threads/{thread_id}/comments\x12~\n" +
-	"\vEditComment\x12#.chap.comment.v1.EditCommentRequest\x1a .chap.common.v1.StandardResponse\"(\x82\xd3\xe4\x93\x02\":\x01*\x1a\x1d/api/v1/comments/{comment_id}\x12\x7f\n" +
-	"\rDeleteComment\x12%.chap.comment.v1.DeleteCommentRequest\x1a .chap.common.v1.StandardResponse\"%\x82\xd3\xe4\x93\x02\x1f*\x1d/api/v1/comments/{comment_id}B1Z/github.com/uzak0209/CHAP_Grpc/backend/api/pd;pdb\x06proto3"
+	"comment_id\x18\x01 \x01(\tR\tcommentId2\xae\x04\n" +
+	"\x0eCommentService\x12\x9c\x01\n" +
+	"\x15GetCommentsByThreadID\x12-.chap.comment.v1.GetCommentsByThreadIDRequest\x1a..chap.comment.v1.GetCommentsByThreadIDResponse\"$\x82\xd3\xe4\x93\x02\x1e\x12\x1c/api/v1/comments/{thread_id}\x12|\n" +
+	"\rCreateComment\x12%.chap.comment.v1.CreateCommentRequest\x1a .chap.common.v1.StandardResponse\"\"\x82\xd3\xe4\x93\x02\x1c:\x01*\"\x17/api/v1/comments/create\x12v\n" +
+	"\vEditComment\x12#.chap.comment.v1.EditCommentRequest\x1a .chap.common.v1.StandardResponse\" \x82\xd3\xe4\x93\x02\x1a:\x01*\x1a\x15/api/v1/comments/edit\x12\x86\x01\n" +
+	"\rDeleteComment\x12%.chap.comment.v1.DeleteCommentRequest\x1a .chap.common.v1.StandardResponse\",\x82\xd3\xe4\x93\x02&*$/api/v1/comments/delete/{comment_id}B1Z/github.com/uzak0209/CHAP_Grpc/backend/api/pd;pdb\x06proto3"
 
 var (
 	file_comment_proto_rawDescOnce sync.Once

@@ -462,12 +462,12 @@ const file_user_proto_rawDesc = "" +
 	"\x11FollowUserRequest\x12$\n" +
 	"\x0etarget_user_id\x18\x02 \x01(\tR\ftargetUserId\";\n" +
 	"\x13UnfollowUserRequest\x12$\n" +
-	"\x0etarget_user_id\x18\x02 \x01(\tR\ftargetUserId2\xee\x04\n" +
+	"\x0etarget_user_id\x18\x02 \x01(\tR\ftargetUserId2\xf0\x04\n" +
 	"\vUserService\x12s\n" +
-	"\vGetUserByID\x12 .chap.user.v1.GetUserByIDRequest\x1a!.chap.user.v1.GetUserByIDResponse\"\x1f\x82\xd3\xe4\x93\x02\x19\x12\x17/api/v1/users/{user_id}\x12o\n" +
-	"\bEditUser\x12\x1d.chap.user.v1.EditUserRequest\x1a .chap.common.v1.StandardResponse\"\"\x82\xd3\xe4\x93\x02\x1c:\x01*\x1a\x17/api/v1/users/{user_id}\x12p\n" +
+	"\vGetUserByID\x12 .chap.user.v1.GetUserByIDRequest\x1a!.chap.user.v1.GetUserByIDResponse\"\x1f\x82\xd3\xe4\x93\x02\x19\x12\x17/api/v1/users/{user_id}\x12j\n" +
+	"\bEditUser\x12\x1d.chap.user.v1.EditUserRequest\x1a .chap.common.v1.StandardResponse\"\x1d\x82\xd3\xe4\x93\x02\x17:\x01*\x1a\x12/api/v1/users/edit\x12w\n" +
 	"\n" +
-	"DeleteUser\x12\x1f.chap.user.v1.DeleteUserRequest\x1a .chap.common.v1.StandardResponse\"\x1f\x82\xd3\xe4\x93\x02\x19*\x17/api/v1/users/{user_id}\x12\x81\x01\n" +
+	"DeleteUser\x12\x1f.chap.user.v1.DeleteUserRequest\x1a .chap.common.v1.StandardResponse\"&\x82\xd3\xe4\x93\x02 *\x1e/api/v1/users/delete/{user_id}\x12\x81\x01\n" +
 	"\n" +
 	"FollowUser\x12\x1f.chap.user.v1.FollowUserRequest\x1a .chap.common.v1.StandardResponse\"0\x82\xd3\xe4\x93\x02*:\x01*\"%/api/v1/users/{target_user_id}/follow\x12\x82\x01\n" +
 	"\fUnfollowUser\x12!.chap.user.v1.UnfollowUserRequest\x1a .chap.common.v1.StandardResponse\"-\x82\xd3\xe4\x93\x02'*%/api/v1/users/{target_user_id}/followB1Z/github.com/uzak0209/CHAP_Grpc/backend/api/pd;pdb\x06proto3"

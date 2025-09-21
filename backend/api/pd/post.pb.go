@@ -553,15 +553,15 @@ const file_post_proto_rawDesc = "" +
 	"\acontent\x18\x02 \x01(\tR\acontent\x12\x14\n" +
 	"\x05image\x18\x03 \x01(\tR\x05image\",\n" +
 	"\x11DeletePostRequest\x12\x17\n" +
-	"\apost_id\x18\x01 \x01(\tR\x06postId2\xc8\x04\n" +
+	"\apost_id\x18\x01 \x01(\tR\x06postId2\xd1\x04\n" +
 	"\vPostService\x12`\n" +
 	"\bGetPosts\x12\x1d.chap.post.v1.GetPostsRequest\x1a\x1e.chap.post.v1.GetPostsResponse\"\x15\x82\xd3\xe4\x93\x02\x0f\x12\r/api/v1/posts\x12\x88\x01\n" +
-	"\x10GetPostsByUserID\x12%.chap.post.v1.GetPostsByUserIDRequest\x1a&.chap.post.v1.GetPostsByUserIDResponse\"%\x82\xd3\xe4\x93\x02\x1f\x12\x1d/api/v1/users/{user_id}/posts\x12i\n" +
+	"\x10GetPostsByUserID\x12%.chap.post.v1.GetPostsByUserIDRequest\x1a&.chap.post.v1.GetPostsByUserIDResponse\"%\x82\xd3\xe4\x93\x02\x1f\x12\x1d/api/v1/posts/{user_id}/posts\x12p\n" +
 	"\n" +
-	"CreatePost\x12\x1f.chap.post.v1.CreatePostRequest\x1a .chap.common.v1.StandardResponse\"\x18\x82\xd3\xe4\x93\x02\x12:\x01*\"\r/api/v1/posts\x12o\n" +
-	"\bEditPost\x12\x1d.chap.post.v1.EditPostRequest\x1a .chap.common.v1.StandardResponse\"\"\x82\xd3\xe4\x93\x02\x1c:\x01*\x1a\x17/api/v1/posts/{post_id}\x12p\n" +
+	"CreatePost\x12\x1f.chap.post.v1.CreatePostRequest\x1a .chap.common.v1.StandardResponse\"\x1f\x82\xd3\xe4\x93\x02\x19:\x01*\"\x14/api/v1/posts/create\x12j\n" +
+	"\bEditPost\x12\x1d.chap.post.v1.EditPostRequest\x1a .chap.common.v1.StandardResponse\"\x1d\x82\xd3\xe4\x93\x02\x17:\x01*\x1a\x12/api/v1/posts/edit\x12w\n" +
 	"\n" +
-	"DeletePost\x12\x1f.chap.post.v1.DeletePostRequest\x1a .chap.common.v1.StandardResponse\"\x1f\x82\xd3\xe4\x93\x02\x19*\x17/api/v1/posts/{post_id}B1Z/github.com/uzak0209/CHAP_Grpc/backend/api/pd;pdb\x06proto3"
+	"DeletePost\x12\x1f.chap.post.v1.DeletePostRequest\x1a .chap.common.v1.StandardResponse\"&\x82\xd3\xe4\x93\x02 *\x1e/api/v1/posts/delete/{post_id}B1Z/github.com/uzak0209/CHAP_Grpc/backend/api/pd;pdb\x06proto3"
 
 var (
 	file_post_proto_rawDescOnce sync.Once

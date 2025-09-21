@@ -92,21 +92,12 @@ func request_CommentService_CreateComment_0(ctx context.Context, marshaler runti
 	var (
 		protoReq CreateCommentRequest
 		metadata runtime.ServerMetadata
-		err      error
 	)
 	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 	if req.Body != nil {
 		_, _ = io.Copy(io.Discard, req.Body)
-	}
-	val, ok := pathParams["thread_id"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "thread_id")
-	}
-	protoReq.ThreadId, err = runtime.String(val)
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "thread_id", err)
 	}
 	msg, err := client.CreateComment(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
@@ -116,18 +107,9 @@ func local_request_CommentService_CreateComment_0(ctx context.Context, marshaler
 	var (
 		protoReq CreateCommentRequest
 		metadata runtime.ServerMetadata
-		err      error
 	)
 	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
-	}
-	val, ok := pathParams["thread_id"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "thread_id")
-	}
-	protoReq.ThreadId, err = runtime.String(val)
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "thread_id", err)
 	}
 	msg, err := server.CreateComment(ctx, &protoReq)
 	return msg, metadata, err
@@ -137,21 +119,12 @@ func request_CommentService_EditComment_0(ctx context.Context, marshaler runtime
 	var (
 		protoReq EditCommentRequest
 		metadata runtime.ServerMetadata
-		err      error
 	)
 	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 	if req.Body != nil {
 		_, _ = io.Copy(io.Discard, req.Body)
-	}
-	val, ok := pathParams["comment_id"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "comment_id")
-	}
-	protoReq.CommentId, err = runtime.String(val)
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "comment_id", err)
 	}
 	msg, err := client.EditComment(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
@@ -161,18 +134,9 @@ func local_request_CommentService_EditComment_0(ctx context.Context, marshaler r
 	var (
 		protoReq EditCommentRequest
 		metadata runtime.ServerMetadata
-		err      error
 	)
 	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
-	}
-	val, ok := pathParams["comment_id"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "comment_id")
-	}
-	protoReq.CommentId, err = runtime.String(val)
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "comment_id", err)
 	}
 	msg, err := server.EditComment(ctx, &protoReq)
 	return msg, metadata, err
@@ -229,7 +193,7 @@ func RegisterCommentServiceHandlerServer(ctx context.Context, mux *runtime.Serve
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/chap.comment.v1.CommentService/GetCommentsByThreadID", runtime.WithHTTPPathPattern("/api/v1/threads/{thread_id}/comments"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/chap.comment.v1.CommentService/GetCommentsByThreadID", runtime.WithHTTPPathPattern("/api/v1/comments/{thread_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -249,7 +213,7 @@ func RegisterCommentServiceHandlerServer(ctx context.Context, mux *runtime.Serve
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/chap.comment.v1.CommentService/CreateComment", runtime.WithHTTPPathPattern("/api/v1/threads/{thread_id}/comments"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/chap.comment.v1.CommentService/CreateComment", runtime.WithHTTPPathPattern("/api/v1/comments/create"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -269,7 +233,7 @@ func RegisterCommentServiceHandlerServer(ctx context.Context, mux *runtime.Serve
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/chap.comment.v1.CommentService/EditComment", runtime.WithHTTPPathPattern("/api/v1/comments/{comment_id}"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/chap.comment.v1.CommentService/EditComment", runtime.WithHTTPPathPattern("/api/v1/comments/edit"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -289,7 +253,7 @@ func RegisterCommentServiceHandlerServer(ctx context.Context, mux *runtime.Serve
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/chap.comment.v1.CommentService/DeleteComment", runtime.WithHTTPPathPattern("/api/v1/comments/{comment_id}"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/chap.comment.v1.CommentService/DeleteComment", runtime.WithHTTPPathPattern("/api/v1/comments/delete/{comment_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -347,7 +311,7 @@ func RegisterCommentServiceHandlerClient(ctx context.Context, mux *runtime.Serve
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/chap.comment.v1.CommentService/GetCommentsByThreadID", runtime.WithHTTPPathPattern("/api/v1/threads/{thread_id}/comments"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/chap.comment.v1.CommentService/GetCommentsByThreadID", runtime.WithHTTPPathPattern("/api/v1/comments/{thread_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -364,7 +328,7 @@ func RegisterCommentServiceHandlerClient(ctx context.Context, mux *runtime.Serve
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/chap.comment.v1.CommentService/CreateComment", runtime.WithHTTPPathPattern("/api/v1/threads/{thread_id}/comments"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/chap.comment.v1.CommentService/CreateComment", runtime.WithHTTPPathPattern("/api/v1/comments/create"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -381,7 +345,7 @@ func RegisterCommentServiceHandlerClient(ctx context.Context, mux *runtime.Serve
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/chap.comment.v1.CommentService/EditComment", runtime.WithHTTPPathPattern("/api/v1/comments/{comment_id}"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/chap.comment.v1.CommentService/EditComment", runtime.WithHTTPPathPattern("/api/v1/comments/edit"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -398,7 +362,7 @@ func RegisterCommentServiceHandlerClient(ctx context.Context, mux *runtime.Serve
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/chap.comment.v1.CommentService/DeleteComment", runtime.WithHTTPPathPattern("/api/v1/comments/{comment_id}"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/chap.comment.v1.CommentService/DeleteComment", runtime.WithHTTPPathPattern("/api/v1/comments/delete/{comment_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -415,10 +379,10 @@ func RegisterCommentServiceHandlerClient(ctx context.Context, mux *runtime.Serve
 }
 
 var (
-	pattern_CommentService_GetCommentsByThreadID_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"api", "v1", "threads", "thread_id", "comments"}, ""))
-	pattern_CommentService_CreateComment_0         = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"api", "v1", "threads", "thread_id", "comments"}, ""))
-	pattern_CommentService_EditComment_0           = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"api", "v1", "comments", "comment_id"}, ""))
-	pattern_CommentService_DeleteComment_0         = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"api", "v1", "comments", "comment_id"}, ""))
+	pattern_CommentService_GetCommentsByThreadID_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"api", "v1", "comments", "thread_id"}, ""))
+	pattern_CommentService_CreateComment_0         = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "comments", "create"}, ""))
+	pattern_CommentService_EditComment_0           = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "comments", "edit"}, ""))
+	pattern_CommentService_DeleteComment_0         = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"api", "v1", "comments", "delete", "comment_id"}, ""))
 )
 
 var (

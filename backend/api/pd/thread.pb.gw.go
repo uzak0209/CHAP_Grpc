@@ -140,21 +140,12 @@ func request_ThreadService_EditThread_0(ctx context.Context, marshaler runtime.M
 	var (
 		protoReq EditThreadRequest
 		metadata runtime.ServerMetadata
-		err      error
 	)
 	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 	if req.Body != nil {
 		_, _ = io.Copy(io.Discard, req.Body)
-	}
-	val, ok := pathParams["thread_id"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "thread_id")
-	}
-	protoReq.ThreadId, err = runtime.String(val)
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "thread_id", err)
 	}
 	msg, err := client.EditThread(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
@@ -164,18 +155,9 @@ func local_request_ThreadService_EditThread_0(ctx context.Context, marshaler run
 	var (
 		protoReq EditThreadRequest
 		metadata runtime.ServerMetadata
-		err      error
 	)
 	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
-	}
-	val, ok := pathParams["thread_id"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "thread_id")
-	}
-	protoReq.ThreadId, err = runtime.String(val)
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "thread_id", err)
 	}
 	msg, err := server.EditThread(ctx, &protoReq)
 	return msg, metadata, err
@@ -272,7 +254,7 @@ func RegisterThreadServiceHandlerServer(ctx context.Context, mux *runtime.ServeM
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/chap.thread.v1.ThreadService/CreateThread", runtime.WithHTTPPathPattern("/api/v1/threads"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/chap.thread.v1.ThreadService/CreateThread", runtime.WithHTTPPathPattern("/api/v1/threads/create"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -292,7 +274,7 @@ func RegisterThreadServiceHandlerServer(ctx context.Context, mux *runtime.ServeM
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/chap.thread.v1.ThreadService/EditThread", runtime.WithHTTPPathPattern("/api/v1/threads/{thread_id}"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/chap.thread.v1.ThreadService/EditThread", runtime.WithHTTPPathPattern("/api/v1/threads/edit"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -312,7 +294,7 @@ func RegisterThreadServiceHandlerServer(ctx context.Context, mux *runtime.ServeM
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/chap.thread.v1.ThreadService/DeleteThread", runtime.WithHTTPPathPattern("/api/v1/threads/{thread_id}"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/chap.thread.v1.ThreadService/DeleteThread", runtime.WithHTTPPathPattern("/api/v1/threads/delete/{thread_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -404,7 +386,7 @@ func RegisterThreadServiceHandlerClient(ctx context.Context, mux *runtime.ServeM
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/chap.thread.v1.ThreadService/CreateThread", runtime.WithHTTPPathPattern("/api/v1/threads"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/chap.thread.v1.ThreadService/CreateThread", runtime.WithHTTPPathPattern("/api/v1/threads/create"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -421,7 +403,7 @@ func RegisterThreadServiceHandlerClient(ctx context.Context, mux *runtime.ServeM
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/chap.thread.v1.ThreadService/EditThread", runtime.WithHTTPPathPattern("/api/v1/threads/{thread_id}"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/chap.thread.v1.ThreadService/EditThread", runtime.WithHTTPPathPattern("/api/v1/threads/edit"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -438,7 +420,7 @@ func RegisterThreadServiceHandlerClient(ctx context.Context, mux *runtime.ServeM
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/chap.thread.v1.ThreadService/DeleteThread", runtime.WithHTTPPathPattern("/api/v1/threads/{thread_id}"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/chap.thread.v1.ThreadService/DeleteThread", runtime.WithHTTPPathPattern("/api/v1/threads/delete/{thread_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -457,9 +439,9 @@ func RegisterThreadServiceHandlerClient(ctx context.Context, mux *runtime.ServeM
 var (
 	pattern_ThreadService_GetThreadsByID_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"api", "v1", "threads", "thread_id"}, ""))
 	pattern_ThreadService_GetThreads_0     = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v1", "threads"}, ""))
-	pattern_ThreadService_CreateThread_0   = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v1", "threads"}, ""))
-	pattern_ThreadService_EditThread_0     = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"api", "v1", "threads", "thread_id"}, ""))
-	pattern_ThreadService_DeleteThread_0   = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"api", "v1", "threads", "thread_id"}, ""))
+	pattern_ThreadService_CreateThread_0   = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "threads", "create"}, ""))
+	pattern_ThreadService_EditThread_0     = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "threads", "edit"}, ""))
+	pattern_ThreadService_DeleteThread_0   = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"api", "v1", "threads", "delete", "thread_id"}, ""))
 )
 
 var (

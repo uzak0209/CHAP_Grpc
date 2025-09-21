@@ -14,13 +14,13 @@ service UserService {
   }
   rpc EditUser(EditUserRequest) returns (chap.common.v1.StandardResponse) {
     option (google.api.http) = {
-      put: "/api/v1/users/{user_id}"
+      put: "/api/v1/users/edit"
       body: "*"
     };
   }
   rpc DeleteUser(DeleteUserRequest) returns (chap.common.v1.StandardResponse) {
     option (google.api.http) = {
-      delete: "/api/v1/users/{user_id}"
+      delete: "/api/v1/users/delete/{user_id}"
     };
   }
   rpc FollowUser(FollowUserRequest) returns (chap.common.v1.StandardResponse) {
