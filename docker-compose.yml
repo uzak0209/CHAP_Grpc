@@ -3,6 +3,7 @@ services:
     build: ./backend
     ports:
       - "50051:50051"
+      - "8081:8081"
     env_file:
       - ./backend/.env
     restart: on-failure

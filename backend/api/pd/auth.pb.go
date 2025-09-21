@@ -7,6 +7,7 @@
 package pd
 
 import (
+	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -198,7 +199,7 @@ var File_auth_proto protoreflect.FileDescriptor
 const file_auth_proto_rawDesc = "" +
 	"\n" +
 	"\n" +
-	"auth.proto\x12\fchap.auth.v1\"U\n" +
+	"auth.proto\x12\fchap.auth.v1\x1a\x1cgoogle/api/annotations.proto\"U\n" +
 	"\rSignUpRequest\x12\x14\n" +
 	"\x05email\x18\x01 \x01(\tR\x05email\x12\x1a\n" +
 	"\bpassword\x18\x02 \x01(\tR\bpassword\x12\x12\n" +
@@ -209,10 +210,10 @@ const file_auth_proto_rawDesc = "" +
 	"\fAuthResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12\x14\n" +
-	"\x05token\x18\x03 \x01(\tR\x05token2\x93\x01\n" +
-	"\vAuthService\x12A\n" +
-	"\x06SignUp\x12\x1b.chap.auth.v1.SignUpRequest\x1a\x1a.chap.auth.v1.AuthResponse\x12A\n" +
-	"\x06SignIn\x12\x1b.chap.auth.v1.SignInRequest\x1a\x1a.chap.auth.v1.AuthResponseB1Z/github.com/uzak0209/CHAP_Grpc/backend/api/pd;pdb\x06proto3"
+	"\x05token\x18\x03 \x01(\tR\x05token2\xd3\x01\n" +
+	"\vAuthService\x12a\n" +
+	"\x06SignUp\x12\x1b.chap.auth.v1.SignUpRequest\x1a\x1a.chap.auth.v1.AuthResponse\"\x1e\x82\xd3\xe4\x93\x02\x18:\x01*\"\x13/api/v1/auth/signup\x12a\n" +
+	"\x06SignIn\x12\x1b.chap.auth.v1.SignInRequest\x1a\x1a.chap.auth.v1.AuthResponse\"\x1e\x82\xd3\xe4\x93\x02\x18:\x01*\"\x13/api/v1/auth/signinB1Z/github.com/uzak0209/CHAP_Grpc/backend/api/pd;pdb\x06proto3"
 
 var (
 	file_auth_proto_rawDescOnce sync.Once

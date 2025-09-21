@@ -7,6 +7,7 @@
 package pd
 
 import (
+	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -514,7 +515,7 @@ var File_post_proto protoreflect.FileDescriptor
 const file_post_proto_rawDesc = "" +
 	"\n" +
 	"\n" +
-	"post.proto\x12\fchap.post.v1\x1a\fcommon.proto\"\xb2\x02\n" +
+	"post.proto\x12\fchap.post.v1\x1a\fcommon.proto\x1a\x1cgoogle/api/annotations.proto\"\xb2\x02\n" +
 	"\x04Post\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1b\n" +
 	"\tuser_name\x18\x02 \x01(\tR\buserName\x12\x17\n" +
@@ -552,14 +553,15 @@ const file_post_proto_rawDesc = "" +
 	"\acontent\x18\x02 \x01(\tR\acontent\x12\x14\n" +
 	"\x05image\x18\x03 \x01(\tR\x05image\",\n" +
 	"\x11DeletePostRequest\x12\x17\n" +
-	"\apost_id\x18\x01 \x01(\tR\x06postId2\xc7\x02\n" +
-	"\vPostService\x12I\n" +
-	"\bGetPosts\x12\x1d.chap.post.v1.GetPostsRequest\x1a\x1e.chap.post.v1.GetPostsResponse\x12K\n" +
-	"\bEditPost\x12\x1d.chap.post.v1.EditPostRequest\x1a .chap.common.v1.StandardResponse\x12O\n" +
+	"\apost_id\x18\x01 \x01(\tR\x06postId2\xc8\x04\n" +
+	"\vPostService\x12`\n" +
+	"\bGetPosts\x12\x1d.chap.post.v1.GetPostsRequest\x1a\x1e.chap.post.v1.GetPostsResponse\"\x15\x82\xd3\xe4\x93\x02\x0f\x12\r/api/v1/posts\x12\x88\x01\n" +
+	"\x10GetPostsByUserID\x12%.chap.post.v1.GetPostsByUserIDRequest\x1a&.chap.post.v1.GetPostsByUserIDResponse\"%\x82\xd3\xe4\x93\x02\x1f\x12\x1d/api/v1/users/{user_id}/posts\x12i\n" +
 	"\n" +
-	"CreatePost\x12\x1f.chap.post.v1.CreatePostRequest\x1a .chap.common.v1.StandardResponse\x12O\n" +
+	"CreatePost\x12\x1f.chap.post.v1.CreatePostRequest\x1a .chap.common.v1.StandardResponse\"\x18\x82\xd3\xe4\x93\x02\x12:\x01*\"\r/api/v1/posts\x12o\n" +
+	"\bEditPost\x12\x1d.chap.post.v1.EditPostRequest\x1a .chap.common.v1.StandardResponse\"\"\x82\xd3\xe4\x93\x02\x1c:\x01*\x1a\x17/api/v1/posts/{post_id}\x12p\n" +
 	"\n" +
-	"DeletePost\x12\x1f.chap.post.v1.DeletePostRequest\x1a .chap.common.v1.StandardResponseB1Z/github.com/uzak0209/CHAP_Grpc/backend/api/pd;pdb\x06proto3"
+	"DeletePost\x12\x1f.chap.post.v1.DeletePostRequest\x1a .chap.common.v1.StandardResponse\"\x1f\x82\xd3\xe4\x93\x02\x19*\x17/api/v1/posts/{post_id}B1Z/github.com/uzak0209/CHAP_Grpc/backend/api/pd;pdb\x06proto3"
 
 var (
 	file_post_proto_rawDescOnce sync.Once
@@ -589,15 +591,17 @@ var file_post_proto_depIdxs = []int32{
 	0, // 0: chap.post.v1.GetPostsResponse.posts:type_name -> chap.post.v1.Post
 	0, // 1: chap.post.v1.GetPostsByUserIDResponse.posts:type_name -> chap.post.v1.Post
 	1, // 2: chap.post.v1.PostService.GetPosts:input_type -> chap.post.v1.GetPostsRequest
-	6, // 3: chap.post.v1.PostService.EditPost:input_type -> chap.post.v1.EditPostRequest
+	3, // 3: chap.post.v1.PostService.GetPostsByUserID:input_type -> chap.post.v1.GetPostsByUserIDRequest
 	5, // 4: chap.post.v1.PostService.CreatePost:input_type -> chap.post.v1.CreatePostRequest
-	7, // 5: chap.post.v1.PostService.DeletePost:input_type -> chap.post.v1.DeletePostRequest
-	2, // 6: chap.post.v1.PostService.GetPosts:output_type -> chap.post.v1.GetPostsResponse
-	8, // 7: chap.post.v1.PostService.EditPost:output_type -> chap.common.v1.StandardResponse
-	8, // 8: chap.post.v1.PostService.CreatePost:output_type -> chap.common.v1.StandardResponse
-	8, // 9: chap.post.v1.PostService.DeletePost:output_type -> chap.common.v1.StandardResponse
-	6, // [6:10] is the sub-list for method output_type
-	2, // [2:6] is the sub-list for method input_type
+	6, // 5: chap.post.v1.PostService.EditPost:input_type -> chap.post.v1.EditPostRequest
+	7, // 6: chap.post.v1.PostService.DeletePost:input_type -> chap.post.v1.DeletePostRequest
+	2, // 7: chap.post.v1.PostService.GetPosts:output_type -> chap.post.v1.GetPostsResponse
+	4, // 8: chap.post.v1.PostService.GetPostsByUserID:output_type -> chap.post.v1.GetPostsByUserIDResponse
+	8, // 9: chap.post.v1.PostService.CreatePost:output_type -> chap.common.v1.StandardResponse
+	8, // 10: chap.post.v1.PostService.EditPost:output_type -> chap.common.v1.StandardResponse
+	8, // 11: chap.post.v1.PostService.DeletePost:output_type -> chap.common.v1.StandardResponse
+	7, // [7:12] is the sub-list for method output_type
+	2, // [2:7] is the sub-list for method input_type
 	2, // [2:2] is the sub-list for extension type_name
 	2, // [2:2] is the sub-list for extension extendee
 	0, // [0:2] is the sub-list for field type_name

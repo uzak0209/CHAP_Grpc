@@ -7,6 +7,7 @@
 package pd
 
 import (
+	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -295,6 +296,7 @@ func (x *EditUserRequest) GetImage() string {
 
 type DeleteUserRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -327,6 +329,13 @@ func (x *DeleteUserRequest) ProtoReflect() protoreflect.Message {
 // Deprecated: Use DeleteUserRequest.ProtoReflect.Descriptor instead.
 func (*DeleteUserRequest) Descriptor() ([]byte, []int) {
 	return file_user_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *DeleteUserRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
 }
 
 type FollowUserRequest struct {
@@ -422,7 +431,7 @@ var File_user_proto protoreflect.FileDescriptor
 const file_user_proto_rawDesc = "" +
 	"\n" +
 	"\n" +
-	"user.proto\x12\fchap.user.v1\x1a\fcommon.proto\"\xae\x02\n" +
+	"user.proto\x12\fchap.user.v1\x1a\fcommon.proto\x1a\x1cgoogle/api/annotations.proto\"\xae\x02\n" +
 	"\x04User\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12 \n" +
@@ -447,20 +456,21 @@ const file_user_proto_rawDesc = "" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12 \n" +
 	"\vdescription\x18\x03 \x01(\tR\vdescription\x12\x14\n" +
-	"\x05image\x18\x04 \x01(\tR\x05image\"\x13\n" +
-	"\x11DeleteUserRequest\"9\n" +
+	"\x05image\x18\x04 \x01(\tR\x05image\",\n" +
+	"\x11DeleteUserRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\"9\n" +
 	"\x11FollowUserRequest\x12$\n" +
 	"\x0etarget_user_id\x18\x02 \x01(\tR\ftargetUserId\";\n" +
 	"\x13UnfollowUserRequest\x12$\n" +
-	"\x0etarget_user_id\x18\x02 \x01(\tR\ftargetUserId2\xa5\x03\n" +
-	"\vUserService\x12R\n" +
-	"\vGetUserByID\x12 .chap.user.v1.GetUserByIDRequest\x1a!.chap.user.v1.GetUserByIDResponse\x12K\n" +
-	"\bEditUser\x12\x1d.chap.user.v1.EditUserRequest\x1a .chap.common.v1.StandardResponse\x12O\n" +
+	"\x0etarget_user_id\x18\x02 \x01(\tR\ftargetUserId2\xee\x04\n" +
+	"\vUserService\x12s\n" +
+	"\vGetUserByID\x12 .chap.user.v1.GetUserByIDRequest\x1a!.chap.user.v1.GetUserByIDResponse\"\x1f\x82\xd3\xe4\x93\x02\x19\x12\x17/api/v1/users/{user_id}\x12o\n" +
+	"\bEditUser\x12\x1d.chap.user.v1.EditUserRequest\x1a .chap.common.v1.StandardResponse\"\"\x82\xd3\xe4\x93\x02\x1c:\x01*\x1a\x17/api/v1/users/{user_id}\x12p\n" +
 	"\n" +
-	"DeleteUser\x12\x1f.chap.user.v1.DeleteUserRequest\x1a .chap.common.v1.StandardResponse\x12O\n" +
+	"DeleteUser\x12\x1f.chap.user.v1.DeleteUserRequest\x1a .chap.common.v1.StandardResponse\"\x1f\x82\xd3\xe4\x93\x02\x19*\x17/api/v1/users/{user_id}\x12\x81\x01\n" +
 	"\n" +
-	"FollowUser\x12\x1f.chap.user.v1.FollowUserRequest\x1a .chap.common.v1.StandardResponse\x12S\n" +
-	"\fUnfollowUser\x12!.chap.user.v1.UnfollowUserRequest\x1a .chap.common.v1.StandardResponseB1Z/github.com/uzak0209/CHAP_Grpc/backend/api/pd;pdb\x06proto3"
+	"FollowUser\x12\x1f.chap.user.v1.FollowUserRequest\x1a .chap.common.v1.StandardResponse\"0\x82\xd3\xe4\x93\x02*:\x01*\"%/api/v1/users/{target_user_id}/follow\x12\x82\x01\n" +
+	"\fUnfollowUser\x12!.chap.user.v1.UnfollowUserRequest\x1a .chap.common.v1.StandardResponse\"-\x82\xd3\xe4\x93\x02'*%/api/v1/users/{target_user_id}/followB1Z/github.com/uzak0209/CHAP_Grpc/backend/api/pd;pdb\x06proto3"
 
 var (
 	file_user_proto_rawDescOnce sync.Once

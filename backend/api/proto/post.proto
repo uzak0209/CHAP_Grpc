@@ -1,14 +1,41 @@
 syntax = "proto3";
 package chap.post.v1;
 option go_package = "github.com/uzak0209/CHAP_Grpc/backend/api/pd;pd";
+
 import "common.proto";
+import "google/api/annotations.proto";
+
 service PostService {
   // 投稿操作
-  rpc GetPosts(GetPostsRequest) returns (GetPostsResponse);
-  rpc EditPost(EditPostRequest) returns (chap.common.v1.StandardResponse);
-  rpc CreatePost(CreatePostRequest) returns (chap.common.v1.StandardResponse);
-  rpc DeletePost(DeletePostRequest) returns (chap.common.v1.StandardResponse);
+  rpc GetPosts(GetPostsRequest) returns (GetPostsResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/posts"
+    };
+  }
+  rpc GetPostsByUserID(GetPostsByUserIDRequest) returns (GetPostsByUserIDResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/users/{user_id}/posts"
+    };
+  }
+  rpc CreatePost(CreatePostRequest) returns (chap.common.v1.StandardResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/posts"
+      body: "*"
+    };
+  }
+  rpc EditPost(EditPostRequest) returns (chap.common.v1.StandardResponse) {
+    option (google.api.http) = {
+      put: "/api/v1/posts/{post_id}"
+      body: "*"
+    };
+  }
+  rpc DeletePost(DeletePostRequest) returns (chap.common.v1.StandardResponse) {
+    option (google.api.http) = {
+      delete: "/api/v1/posts/{post_id}"
+    };
+  }
 }
+
 message Post{
     string id =1;
     string user_name =2;
@@ -23,30 +50,37 @@ message Post{
     double lng =11;
     repeated string likes=12;
 }
+
 message GetPostsRequest {
   double lat = 1;
   double lng = 2;
 }
+
 message GetPostsResponse {
   repeated Post posts = 1;
 }
+
 message GetPostsByUserIDRequest {
   string user_id = 1;
 }
+
 message GetPostsByUserIDResponse {
   repeated Post posts = 1;
 }
+
 message CreatePostRequest{
     string content =1;
     string image=2;
     double lat =3;
     double lng =4;
 }
+
 message EditPostRequest {
   string post_id = 1;
   string content = 2;
   string image=3;
 }
+
 message DeletePostRequest {
   string post_id = 1;
 }

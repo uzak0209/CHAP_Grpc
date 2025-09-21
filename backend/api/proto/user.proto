@@ -1,15 +1,41 @@
 syntax = "proto3";
 package chap.user.v1;
 option go_package = "github.com/uzak0209/CHAP_Grpc/backend/api/pd;pd";
+
 import "common.proto";
+import "google/api/annotations.proto";
+
 service UserService {
   // ユーザー操作
-  rpc GetUserByID(GetUserByIDRequest) returns (GetUserByIDResponse);
-  rpc EditUser(EditUserRequest) returns (chap.common.v1.StandardResponse);
-  rpc DeleteUser(DeleteUserRequest) returns (chap.common.v1.StandardResponse);
-  rpc FollowUser(FollowUserRequest) returns (chap.common.v1.StandardResponse);
-  rpc UnfollowUser(UnfollowUserRequest) returns (chap.common.v1.StandardResponse);
+  rpc GetUserByID(GetUserByIDRequest) returns (GetUserByIDResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/users/{user_id}"
+    };
+  }
+  rpc EditUser(EditUserRequest) returns (chap.common.v1.StandardResponse) {
+    option (google.api.http) = {
+      put: "/api/v1/users/{user_id}"
+      body: "*"
+    };
+  }
+  rpc DeleteUser(DeleteUserRequest) returns (chap.common.v1.StandardResponse) {
+    option (google.api.http) = {
+      delete: "/api/v1/users/{user_id}"
+    };
+  }
+  rpc FollowUser(FollowUserRequest) returns (chap.common.v1.StandardResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/users/{target_user_id}/follow"
+      body: "*"
+    };
+  }
+  rpc UnfollowUser(UnfollowUserRequest) returns (chap.common.v1.StandardResponse) {
+    option (google.api.http) = {
+      delete: "/api/v1/users/{target_user_id}/follow"
+    };
+  }
 }
+
 message User{
     string id =1;
     string name =2;
@@ -22,9 +48,11 @@ message User{
     repeated string followers=10;
     repeated string followings=11;
 }
+
 message GetUserByIDRequest {
   string user_id = 1;
 }
+
 message GetUserByIDResponse {
   User user = 1;
 }
@@ -35,11 +63,15 @@ message EditUserRequest {
   string description = 3;
   string image = 4;
 }
+
 message DeleteUserRequest {
+  string user_id = 1;
 }
+
 message FollowUserRequest {
   string target_user_id = 2;
 }
+
 message UnfollowUserRequest {
   string target_user_id = 2;
 }

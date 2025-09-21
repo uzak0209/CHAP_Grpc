@@ -19,10 +19,11 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	PostService_GetPosts_FullMethodName   = "/chap.post.v1.PostService/GetPosts"
-	PostService_EditPost_FullMethodName   = "/chap.post.v1.PostService/EditPost"
-	PostService_CreatePost_FullMethodName = "/chap.post.v1.PostService/CreatePost"
-	PostService_DeletePost_FullMethodName = "/chap.post.v1.PostService/DeletePost"
+	PostService_GetPosts_FullMethodName         = "/chap.post.v1.PostService/GetPosts"
+	PostService_GetPostsByUserID_FullMethodName = "/chap.post.v1.PostService/GetPostsByUserID"
+	PostService_CreatePost_FullMethodName       = "/chap.post.v1.PostService/CreatePost"
+	PostService_EditPost_FullMethodName         = "/chap.post.v1.PostService/EditPost"
+	PostService_DeletePost_FullMethodName       = "/chap.post.v1.PostService/DeletePost"
 )
 
 // PostServiceClient is the client API for PostService service.
@@ -31,8 +32,9 @@ const (
 type PostServiceClient interface {
 	// 投稿操作
 	GetPosts(ctx context.Context, in *GetPostsRequest, opts ...grpc.CallOption) (*GetPostsResponse, error)
-	EditPost(ctx context.Context, in *EditPostRequest, opts ...grpc.CallOption) (*StandardResponse, error)
+	GetPostsByUserID(ctx context.Context, in *GetPostsByUserIDRequest, opts ...grpc.CallOption) (*GetPostsByUserIDResponse, error)
 	CreatePost(ctx context.Context, in *CreatePostRequest, opts ...grpc.CallOption) (*StandardResponse, error)
+	EditPost(ctx context.Context, in *EditPostRequest, opts ...grpc.CallOption) (*StandardResponse, error)
 	DeletePost(ctx context.Context, in *DeletePostRequest, opts ...grpc.CallOption) (*StandardResponse, error)
 }
 
@@ -54,10 +56,10 @@ func (c *postServiceClient) GetPosts(ctx context.Context, in *GetPostsRequest, o
 	return out, nil
 }
 
-func (c *postServiceClient) EditPost(ctx context.Context, in *EditPostRequest, opts ...grpc.CallOption) (*StandardResponse, error) {
+func (c *postServiceClient) GetPostsByUserID(ctx context.Context, in *GetPostsByUserIDRequest, opts ...grpc.CallOption) (*GetPostsByUserIDResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(StandardResponse)
-	err := c.cc.Invoke(ctx, PostService_EditPost_FullMethodName, in, out, cOpts...)
+	out := new(GetPostsByUserIDResponse)
+	err := c.cc.Invoke(ctx, PostService_GetPostsByUserID_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -68,6 +70,16 @@ func (c *postServiceClient) CreatePost(ctx context.Context, in *CreatePostReques
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(StandardResponse)
 	err := c.cc.Invoke(ctx, PostService_CreatePost_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *postServiceClient) EditPost(ctx context.Context, in *EditPostRequest, opts ...grpc.CallOption) (*StandardResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(StandardResponse)
+	err := c.cc.Invoke(ctx, PostService_EditPost_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -90,8 +102,9 @@ func (c *postServiceClient) DeletePost(ctx context.Context, in *DeletePostReques
 type PostServiceServer interface {
 	// 投稿操作
 	GetPosts(context.Context, *GetPostsRequest) (*GetPostsResponse, error)
-	EditPost(context.Context, *EditPostRequest) (*StandardResponse, error)
+	GetPostsByUserID(context.Context, *GetPostsByUserIDRequest) (*GetPostsByUserIDResponse, error)
 	CreatePost(context.Context, *CreatePostRequest) (*StandardResponse, error)
+	EditPost(context.Context, *EditPostRequest) (*StandardResponse, error)
 	DeletePost(context.Context, *DeletePostRequest) (*StandardResponse, error)
 	mustEmbedUnimplementedPostServiceServer()
 }
@@ -106,11 +119,14 @@ type UnimplementedPostServiceServer struct{}
 func (UnimplementedPostServiceServer) GetPosts(context.Context, *GetPostsRequest) (*GetPostsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetPosts not implemented")
 }
-func (UnimplementedPostServiceServer) EditPost(context.Context, *EditPostRequest) (*StandardResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method EditPost not implemented")
+func (UnimplementedPostServiceServer) GetPostsByUserID(context.Context, *GetPostsByUserIDRequest) (*GetPostsByUserIDResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetPostsByUserID not implemented")
 }
 func (UnimplementedPostServiceServer) CreatePost(context.Context, *CreatePostRequest) (*StandardResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreatePost not implemented")
+}
+func (UnimplementedPostServiceServer) EditPost(context.Context, *EditPostRequest) (*StandardResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method EditPost not implemented")
 }
 func (UnimplementedPostServiceServer) DeletePost(context.Context, *DeletePostRequest) (*StandardResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeletePost not implemented")
@@ -154,20 +170,20 @@ func _PostService_GetPosts_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
-func _PostService_EditPost_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(EditPostRequest)
+func _PostService_GetPostsByUserID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetPostsByUserIDRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(PostServiceServer).EditPost(ctx, in)
+		return srv.(PostServiceServer).GetPostsByUserID(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: PostService_EditPost_FullMethodName,
+		FullMethod: PostService_GetPostsByUserID_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PostServiceServer).EditPost(ctx, req.(*EditPostRequest))
+		return srv.(PostServiceServer).GetPostsByUserID(ctx, req.(*GetPostsByUserIDRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -186,6 +202,24 @@ func _PostService_CreatePost_Handler(srv interface{}, ctx context.Context, dec f
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(PostServiceServer).CreatePost(ctx, req.(*CreatePostRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _PostService_EditPost_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(EditPostRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PostServiceServer).EditPost(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PostService_EditPost_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PostServiceServer).EditPost(ctx, req.(*EditPostRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -220,12 +254,16 @@ var PostService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _PostService_GetPosts_Handler,
 		},
 		{
-			MethodName: "EditPost",
-			Handler:    _PostService_EditPost_Handler,
+			MethodName: "GetPostsByUserID",
+			Handler:    _PostService_GetPostsByUserID_Handler,
 		},
 		{
 			MethodName: "CreatePost",
 			Handler:    _PostService_CreatePost_Handler,
+		},
+		{
+			MethodName: "EditPost",
+			Handler:    _PostService_EditPost_Handler,
 		},
 		{
 			MethodName: "DeletePost",

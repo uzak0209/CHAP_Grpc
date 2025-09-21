@@ -7,6 +7,7 @@
 package pd
 
 import (
+	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -529,7 +530,7 @@ var File_thread_proto protoreflect.FileDescriptor
 
 const file_thread_proto_rawDesc = "" +
 	"\n" +
-	"\fthread.proto\x12\x0echap.thread.v1\x1a\fcommon.proto\x1a\rcomment.proto\"3\n" +
+	"\fthread.proto\x12\x0echap.thread.v1\x1a\fcommon.proto\x1a\rcomment.proto\x1a\x1cgoogle/api/annotations.proto\"3\n" +
 	"\x14GetThreadByIDRequest\x12\x1b\n" +
 	"\tthread_id\x18\x01 \x01(\tR\bthreadId\"{\n" +
 	"\x15GetThreadByIDResponse\x12.\n" +
@@ -569,15 +570,15 @@ const file_thread_proto_rawDesc = "" +
 	"\acontent\x18\x02 \x01(\tR\acontent\x12\x14\n" +
 	"\x05image\x18\x03 \x01(\tR\x05image\"2\n" +
 	"\x13DeleteThreadRequest\x12\x1b\n" +
-	"\tthread_id\x18\x01 \x01(\tR\bthreadId2\xc4\x03\n" +
-	"\rThreadService\x12]\n" +
-	"\x0eGetThreadsByID\x12$.chap.thread.v1.GetThreadByIDRequest\x1a%.chap.thread.v1.GetThreadByIDResponse\x12S\n" +
+	"\tthread_id\x18\x01 \x01(\tR\bthreadId2\xec\x04\n" +
+	"\rThreadService\x12\x82\x01\n" +
+	"\x0eGetThreadsByID\x12$.chap.thread.v1.GetThreadByIDRequest\x1a%.chap.thread.v1.GetThreadByIDResponse\"#\x82\xd3\xe4\x93\x02\x1d\x12\x1b/api/v1/threads/{thread_id}\x12l\n" +
 	"\n" +
-	"GetThreads\x12!.chap.thread.v1.GetThreadsRequest\x1a\".chap.thread.v1.GetThreadsResponse\x12U\n" +
-	"\fCreateThread\x12#.chap.thread.v1.CreateThreadRequest\x1a .chap.common.v1.StandardResponse\x12Q\n" +
+	"GetThreads\x12!.chap.thread.v1.GetThreadsRequest\x1a\".chap.thread.v1.GetThreadsResponse\"\x17\x82\xd3\xe4\x93\x02\x11\x12\x0f/api/v1/threads\x12q\n" +
+	"\fCreateThread\x12#.chap.thread.v1.CreateThreadRequest\x1a .chap.common.v1.StandardResponse\"\x1a\x82\xd3\xe4\x93\x02\x14:\x01*\"\x0f/api/v1/threads\x12y\n" +
 	"\n" +
-	"EditThread\x12!.chap.thread.v1.EditThreadRequest\x1a .chap.common.v1.StandardResponse\x12U\n" +
-	"\fDeleteThread\x12#.chap.thread.v1.DeleteThreadRequest\x1a .chap.common.v1.StandardResponseB1Z/github.com/uzak0209/CHAP_Grpc/backend/api/pd;pdb\x06proto3"
+	"EditThread\x12!.chap.thread.v1.EditThreadRequest\x1a .chap.common.v1.StandardResponse\"&\x82\xd3\xe4\x93\x02 :\x01*\x1a\x1b/api/v1/threads/{thread_id}\x12z\n" +
+	"\fDeleteThread\x12#.chap.thread.v1.DeleteThreadRequest\x1a .chap.common.v1.StandardResponse\"#\x82\xd3\xe4\x93\x02\x1d*\x1b/api/v1/threads/{thread_id}B1Z/github.com/uzak0209/CHAP_Grpc/backend/api/pd;pdb\x06proto3"
 
 var (
 	file_thread_proto_rawDescOnce sync.Once

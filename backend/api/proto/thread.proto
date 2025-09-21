@@ -1,16 +1,42 @@
 syntax = "proto3";
 package chap.thread.v1;
 option go_package = "github.com/uzak0209/CHAP_Grpc/backend/api/pd;pd";
+
 import "common.proto";
 import "comment.proto";
+import "google/api/annotations.proto";
+
 service ThreadService {
   // スレッド操作
-  rpc GetThreadsByID(GetThreadByIDRequest) returns (GetThreadByIDResponse);
-  rpc GetThreads(GetThreadsRequest) returns (GetThreadsResponse);
-  rpc CreateThread(CreateThreadRequest) returns (chap.common.v1.StandardResponse);
-  rpc EditThread(EditThreadRequest) returns (chap.common.v1.StandardResponse);
-  rpc DeleteThread(DeleteThreadRequest) returns (chap.common.v1.StandardResponse);
+  rpc GetThreadsByID(GetThreadByIDRequest) returns (GetThreadByIDResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/threads/{thread_id}"
+    };
+  }
+  rpc GetThreads(GetThreadsRequest) returns (GetThreadsResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/threads"
+    };
+  }
+  rpc CreateThread(CreateThreadRequest) returns (chap.common.v1.StandardResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/threads"
+      body: "*"
+    };
+  }
+  rpc EditThread(EditThreadRequest) returns (chap.common.v1.StandardResponse) {
+    option (google.api.http) = {
+      put: "/api/v1/threads/{thread_id}"
+      body: "*"
+    };
+  }
+  rpc DeleteThread(DeleteThreadRequest) returns (chap.common.v1.StandardResponse) {
+    option (google.api.http) = {
+      delete: "/api/v1/threads/{thread_id}"
+    };
+  }
 }
+
 message GetThreadByIDRequest {
   string thread_id = 1;
 }
@@ -34,26 +60,30 @@ message Thread{
     double lng =11;
     repeated string likes=12;
     repeated string comments=13;
-
 }
+
 message GetThreadsRequest {
   double lat = 1;
   double lng = 2;
 }
+
 message GetThreadsResponse {
   repeated Thread threads = 1;
 }
+
 message CreateThreadRequest{
     string content =1;
     string image=2;
     double lat =3;
     double lng =4;
 }
+
 message EditThreadRequest {
   string thread_id = 1;
   string content = 2;
   string image=3;
 }
+
 message DeleteThreadRequest {
   string thread_id = 1;
 }

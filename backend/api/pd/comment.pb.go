@@ -7,6 +7,7 @@
 package pd
 
 import (
+	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -425,7 +426,7 @@ var File_comment_proto protoreflect.FileDescriptor
 
 const file_comment_proto_rawDesc = "" +
 	"\n" +
-	"\rcomment.proto\x12\x0fchap.comment.v1\x1a\fcommon.proto\"\xfe\x02\n" +
+	"\rcomment.proto\x12\x0fchap.comment.v1\x1a\fcommon.proto\x1a\x1cgoogle/api/annotations.proto\"\xfe\x02\n" +
 	"\aComment\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1b\n" +
 	"\tthread_id\x18\x02 \x01(\tR\bthreadId\x12\x1b\n" +
@@ -461,12 +462,12 @@ const file_comment_proto_rawDesc = "" +
 	"\acontent\x18\x02 \x01(\tR\acontent\"5\n" +
 	"\x14DeleteCommentRequest\x12\x1d\n" +
 	"\n" +
-	"comment_id\x18\x01 \x01(\tR\tcommentId2\x92\x03\n" +
-	"\x0eCommentService\x12v\n" +
-	"\x15GetCommentsByThreadID\x12-.chap.comment.v1.GetCommentsByThreadIDRequest\x1a..chap.comment.v1.GetCommentsByThreadIDResponse\x12T\n" +
-	"\vEditComment\x12#.chap.comment.v1.EditCommentRequest\x1a .chap.common.v1.StandardResponse\x12X\n" +
-	"\rCreateComment\x12%.chap.comment.v1.CreateCommentRequest\x1a .chap.common.v1.StandardResponse\x12X\n" +
-	"\rDeleteComment\x12%.chap.comment.v1.DeleteCommentRequest\x1a .chap.common.v1.StandardResponseB1Z/github.com/uzak0209/CHAP_Grpc/backend/api/pd;pdb\x06proto3"
+	"comment_id\x18\x01 \x01(\tR\tcommentId2\xc4\x04\n" +
+	"\x0eCommentService\x12\xa4\x01\n" +
+	"\x15GetCommentsByThreadID\x12-.chap.comment.v1.GetCommentsByThreadIDRequest\x1a..chap.comment.v1.GetCommentsByThreadIDResponse\",\x82\xd3\xe4\x93\x02&\x12$/api/v1/threads/{thread_id}/comments\x12\x89\x01\n" +
+	"\rCreateComment\x12%.chap.comment.v1.CreateCommentRequest\x1a .chap.common.v1.StandardResponse\"/\x82\xd3\xe4\x93\x02):\x01*\"$/api/v1/threads/{thread_id}/comments\x12~\n" +
+	"\vEditComment\x12#.chap.comment.v1.EditCommentRequest\x1a .chap.common.v1.StandardResponse\"(\x82\xd3\xe4\x93\x02\":\x01*\x1a\x1d/api/v1/comments/{comment_id}\x12\x7f\n" +
+	"\rDeleteComment\x12%.chap.comment.v1.DeleteCommentRequest\x1a .chap.common.v1.StandardResponse\"%\x82\xd3\xe4\x93\x02\x1f*\x1d/api/v1/comments/{comment_id}B1Z/github.com/uzak0209/CHAP_Grpc/backend/api/pd;pdb\x06proto3"
 
 var (
 	file_comment_proto_rawDescOnce sync.Once
@@ -493,12 +494,12 @@ var file_comment_proto_goTypes = []any{
 var file_comment_proto_depIdxs = []int32{
 	0, // 0: chap.comment.v1.GetCommentsByThreadIDResponse.comments:type_name -> chap.comment.v1.Comment
 	1, // 1: chap.comment.v1.CommentService.GetCommentsByThreadID:input_type -> chap.comment.v1.GetCommentsByThreadIDRequest
-	4, // 2: chap.comment.v1.CommentService.EditComment:input_type -> chap.comment.v1.EditCommentRequest
-	3, // 3: chap.comment.v1.CommentService.CreateComment:input_type -> chap.comment.v1.CreateCommentRequest
+	3, // 2: chap.comment.v1.CommentService.CreateComment:input_type -> chap.comment.v1.CreateCommentRequest
+	4, // 3: chap.comment.v1.CommentService.EditComment:input_type -> chap.comment.v1.EditCommentRequest
 	5, // 4: chap.comment.v1.CommentService.DeleteComment:input_type -> chap.comment.v1.DeleteCommentRequest
 	2, // 5: chap.comment.v1.CommentService.GetCommentsByThreadID:output_type -> chap.comment.v1.GetCommentsByThreadIDResponse
-	6, // 6: chap.comment.v1.CommentService.EditComment:output_type -> chap.common.v1.StandardResponse
-	6, // 7: chap.comment.v1.CommentService.CreateComment:output_type -> chap.common.v1.StandardResponse
+	6, // 6: chap.comment.v1.CommentService.CreateComment:output_type -> chap.common.v1.StandardResponse
+	6, // 7: chap.comment.v1.CommentService.EditComment:output_type -> chap.common.v1.StandardResponse
 	6, // 8: chap.comment.v1.CommentService.DeleteComment:output_type -> chap.common.v1.StandardResponse
 	5, // [5:9] is the sub-list for method output_type
 	1, // [1:5] is the sub-list for method input_type
