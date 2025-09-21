@@ -46,4 +46,6 @@ generate:
 	cd backend && protoc --proto_path=api/proto \
 		--go_out=api/pd --go_opt=paths=source_relative \
 		--go-grpc_out=api/pd --go-grpc_opt=paths=source_relative \
+		--grpc-gateway_out=api/pd --grpc-gateway_opt=paths=source_relative \
+		--openapiv2_out=../docs --openapiv2_opt=logtostderr=true \
 		api/proto/*.proto
