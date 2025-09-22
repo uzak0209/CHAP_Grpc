@@ -4,8 +4,8 @@ import (
 	"log"
 	"net"
 
-	"CHAP_Grpc/backend/api/pd"
-	"CHAP_Grpc/backend/middleware"
+	"github.com/uzak0209/CHAP_Grpc/backend/api/pd"
+	"github.com/uzak0209/CHAP_Grpc/backend/middleware"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"

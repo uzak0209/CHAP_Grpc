@@ -1,27 +1,32 @@
-FROM golang:1.25-alpine
-
-# Install git and useful tools
-RUN apk add --no-cache git inotify-tools
+# Build stage
+FROM golang:1.23-alpine AS builder
 
 WORKDIR /app
 
-# Install air for hot reloading
-RUN go install github.com/cosmtrek/air@v1.49.0
-
-# Copy go mod files first for better caching
+# Copy go mod and sum files
 COPY go.mod go.sum ./
+
+# Download dependencies
 RUN go mod download
 
 # Copy source code
 COPY . .
 
-# Make sure tmp directory exists with correct permissions
-RUN mkdir -p tmp && chmod 755 tmp
+# Build the application
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main .
 
-# Set environment variable for air debugging
-ENV AIR_DEBUG=1
+# Final stage
+FROM alpine:latest
 
+RUN apk --no-cache add ca-certificates
+
+WORKDIR /root/
+
+# Copy the binary from builder stage
+COPY --from=builder /app/main .
+
+# Expose port
 EXPOSE 50051
 
-# Use air with debug flag
-CMD ["sh", "-c", "echo 'Air config:' && cat .air.toml && echo 'Starting air...' && air -c .air.toml -d"]
+# Command to run
+CMD ["./main"]

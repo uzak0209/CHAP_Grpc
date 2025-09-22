@@ -4,7 +4,7 @@ import (
 	"context"
 	"log"
 
-	"CHAP_Grpc/backend/api/pd"
+	"github.com/uzak0209/CHAP_Grpc/backend/api/pd"
 )
 
 // PostServerはPostサービスの実装です。

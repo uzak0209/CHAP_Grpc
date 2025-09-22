@@ -1,10 +1,11 @@
 package repository
 
 import (
-	"CHAP_Grpc/backend/api/pd"
-	"CHAP_Grpc/backend/infra/db"
-	"CHAP_Grpc/backend/infra/model"
 	"context"
+
+	"github.com/uzak0209/CHAP_Grpc/backend/api/pd"
+	"github.com/uzak0209/CHAP_Grpc/backend/infra/db"
+	"github.com/uzak0209/CHAP_Grpc/backend/infra/model"
 )
 
 type UserRepository struct{}

@@ -1,13 +1,14 @@
 package handler
 
 import (
-	"CHAP_Grpc/backend/api/pd"
-	"CHAP_Grpc/backend/infra/model"
-	"CHAP_Grpc/backend/infra/repository"
-	"CHAP_Grpc/backend/utils"
 	"context"
 	"log"
 	"time"
+
+	"github.com/uzak0209/CHAP_Grpc/backend/api/pd"
+	"github.com/uzak0209/CHAP_Grpc/backend/infra/model"
+	"github.com/uzak0209/CHAP_Grpc/backend/infra/repository"
+	"github.com/uzak0209/CHAP_Grpc/backend/utils"
 
 	"github.com/google/uuid"
 	"google.golang.org/grpc/codes"
