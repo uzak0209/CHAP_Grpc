@@ -1,20 +1,37 @@
 syntax = "proto3";
 package chap.auth.v1;
-option go_package = "/backend/api/generated/auth";
+option go_package = "github.com/uzak0209/CHAP_Grpc/backend/api/pd;pd";
+
+import "google/api/annotations.proto";
+
 service AuthService {
   // 認証操作
-  rpc SignUp(SignUpRequest) returns (SignInResponse);
-  rpc SignIn(SignInRequest) returns (SignInResponse);
+  rpc SignUp(SignUpRequest) returns (AuthResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/auth/signup"
+      body: "*"
+    };
+  }
+  rpc SignIn(SignInRequest) returns (AuthResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/auth/signin"
+      body: "*"
+    };
+  }
 }
+
 message SignUpRequest{
     string email =1;
     string password =2;
+    string name =3;
 }
+
 message SignInRequest{
     string email =1;
     string password =2;
 }
-message SignInResponse {
+
+message AuthResponse {
     bool success =1;
     string message =2;
     string token =3;

@@ -1,0 +1,47 @@
+services:
+  grpc-server:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "50051:50051"
+      - "8081:8081"
+    env_file:
+      - ./backend/.env
+    volumes:
+      - ./backend:/app:delegated  # ホストのbackendディレクトリをコンテナの/appにマウント
+      - /app/tmp                  # tmpディレクトリは除外
+      - go_mod_cache:/go/pkg/mod  # go modulesキャッシュ
+    networks:
+      - grpc-network
+    restart: "no"
+    environment:
+      - GOOS=linux
+
+  envoy:
+    build: ./envoy
+    ports:
+      - "8080:8080"
+      - "9901:9901"
+    depends_on:
+      - grpc-server
+    networks:
+      - grpc-network
+
+  swagger-ui:
+    build:
+      context: ./docs
+      dockerfile: Dockerfile.swagger
+    ports:
+      - "3000:8080"
+    environment:
+      - SWAGGER_JSON=/swagger.json
+    networks:
+      - grpc-network
+
+networks:
+  grpc-network:
+    driver: bridge
+
+volumes:
+  go_mod_cache:

@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package chap.common.v1;
 
-option go_package = "backend/api/generated/common";
+option go_package = "github.com/uzak0209/CHAP_Grpc/backend/api/pd;pd";
 
 message StandardResponse {
   bool success = 1;

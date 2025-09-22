@@ -1,0 +1,12 @@
+FROM swaggerapi/swagger-ui:latest
+
+# 生成されたSwagger JSONファイルを docs 配下へコピー
+COPY *.swagger.json /usr/share/nginx/html/docs/
+
+# カスタム初期化スクリプトをコピー
+COPY swagger-initializer.js /usr/share/nginx/html/swagger-initializer.js
+
+
+# Swagger UI に参照する JSON を指定
+ENV SWAGGER_JSON=/docs/auth.swagger.json
+

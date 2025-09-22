@@ -1,0 +1,38 @@
+services:
+  grpc-server:
+    build: ./backend
+    ports:
+      - "50051:50051"
+      - "8081:8081"
+    env_file:
+      - ./backend/.env
+    restart: on-failure
+    networks:
+      - grpc-network
+
+  envoy:
+    build: ./envoy
+    ports:
+      - "8080:8080"
+      - "9901:9901"
+    depends_on:
+      - grpc-server
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - grpc-network
+
+
+  swagger-ui:
+    build:
+      context: ./docs
+      dockerfile: Dockerfile.swagger
+    ports:
+      - "3000:8080"
+    environment:
+      - SWAGGER_JSON=/swagger.json
+    networks:
+      - grpc-network
+networks:
+  grpc-network:
+    driver: bridge
