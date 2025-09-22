@@ -1,8 +1,7 @@
-@import "tailwindcss";
 
-@plugin "tailwindcss-animate";
-
-@custom-variant dark (&:is(.dark *));
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 :root {
   --background: hsl(0 0% 100%);
@@ -134,11 +133,5 @@
   }
 }
 
-@layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
-}
+
+/* Tailwind v4では@applyやカスタムクラスは使えません。必要なら通常CSSで記述してください。*/

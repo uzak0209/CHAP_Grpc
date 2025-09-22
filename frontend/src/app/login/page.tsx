@@ -8,30 +8,76 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
 import { useAuthStore } from "@/store/useAuthStore";
+import { useAuthServiceSignIn, useAuthServiceSignUp } from '@/api/auth';
+import "../../api/axios";
 
 type AuthMode = 'login' | 'register';
 
 export default function LoginPage() {
+  
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-
   const [displayName, setDisplayName] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [authMode, setAuthMode] = useState<AuthMode>('login');
-  const authStore= useAuthStore((state) => state);
-  
+  const [isLoading, setIsLoading] = useState(false);
+  const [currentError, setCurrentError] = useState<string | null>(null);
 
+  const authStore = useAuthStore((state) => state);
   const router = useRouter();
-  
+
+  // orvalで生成されたmutation
+  const signUpMutation = useAuthServiceSignUp();
+  const signInMutation = useAuthServiceSignIn();
 
   // ログイン成功時のリダイレクト処理
   useEffect(() => {
     if (authStore.isAuthenticated) {
       router.push('/timeline');
     }
-  }, [authStore.isAuthenticated]);
+  }, [authStore.isAuthenticated, router]);
 
+  // 登録・ログイン処理
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setCurrentError(null);
 
-
+    if (authMode === 'register') {
+      if (password !== confirmPassword) {
+        setCurrentError('パスワードが一致しません');
+        return;
+      }
+      setIsLoading(true);
+      signUpMutation.mutate(
+        { data: { email, password, name: displayName } },
+        {
+          onSuccess: () => {
+            authStore.setAuthenticated(true);
+            setIsLoading(false);
+          },
+          onError: (err: any) => {
+            setCurrentError('新規登録に失敗しました');
+            setIsLoading(false);
+          },
+        }
+      );
+    } else {
+      setIsLoading(true);
+      signInMutation.mutate(
+        { data: { email, password } },
+        {
+          onSuccess: () => {
+            authStore.setAuthenticated(true);
+            setIsLoading(false);
+          },
+          onError: (err: any) => {
+            setCurrentError('ログインに失敗しました');
+            setIsLoading(false);
+          },
+        }
+      );
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center p-4">
@@ -197,4 +243,4 @@ function PrivacyNotice() {
       </p>
     </div>
   );
-} 
+}

@@ -9,9 +9,14 @@ import {
   useQuery
 } from '@tanstack/react-query';
 import type {
+  DataTag,
+  DefinedInitialDataOptions,
+  DefinedUseQueryResult,
   MutationFunction,
+  QueryClient,
   QueryFunction,
   QueryKey,
+  UndefinedInitialDataOptions,
   UseMutationOptions,
   UseMutationResult,
   UseQueryOptions,
@@ -31,7 +36,7 @@ import type {
   V1EditUserRequest,
   V1GetUserByIDResponse,
   V1StandardResponse
-} from './';
+} from './user.schemas.ts';
 
 type AwaitedInput<T> = PromiseLike<T> | T;
 
@@ -83,7 +88,7 @@ const {mutation: mutationOptions, axios: axiosOptions} = options ?
 
     export const useUserServiceDeleteUser = <TError = AxiosError<RpcStatus>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof userServiceDeleteUser>>, TError,{userId: string}, TContext>, axios?: AxiosRequestConfig}
- ): UseMutationResult<
+ , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof userServiceDeleteUser>>,
         TError,
         {userId: string},
@@ -92,7 +97,7 @@ const {mutation: mutationOptions, axios: axiosOptions} = options ?
 
       const mutationOptions = getUserServiceDeleteUserMutationOptions(options);
 
-      return useMutation(mutationOptions );
+      return useMutation(mutationOptions , queryClient);
     }
     
 export const userServiceEditUser = (
@@ -139,7 +144,7 @@ const {mutation: mutationOptions, axios: axiosOptions} = options ?
 
     export const useUserServiceEditUser = <TError = AxiosError<RpcStatus>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof userServiceEditUser>>, TError,{data: V1EditUserRequest}, TContext>, axios?: AxiosRequestConfig}
- ): UseMutationResult<
+ , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof userServiceEditUser>>,
         TError,
         {data: V1EditUserRequest},
@@ -148,7 +153,7 @@ const {mutation: mutationOptions, axios: axiosOptions} = options ?
 
       const mutationOptions = getUserServiceEditUserMutationOptions(options);
 
-      return useMutation(mutationOptions );
+      return useMutation(mutationOptions , queryClient);
     }
     
 export const userServiceUnfollowUser = (
@@ -194,7 +199,7 @@ const {mutation: mutationOptions, axios: axiosOptions} = options ?
 
     export const useUserServiceUnfollowUser = <TError = AxiosError<RpcStatus>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof userServiceUnfollowUser>>, TError,{targetUserId: string}, TContext>, axios?: AxiosRequestConfig}
- ): UseMutationResult<
+ , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof userServiceUnfollowUser>>,
         TError,
         {targetUserId: string},
@@ -203,7 +208,7 @@ const {mutation: mutationOptions, axios: axiosOptions} = options ?
 
       const mutationOptions = getUserServiceUnfollowUserMutationOptions(options);
 
-      return useMutation(mutationOptions );
+      return useMutation(mutationOptions , queryClient);
     }
     
 export const userServiceFollowUser = (
@@ -251,7 +256,7 @@ const {mutation: mutationOptions, axios: axiosOptions} = options ?
 
     export const useUserServiceFollowUser = <TError = AxiosError<RpcStatus>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof userServiceFollowUser>>, TError,{targetUserId: string;data: UserServiceFollowUserBody}, TContext>, axios?: AxiosRequestConfig}
- ): UseMutationResult<
+ , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof userServiceFollowUser>>,
         TError,
         {targetUserId: string;data: UserServiceFollowUserBody},
@@ -260,7 +265,7 @@ const {mutation: mutationOptions, axios: axiosOptions} = options ?
 
       const mutationOptions = getUserServiceFollowUserMutationOptions(options);
 
-      return useMutation(mutationOptions );
+      return useMutation(mutationOptions , queryClient);
     }
     
 /**
@@ -282,7 +287,7 @@ export const getUserServiceGetUserByIDQueryKey = (userId?: string,) => {
     }
 
     
-export const getUserServiceGetUserByIDQueryOptions = <TData = Awaited<ReturnType<typeof userServiceGetUserByID>>, TError = AxiosError<RpcStatus>>(userId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof userServiceGetUserByID>>, TError, TData>, axios?: AxiosRequestConfig}
+export const getUserServiceGetUserByIDQueryOptions = <TData = Awaited<ReturnType<typeof userServiceGetUserByID>>, TError = AxiosError<RpcStatus>>(userId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof userServiceGetUserByID>>, TError, TData>>, axios?: AxiosRequestConfig}
 ) => {
 
 const {query: queryOptions, axios: axiosOptions} = options ?? {};
@@ -297,25 +302,49 @@ const {query: queryOptions, axios: axiosOptions} = options ?? {};
 
       
 
-   return  { queryKey, queryFn, enabled: !!(userId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof userServiceGetUserByID>>, TError, TData> & { queryKey: QueryKey }
+   return  { queryKey, queryFn, enabled: !!(userId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof userServiceGetUserByID>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
 export type UserServiceGetUserByIDQueryResult = NonNullable<Awaited<ReturnType<typeof userServiceGetUserByID>>>
 export type UserServiceGetUserByIDQueryError = AxiosError<RpcStatus>
 
 
+export function useUserServiceGetUserByID<TData = Awaited<ReturnType<typeof userServiceGetUserByID>>, TError = AxiosError<RpcStatus>>(
+ userId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof userServiceGetUserByID>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof userServiceGetUserByID>>,
+          TError,
+          Awaited<ReturnType<typeof userServiceGetUserByID>>
+        > , 'initialData'
+      >, axios?: AxiosRequestConfig}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useUserServiceGetUserByID<TData = Awaited<ReturnType<typeof userServiceGetUserByID>>, TError = AxiosError<RpcStatus>>(
+ userId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof userServiceGetUserByID>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof userServiceGetUserByID>>,
+          TError,
+          Awaited<ReturnType<typeof userServiceGetUserByID>>
+        > , 'initialData'
+      >, axios?: AxiosRequestConfig}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useUserServiceGetUserByID<TData = Awaited<ReturnType<typeof userServiceGetUserByID>>, TError = AxiosError<RpcStatus>>(
+ userId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof userServiceGetUserByID>>, TError, TData>>, axios?: AxiosRequestConfig}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary ユーザー操作
  */
 
 export function useUserServiceGetUserByID<TData = Awaited<ReturnType<typeof userServiceGetUserByID>>, TError = AxiosError<RpcStatus>>(
- userId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof userServiceGetUserByID>>, TError, TData>, axios?: AxiosRequestConfig}
-  
- ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+ userId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof userServiceGetUserByID>>, TError, TData>>, axios?: AxiosRequestConfig}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getUserServiceGetUserByIDQueryOptions(userId,options)
 
-  const query = useQuery(queryOptions ) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+  const query = useQuery(queryOptions , queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
   query.queryKey = queryOptions.queryKey ;
 

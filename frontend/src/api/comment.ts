@@ -9,9 +9,14 @@ import {
   useQuery
 } from '@tanstack/react-query';
 import type {
+  DataTag,
+  DefinedInitialDataOptions,
+  DefinedUseQueryResult,
   MutationFunction,
+  QueryClient,
   QueryFunction,
   QueryKey,
+  UndefinedInitialDataOptions,
   UseMutationOptions,
   UseMutationResult,
   UseQueryOptions,
@@ -32,7 +37,7 @@ import type {
   V1EditCommentRequest,
   V1GetCommentsByThreadIDResponse,
   V1StandardResponse
-} from './';
+} from './comment.schemas.ts';
 
 type AwaitedInput<T> = PromiseLike<T> | T;
 
@@ -85,7 +90,7 @@ const {mutation: mutationOptions, axios: axiosOptions} = options ?
 
     export const useCommentServiceCreateComment = <TError = AxiosError<RpcStatus>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof commentServiceCreateComment>>, TError,{data: V1CreateCommentRequest}, TContext>, axios?: AxiosRequestConfig}
- ): UseMutationResult<
+ , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof commentServiceCreateComment>>,
         TError,
         {data: V1CreateCommentRequest},
@@ -94,7 +99,7 @@ const {mutation: mutationOptions, axios: axiosOptions} = options ?
 
       const mutationOptions = getCommentServiceCreateCommentMutationOptions(options);
 
-      return useMutation(mutationOptions );
+      return useMutation(mutationOptions , queryClient);
     }
     
 export const commentServiceDeleteComment = (
@@ -140,7 +145,7 @@ const {mutation: mutationOptions, axios: axiosOptions} = options ?
 
     export const useCommentServiceDeleteComment = <TError = AxiosError<RpcStatus>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof commentServiceDeleteComment>>, TError,{commentId: string}, TContext>, axios?: AxiosRequestConfig}
- ): UseMutationResult<
+ , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof commentServiceDeleteComment>>,
         TError,
         {commentId: string},
@@ -149,7 +154,7 @@ const {mutation: mutationOptions, axios: axiosOptions} = options ?
 
       const mutationOptions = getCommentServiceDeleteCommentMutationOptions(options);
 
-      return useMutation(mutationOptions );
+      return useMutation(mutationOptions , queryClient);
     }
     
 export const commentServiceEditComment = (
@@ -196,7 +201,7 @@ const {mutation: mutationOptions, axios: axiosOptions} = options ?
 
     export const useCommentServiceEditComment = <TError = AxiosError<RpcStatus>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof commentServiceEditComment>>, TError,{data: V1EditCommentRequest}, TContext>, axios?: AxiosRequestConfig}
- ): UseMutationResult<
+ , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof commentServiceEditComment>>,
         TError,
         {data: V1EditCommentRequest},
@@ -205,7 +210,7 @@ const {mutation: mutationOptions, axios: axiosOptions} = options ?
 
       const mutationOptions = getCommentServiceEditCommentMutationOptions(options);
 
-      return useMutation(mutationOptions );
+      return useMutation(mutationOptions , queryClient);
     }
     
 /**
@@ -232,7 +237,7 @@ export const getCommentServiceGetCommentsByThreadIDQueryKey = (threadId?: string
 
     
 export const getCommentServiceGetCommentsByThreadIDQueryOptions = <TData = Awaited<ReturnType<typeof commentServiceGetCommentsByThreadID>>, TError = AxiosError<RpcStatus>>(threadId: string,
-    params?: CommentServiceGetCommentsByThreadIDParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof commentServiceGetCommentsByThreadID>>, TError, TData>, axios?: AxiosRequestConfig}
+    params?: CommentServiceGetCommentsByThreadIDParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof commentServiceGetCommentsByThreadID>>, TError, TData>>, axios?: AxiosRequestConfig}
 ) => {
 
 const {query: queryOptions, axios: axiosOptions} = options ?? {};
@@ -247,26 +252,53 @@ const {query: queryOptions, axios: axiosOptions} = options ?? {};
 
       
 
-   return  { queryKey, queryFn, enabled: !!(threadId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof commentServiceGetCommentsByThreadID>>, TError, TData> & { queryKey: QueryKey }
+   return  { queryKey, queryFn, enabled: !!(threadId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof commentServiceGetCommentsByThreadID>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
 export type CommentServiceGetCommentsByThreadIDQueryResult = NonNullable<Awaited<ReturnType<typeof commentServiceGetCommentsByThreadID>>>
 export type CommentServiceGetCommentsByThreadIDQueryError = AxiosError<RpcStatus>
 
 
+export function useCommentServiceGetCommentsByThreadID<TData = Awaited<ReturnType<typeof commentServiceGetCommentsByThreadID>>, TError = AxiosError<RpcStatus>>(
+ threadId: string,
+    params: undefined |  CommentServiceGetCommentsByThreadIDParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof commentServiceGetCommentsByThreadID>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof commentServiceGetCommentsByThreadID>>,
+          TError,
+          Awaited<ReturnType<typeof commentServiceGetCommentsByThreadID>>
+        > , 'initialData'
+      >, axios?: AxiosRequestConfig}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useCommentServiceGetCommentsByThreadID<TData = Awaited<ReturnType<typeof commentServiceGetCommentsByThreadID>>, TError = AxiosError<RpcStatus>>(
+ threadId: string,
+    params?: CommentServiceGetCommentsByThreadIDParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof commentServiceGetCommentsByThreadID>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof commentServiceGetCommentsByThreadID>>,
+          TError,
+          Awaited<ReturnType<typeof commentServiceGetCommentsByThreadID>>
+        > , 'initialData'
+      >, axios?: AxiosRequestConfig}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useCommentServiceGetCommentsByThreadID<TData = Awaited<ReturnType<typeof commentServiceGetCommentsByThreadID>>, TError = AxiosError<RpcStatus>>(
+ threadId: string,
+    params?: CommentServiceGetCommentsByThreadIDParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof commentServiceGetCommentsByThreadID>>, TError, TData>>, axios?: AxiosRequestConfig}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary コメント操作
  */
 
 export function useCommentServiceGetCommentsByThreadID<TData = Awaited<ReturnType<typeof commentServiceGetCommentsByThreadID>>, TError = AxiosError<RpcStatus>>(
  threadId: string,
-    params?: CommentServiceGetCommentsByThreadIDParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof commentServiceGetCommentsByThreadID>>, TError, TData>, axios?: AxiosRequestConfig}
-  
- ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+    params?: CommentServiceGetCommentsByThreadIDParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof commentServiceGetCommentsByThreadID>>, TError, TData>>, axios?: AxiosRequestConfig}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getCommentServiceGetCommentsByThreadIDQueryOptions(threadId,params,options)
 
-  const query = useQuery(queryOptions ) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+  const query = useQuery(queryOptions , queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
   query.queryKey = queryOptions.queryKey ;
 

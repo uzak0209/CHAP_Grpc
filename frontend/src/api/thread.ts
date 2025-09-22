@@ -9,9 +9,14 @@ import {
   useQuery
 } from '@tanstack/react-query';
 import type {
+  DataTag,
+  DefinedInitialDataOptions,
+  DefinedUseQueryResult,
   MutationFunction,
+  QueryClient,
   QueryFunction,
   QueryKey,
+  UndefinedInitialDataOptions,
   UseMutationOptions,
   UseMutationResult,
   UseQueryOptions,
@@ -33,7 +38,7 @@ import type {
   V1GetThreadByIDResponse,
   V1GetThreadsResponse,
   V1StandardResponse
-} from './';
+} from './thread.schemas.ts';
 
 type AwaitedInput<T> = PromiseLike<T> | T;
 
@@ -60,7 +65,7 @@ export const getThreadServiceGetThreadsQueryKey = (params?: ThreadServiceGetThre
     }
 
     
-export const getThreadServiceGetThreadsQueryOptions = <TData = Awaited<ReturnType<typeof threadServiceGetThreads>>, TError = AxiosError<RpcStatus>>(params?: ThreadServiceGetThreadsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof threadServiceGetThreads>>, TError, TData>, axios?: AxiosRequestConfig}
+export const getThreadServiceGetThreadsQueryOptions = <TData = Awaited<ReturnType<typeof threadServiceGetThreads>>, TError = AxiosError<RpcStatus>>(params?: ThreadServiceGetThreadsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof threadServiceGetThreads>>, TError, TData>>, axios?: AxiosRequestConfig}
 ) => {
 
 const {query: queryOptions, axios: axiosOptions} = options ?? {};
@@ -75,22 +80,46 @@ const {query: queryOptions, axios: axiosOptions} = options ?? {};
 
       
 
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof threadServiceGetThreads>>, TError, TData> & { queryKey: QueryKey }
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof threadServiceGetThreads>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
 export type ThreadServiceGetThreadsQueryResult = NonNullable<Awaited<ReturnType<typeof threadServiceGetThreads>>>
 export type ThreadServiceGetThreadsQueryError = AxiosError<RpcStatus>
 
 
+export function useThreadServiceGetThreads<TData = Awaited<ReturnType<typeof threadServiceGetThreads>>, TError = AxiosError<RpcStatus>>(
+ params: undefined |  ThreadServiceGetThreadsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof threadServiceGetThreads>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof threadServiceGetThreads>>,
+          TError,
+          Awaited<ReturnType<typeof threadServiceGetThreads>>
+        > , 'initialData'
+      >, axios?: AxiosRequestConfig}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useThreadServiceGetThreads<TData = Awaited<ReturnType<typeof threadServiceGetThreads>>, TError = AxiosError<RpcStatus>>(
+ params?: ThreadServiceGetThreadsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof threadServiceGetThreads>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof threadServiceGetThreads>>,
+          TError,
+          Awaited<ReturnType<typeof threadServiceGetThreads>>
+        > , 'initialData'
+      >, axios?: AxiosRequestConfig}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useThreadServiceGetThreads<TData = Awaited<ReturnType<typeof threadServiceGetThreads>>, TError = AxiosError<RpcStatus>>(
+ params?: ThreadServiceGetThreadsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof threadServiceGetThreads>>, TError, TData>>, axios?: AxiosRequestConfig}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function useThreadServiceGetThreads<TData = Awaited<ReturnType<typeof threadServiceGetThreads>>, TError = AxiosError<RpcStatus>>(
- params?: ThreadServiceGetThreadsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof threadServiceGetThreads>>, TError, TData>, axios?: AxiosRequestConfig}
-  
- ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+ params?: ThreadServiceGetThreadsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof threadServiceGetThreads>>, TError, TData>>, axios?: AxiosRequestConfig}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getThreadServiceGetThreadsQueryOptions(params,options)
 
-  const query = useQuery(queryOptions ) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+  const query = useQuery(queryOptions , queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
   query.queryKey = queryOptions.queryKey ;
 
@@ -144,7 +173,7 @@ const {mutation: mutationOptions, axios: axiosOptions} = options ?
 
     export const useThreadServiceCreateThread = <TError = AxiosError<RpcStatus>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof threadServiceCreateThread>>, TError,{data: V1CreateThreadRequest}, TContext>, axios?: AxiosRequestConfig}
- ): UseMutationResult<
+ , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof threadServiceCreateThread>>,
         TError,
         {data: V1CreateThreadRequest},
@@ -153,7 +182,7 @@ const {mutation: mutationOptions, axios: axiosOptions} = options ?
 
       const mutationOptions = getThreadServiceCreateThreadMutationOptions(options);
 
-      return useMutation(mutationOptions );
+      return useMutation(mutationOptions , queryClient);
     }
     
 export const threadServiceDeleteThread = (
@@ -199,7 +228,7 @@ const {mutation: mutationOptions, axios: axiosOptions} = options ?
 
     export const useThreadServiceDeleteThread = <TError = AxiosError<RpcStatus>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof threadServiceDeleteThread>>, TError,{threadId: string}, TContext>, axios?: AxiosRequestConfig}
- ): UseMutationResult<
+ , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof threadServiceDeleteThread>>,
         TError,
         {threadId: string},
@@ -208,7 +237,7 @@ const {mutation: mutationOptions, axios: axiosOptions} = options ?
 
       const mutationOptions = getThreadServiceDeleteThreadMutationOptions(options);
 
-      return useMutation(mutationOptions );
+      return useMutation(mutationOptions , queryClient);
     }
     
 export const threadServiceEditThread = (
@@ -255,7 +284,7 @@ const {mutation: mutationOptions, axios: axiosOptions} = options ?
 
     export const useThreadServiceEditThread = <TError = AxiosError<RpcStatus>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof threadServiceEditThread>>, TError,{data: V1EditThreadRequest}, TContext>, axios?: AxiosRequestConfig}
- ): UseMutationResult<
+ , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof threadServiceEditThread>>,
         TError,
         {data: V1EditThreadRequest},
@@ -264,7 +293,7 @@ const {mutation: mutationOptions, axios: axiosOptions} = options ?
 
       const mutationOptions = getThreadServiceEditThreadMutationOptions(options);
 
-      return useMutation(mutationOptions );
+      return useMutation(mutationOptions , queryClient);
     }
     
 /**
@@ -286,7 +315,7 @@ export const getThreadServiceGetThreadsByIDQueryKey = (threadId?: string,) => {
     }
 
     
-export const getThreadServiceGetThreadsByIDQueryOptions = <TData = Awaited<ReturnType<typeof threadServiceGetThreadsByID>>, TError = AxiosError<RpcStatus>>(threadId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof threadServiceGetThreadsByID>>, TError, TData>, axios?: AxiosRequestConfig}
+export const getThreadServiceGetThreadsByIDQueryOptions = <TData = Awaited<ReturnType<typeof threadServiceGetThreadsByID>>, TError = AxiosError<RpcStatus>>(threadId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof threadServiceGetThreadsByID>>, TError, TData>>, axios?: AxiosRequestConfig}
 ) => {
 
 const {query: queryOptions, axios: axiosOptions} = options ?? {};
@@ -301,25 +330,49 @@ const {query: queryOptions, axios: axiosOptions} = options ?? {};
 
       
 
-   return  { queryKey, queryFn, enabled: !!(threadId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof threadServiceGetThreadsByID>>, TError, TData> & { queryKey: QueryKey }
+   return  { queryKey, queryFn, enabled: !!(threadId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof threadServiceGetThreadsByID>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
 export type ThreadServiceGetThreadsByIDQueryResult = NonNullable<Awaited<ReturnType<typeof threadServiceGetThreadsByID>>>
 export type ThreadServiceGetThreadsByIDQueryError = AxiosError<RpcStatus>
 
 
+export function useThreadServiceGetThreadsByID<TData = Awaited<ReturnType<typeof threadServiceGetThreadsByID>>, TError = AxiosError<RpcStatus>>(
+ threadId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof threadServiceGetThreadsByID>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof threadServiceGetThreadsByID>>,
+          TError,
+          Awaited<ReturnType<typeof threadServiceGetThreadsByID>>
+        > , 'initialData'
+      >, axios?: AxiosRequestConfig}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useThreadServiceGetThreadsByID<TData = Awaited<ReturnType<typeof threadServiceGetThreadsByID>>, TError = AxiosError<RpcStatus>>(
+ threadId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof threadServiceGetThreadsByID>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof threadServiceGetThreadsByID>>,
+          TError,
+          Awaited<ReturnType<typeof threadServiceGetThreadsByID>>
+        > , 'initialData'
+      >, axios?: AxiosRequestConfig}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useThreadServiceGetThreadsByID<TData = Awaited<ReturnType<typeof threadServiceGetThreadsByID>>, TError = AxiosError<RpcStatus>>(
+ threadId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof threadServiceGetThreadsByID>>, TError, TData>>, axios?: AxiosRequestConfig}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary スレッド操作
  */
 
 export function useThreadServiceGetThreadsByID<TData = Awaited<ReturnType<typeof threadServiceGetThreadsByID>>, TError = AxiosError<RpcStatus>>(
- threadId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof threadServiceGetThreadsByID>>, TError, TData>, axios?: AxiosRequestConfig}
-  
- ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+ threadId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof threadServiceGetThreadsByID>>, TError, TData>>, axios?: AxiosRequestConfig}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getThreadServiceGetThreadsByIDQueryOptions(threadId,options)
 
-  const query = useQuery(queryOptions ) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+  const query = useQuery(queryOptions , queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
   query.queryKey = queryOptions.queryKey ;
 
