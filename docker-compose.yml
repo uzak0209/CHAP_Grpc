@@ -9,20 +9,6 @@ services:
     restart: on-failure
     networks:
       - grpc-network
-
-  envoy:
-    build: ./envoy
-    ports:
-      - "8080:8080"
-      - "9901:9901"
-    depends_on:
-      - grpc-server
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-    networks:
-      - grpc-network
-
-
   swagger-ui:
     build:
       context: ./docs
