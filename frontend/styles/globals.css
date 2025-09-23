@@ -1,5 +1,7 @@
 
 @tailwind base;
+/* ---break---*/
+@custom-variant dark (&:is(.dark *));
 @tailwind components;
 @tailwind utilities;
 
@@ -37,6 +39,7 @@
   --sidebar-accent-foreground: hsl(240 5.9% 10%);
   --sidebar-border: hsl(220 13% 91%);
   --sidebar-ring: hsl(217.2 91.2% 59.8%);
+  --sidebar: hsl(0 0% 98%);
 }
 
 .dark {
@@ -72,6 +75,7 @@
   --sidebar-accent-foreground: hsl(240 4.8% 95.9%);
   --sidebar-border: hsl(240 3.7% 15.9%);
   --sidebar-ring: hsl(217.2 91.2% 59.8%);
+  --sidebar: hsl(240 5.9% 10%);
 }
 
 @theme inline {
@@ -133,5 +137,18 @@
   }
 }
 
-
 /* Tailwind v4では@applyやカスタムクラスは使えません。必要なら通常CSSで記述してください。*/
+
+/* ---break---*/
+
+@layer base {
+  /* Keep base box-sizing and simple body colors. */
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+  }
+}

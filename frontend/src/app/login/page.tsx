@@ -18,7 +18,6 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [displayName, setDisplayName] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
   const [authMode, setAuthMode] = useState<AuthMode>('login');
   const [isLoading, setIsLoading] = useState(false);
   const [currentError, setCurrentError] = useState<string | null>(null);
@@ -33,7 +32,7 @@ export default function LoginPage() {
   // ログイン成功時のリダイレクト処理
   useEffect(() => {
     if (authStore.isAuthenticated) {
-      router.push('/timeline');
+      router.push('/map');
     }
   }, [authStore.isAuthenticated, router]);
 
@@ -43,10 +42,6 @@ export default function LoginPage() {
     setCurrentError(null);
 
     if (authMode === 'register') {
-      if (password !== confirmPassword) {
-        setCurrentError('パスワードが一致しません');
-        return;
-      }
       setIsLoading(true);
       signUpMutation.mutate(
         { data: { email, password, name: displayName } },
@@ -182,22 +177,6 @@ export default function LoginPage() {
                 />
               </div>
 
-              {authMode === 'register' && (
-                <div className="space-y-2">
-                  <Label htmlFor="confirmPassword" className="text-gray-700 font-medium">
-                    パスワード確認
-                  </Label>
-                  <Input
-                    id="confirmPassword"
-                    type="password"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    placeholder="••••••••"
-                    className="h-12 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
-                    required
-                  />
-                </div>
-              )}
 
               <Button
                 type="submit"

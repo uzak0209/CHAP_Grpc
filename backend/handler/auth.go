@@ -27,7 +27,7 @@ func NewAuthServer() *AuthServer {
 }
 
 // 例: Loginメソッドの実装
-func (s *AuthServer) Login(ctx context.Context, req *pd.SignInRequest) (*pd.AuthResponse, error) {
+func (s *AuthServer) SignIn(ctx context.Context, req *pd.SignInRequest) (*pd.AuthResponse, error) {
 	log.Println("Login called")
 
 	// リポジトリからユーザー情報を取得
