@@ -1,4 +1,6 @@
 import * as React from "react"
+import { useQuery } from "@tanstack/react-query"
+import { postServiceGetPosts } from "@/api/post"
 
 const MOBILE_BREAKPOINT = 768
 
@@ -17,3 +19,5 @@ export function useIsMobile() {
 
   return !!isMobile
 }
+
+

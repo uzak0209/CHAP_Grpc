@@ -133,6 +133,7 @@ type Thread struct {
 	Lng           float64                `protobuf:"fixed64,11,opt,name=lng,proto3" json:"lng,omitempty"`
 	Likes         []string               `protobuf:"bytes,12,rep,name=likes,proto3" json:"likes,omitempty"`
 	Comments      []string               `protobuf:"bytes,13,rep,name=comments,proto3" json:"comments,omitempty"`
+	ContentType   string                 `protobuf:"bytes,14,opt,name=content_type,json=contentType,proto3" json:"content_type,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -258,6 +259,13 @@ func (x *Thread) GetComments() []string {
 	return nil
 }
 
+func (x *Thread) GetContentType() string {
+	if x != nil {
+		return x.ContentType
+	}
+	return ""
+}
+
 type GetThreadsRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Lat           float64                `protobuf:"fixed64,1,opt,name=lat,proto3" json:"lat,omitempty"`
@@ -360,6 +368,7 @@ type CreateThreadRequest struct {
 	Image         string                 `protobuf:"bytes,2,opt,name=image,proto3" json:"image,omitempty"`
 	Lat           float64                `protobuf:"fixed64,3,opt,name=lat,proto3" json:"lat,omitempty"`
 	Lng           float64                `protobuf:"fixed64,4,opt,name=lng,proto3" json:"lng,omitempty"`
+	ContentType   string                 `protobuf:"bytes,5,opt,name=content_type,json=contentType,proto3" json:"content_type,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -420,6 +429,13 @@ func (x *CreateThreadRequest) GetLng() float64 {
 		return x.Lng
 	}
 	return 0
+}
+
+func (x *CreateThreadRequest) GetContentType() string {
+	if x != nil {
+		return x.ContentType
+	}
+	return ""
 }
 
 type EditThreadRequest struct {
@@ -535,7 +551,7 @@ const file_thread_proto_rawDesc = "" +
 	"\tthread_id\x18\x01 \x01(\tR\bthreadId\"{\n" +
 	"\x15GetThreadByIDResponse\x12.\n" +
 	"\x06thread\x18\x01 \x01(\v2\x16.chap.thread.v1.ThreadR\x06thread\x122\n" +
-	"\acomment\x18\x02 \x03(\v2\x18.chap.comment.v1.CommentR\acomment\"\xd0\x02\n" +
+	"\acomment\x18\x02 \x03(\v2\x18.chap.comment.v1.CommentR\acomment\"\xf3\x02\n" +
 	"\x06Thread\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1b\n" +
 	"\tuser_name\x18\x02 \x01(\tR\buserName\x12\x17\n" +
@@ -554,17 +570,19 @@ const file_thread_proto_rawDesc = "" +
 	" \x01(\x01R\x03lat\x12\x10\n" +
 	"\x03lng\x18\v \x01(\x01R\x03lng\x12\x14\n" +
 	"\x05likes\x18\f \x03(\tR\x05likes\x12\x1a\n" +
-	"\bcomments\x18\r \x03(\tR\bcomments\"7\n" +
+	"\bcomments\x18\r \x03(\tR\bcomments\x12!\n" +
+	"\fcontent_type\x18\x0e \x01(\tR\vcontentType\"7\n" +
 	"\x11GetThreadsRequest\x12\x10\n" +
 	"\x03lat\x18\x01 \x01(\x01R\x03lat\x12\x10\n" +
 	"\x03lng\x18\x02 \x01(\x01R\x03lng\"F\n" +
 	"\x12GetThreadsResponse\x120\n" +
-	"\athreads\x18\x01 \x03(\v2\x16.chap.thread.v1.ThreadR\athreads\"i\n" +
+	"\athreads\x18\x01 \x03(\v2\x16.chap.thread.v1.ThreadR\athreads\"\x8c\x01\n" +
 	"\x13CreateThreadRequest\x12\x18\n" +
 	"\acontent\x18\x01 \x01(\tR\acontent\x12\x14\n" +
 	"\x05image\x18\x02 \x01(\tR\x05image\x12\x10\n" +
 	"\x03lat\x18\x03 \x01(\x01R\x03lat\x12\x10\n" +
-	"\x03lng\x18\x04 \x01(\x01R\x03lng\"`\n" +
+	"\x03lng\x18\x04 \x01(\x01R\x03lng\x12!\n" +
+	"\fcontent_type\x18\x05 \x01(\tR\vcontentType\"`\n" +
 	"\x11EditThreadRequest\x12\x1b\n" +
 	"\tthread_id\x18\x01 \x01(\tR\bthreadId\x12\x18\n" +
 	"\acontent\x18\x02 \x01(\tR\acontent\x12\x14\n" +

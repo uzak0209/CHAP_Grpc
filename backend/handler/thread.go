@@ -20,10 +20,11 @@ type ThreadServer struct {
 	pd.UnimplementedThreadServiceServer
 	threadRepo  repository.ThreadRepository
 	commentRepo repository.CommentRepository
+	userRepo    repository.UserRepository // Add user repository
 }
 
-func NewThreadServer(threadRepo repository.ThreadRepository, commentRepo repository.CommentRepository) *ThreadServer {
-	return &ThreadServer{threadRepo: threadRepo, commentRepo: commentRepo}
+func NewThreadServer(threadRepo repository.ThreadRepository, commentRepo repository.CommentRepository, userRepo repository.UserRepository) *ThreadServer {
+	return &ThreadServer{threadRepo: threadRepo, commentRepo: commentRepo, userRepo: userRepo}
 }
 
 // 例: CreateThreadメソッドの実装
@@ -42,12 +43,24 @@ func (s *ThreadServer) CreateThread(ctx context.Context, req *pd.CreateThreadReq
 		return nil, status.Error(codes.InvalidArgument, "invalid user ID format")
 	}
 
+	// Fetch username and image from user repository
+	user, err := s.userRepo.GetByID(ctx, parsedUserID.String()) // Convert UUID to string
+	if err != nil {
+		log.Printf("Failed to fetch user details: %v", err)
+		return &pd.StandardResponse{Success: false, Message: "failed to fetch user details"}, nil
+	}
+
 	thread := &model.ThreadDBModel{
-		ID:        uuid.New(),
-		UserID:    parsedUserID,
-		Content:   req.GetContent(),
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+		ID:          uuid.New(),
+		UserID:      parsedUserID,
+		UserName:    user.Name,  // Corrected field name
+		UserImage:   user.Image, // Add user image
+		Content:     req.GetContent(),
+		CreatedAt:   time.Now(),
+		UpdatedAt:   time.Now(),
+		ContentType: req.GetContentType(),
+		Lat:         req.GetLat(),
+		Lng:         req.GetLng(),
 	}
 
 	if err := s.threadRepo.Create(ctx, thread); err != nil {

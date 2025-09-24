@@ -18,16 +18,6 @@ services:
     environment:
       - GOOS=linux
 
-  envoy:
-    build: ./envoy
-    ports:
-      - "8080:8080"
-      - "9901:9901"
-    depends_on:
-      - grpc-server
-    networks:
-      - grpc-network
-
   swagger-ui:
     build:
       context: ./docs

@@ -7,6 +7,11 @@ import "google/api/annotations.proto";
 
 service UserService {
   // ユーザー操作
+  rpc GetMe(chap.common.v1.Empty) returns (GetUserByIDResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/users/me"
+    };
+  }
   rpc GetUserByID(GetUserByIDRequest) returns (GetUserByIDResponse) {
     option (google.api.http) = {
       get: "/api/v1/users/{user_id}"

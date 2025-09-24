@@ -38,6 +38,7 @@ type Comment struct {
 	Lat             float64                `protobuf:"fixed64,12,opt,name=lat,proto3" json:"lat,omitempty"`
 	Lng             float64                `protobuf:"fixed64,13,opt,name=lng,proto3" json:"lng,omitempty"`
 	Likes           []string               `protobuf:"bytes,14,rep,name=likes,proto3" json:"likes,omitempty"`
+	ContentType     string                 `protobuf:"bytes,15,opt,name=content_type,json=contentType,proto3" json:"content_type,omitempty"`
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
 }
@@ -168,6 +169,13 @@ func (x *Comment) GetLikes() []string {
 		return x.Likes
 	}
 	return nil
+}
+
+func (x *Comment) GetContentType() string {
+	if x != nil {
+		return x.ContentType
+	}
+	return ""
 }
 
 type GetCommentsByThreadIDRequest struct {
@@ -426,7 +434,7 @@ var File_comment_proto protoreflect.FileDescriptor
 
 const file_comment_proto_rawDesc = "" +
 	"\n" +
-	"\rcomment.proto\x12\x0fchap.comment.v1\x1a\fcommon.proto\x1a\x1cgoogle/api/annotations.proto\"\xfe\x02\n" +
+	"\rcomment.proto\x12\x0fchap.comment.v1\x1a\fcommon.proto\x1a\x1cgoogle/api/annotations.proto\"\xa1\x03\n" +
 	"\aComment\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1b\n" +
 	"\tthread_id\x18\x02 \x01(\tR\bthreadId\x12\x1b\n" +
@@ -446,7 +454,8 @@ const file_comment_proto_rawDesc = "" +
 	"updated_at\x18\v \x01(\tR\tupdatedAt\x12\x10\n" +
 	"\x03lat\x18\f \x01(\x01R\x03lat\x12\x10\n" +
 	"\x03lng\x18\r \x01(\x01R\x03lng\x12\x14\n" +
-	"\x05likes\x18\x0e \x03(\tR\x05likes\"_\n" +
+	"\x05likes\x18\x0e \x03(\tR\x05likes\x12!\n" +
+	"\fcontent_type\x18\x0f \x01(\tR\vcontentType\"_\n" +
 	"\x1cGetCommentsByThreadIDRequest\x12\x1b\n" +
 	"\tthread_id\x18\x01 \x01(\tR\bthreadId\x12\x10\n" +
 	"\x03lat\x18\x02 \x01(\x01R\x03lat\x12\x10\n" +

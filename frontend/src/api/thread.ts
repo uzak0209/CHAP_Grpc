@@ -38,7 +38,7 @@ import type {
   V1GetThreadByIDResponse,
   V1GetThreadsResponse,
   V1StandardResponse
-} from './thread.schemas.ts';
+} from './';
 
 type AwaitedInput<T> = PromiseLike<T> | T;
 

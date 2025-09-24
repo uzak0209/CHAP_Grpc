@@ -37,7 +37,7 @@ import type {
   V1EditCommentRequest,
   V1GetCommentsByThreadIDResponse,
   V1StandardResponse
-} from './comment.schemas.ts';
+} from './';
 
 type AwaitedInput<T> = PromiseLike<T> | T;
 

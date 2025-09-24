@@ -49,6 +49,7 @@ message Post{
     double lat =10;
     double lng =11;
     repeated string likes=12;
+    string content_type =13;
 }
 
 message GetPostsRequest {
@@ -73,6 +74,7 @@ message CreatePostRequest{
     string image=2;
     double lat =3;
     double lng =4;
+    string content_type =5;
 }
 
 message EditPostRequest {

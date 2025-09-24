@@ -60,6 +60,7 @@ message Thread{
     double lng =11;
     repeated string likes=12;
     repeated string comments=13;
+    string content_type =14;
 }
 
 message GetThreadsRequest {
@@ -76,6 +77,7 @@ message CreateThreadRequest{
     string image=2;
     double lat =3;
     double lng =4;
+    string content_type =5;
 }
 
 message EditThreadRequest {

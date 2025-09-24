@@ -8,7 +8,7 @@ import L from 'leaflet';
 export default function MapClient() {
   const position: LatLngExpression = [35.681236, 139.767125];
   const containerRef = useRef<HTMLDivElement | null>(null);
-
+  
   return (
     // cover the entire viewport (placed behind UI overlays)
     <div ref={containerRef} style={{ position: 'fixed', inset: 0, zIndex: 0, background: 'white' }}>

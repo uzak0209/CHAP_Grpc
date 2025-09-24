@@ -9,6 +9,7 @@ import {
 } from '@tanstack/react-query';
 import type {
   MutationFunction,
+  QueryClient,
   UseMutationOptions,
   UseMutationResult
 } from '@tanstack/react-query';
@@ -25,7 +26,7 @@ import type {
   V1AuthResponse,
   V1SignInRequest,
   V1SignUpRequest
-} from './auth.schemas.ts';
+} from './';
 
 type AwaitedInput<T> = PromiseLike<T> | T;
 
@@ -78,7 +79,7 @@ const {mutation: mutationOptions, axios: axiosOptions} = options ?
 
     export const useAuthServiceSignIn = <TError = AxiosError<RpcStatus>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof authServiceSignIn>>, TError,{data: V1SignInRequest}, TContext>, axios?: AxiosRequestConfig}
- ): UseMutationResult<
+ , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof authServiceSignIn>>,
         TError,
         {data: V1SignInRequest},
@@ -87,7 +88,7 @@ const {mutation: mutationOptions, axios: axiosOptions} = options ?
 
       const mutationOptions = getAuthServiceSignInMutationOptions(options);
 
-      return useMutation(mutationOptions );
+      return useMutation(mutationOptions , queryClient);
     }
     
 /**
@@ -140,7 +141,7 @@ const {mutation: mutationOptions, axios: axiosOptions} = options ?
  */
 export const useAuthServiceSignUp = <TError = AxiosError<RpcStatus>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof authServiceSignUp>>, TError,{data: V1SignUpRequest}, TContext>, axios?: AxiosRequestConfig}
- ): UseMutationResult<
+ , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof authServiceSignUp>>,
         TError,
         {data: V1SignUpRequest},
@@ -149,5 +150,5 @@ export const useAuthServiceSignUp = <TError = AxiosError<RpcStatus>,
 
       const mutationOptions = getAuthServiceSignUpMutationOptions(options);
 
-      return useMutation(mutationOptions );
+      return useMutation(mutationOptions , queryClient);
     }

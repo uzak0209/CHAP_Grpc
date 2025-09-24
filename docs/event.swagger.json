@@ -1,12 +1,12 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "user.proto",
+    "title": "event.proto",
     "version": "version not set"
   },
   "tags": [
     {
-      "name": "UserService"
+      "name": "EventService"
     }
   ],
   "consumes": [
@@ -16,99 +16,14 @@
     "application/json"
   ],
   "paths": {
-    "/api/v1/users/delete/{userId}": {
-      "delete": {
-        "operationId": "UserService_DeleteUser",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1StandardResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "userId",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "UserService"
-        ]
-      }
-    },
-    "/api/v1/users/edit": {
-      "put": {
-        "operationId": "UserService_EditUser",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1StandardResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/v1EditUserRequest"
-            }
-          }
-        ],
-        "tags": [
-          "UserService"
-        ]
-      }
-    },
-    "/api/v1/users/me": {
+    "/api/v1/events": {
       "get": {
-        "summary": "ユーザー操作",
-        "operationId": "UserService_GetMe",
+        "operationId": "EventService_GetEvents",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1GetUserByIDResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "tags": [
-          "UserService"
-        ]
-      }
-    },
-    "/api/v1/users/{targetUserId}/follow": {
-      "delete": {
-        "operationId": "UserService_UnfollowUser",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1StandardResponse"
+              "$ref": "#/definitions/v1GetEventsResponse"
             }
           },
           "default": {
@@ -120,18 +35,28 @@
         },
         "parameters": [
           {
-            "name": "targetUserId",
-            "in": "path",
-            "required": true,
-            "type": "string"
+            "name": "lat",
+            "in": "query",
+            "required": false,
+            "type": "number",
+            "format": "double"
+          },
+          {
+            "name": "lng",
+            "in": "query",
+            "required": false,
+            "type": "number",
+            "format": "double"
           }
         ],
         "tags": [
-          "UserService"
+          "EventService"
         ]
-      },
+      }
+    },
+    "/api/v1/events/create": {
       "post": {
-        "operationId": "UserService_FollowUser",
+        "operationId": "EventService_CreateEvent",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -148,33 +73,27 @@
         },
         "parameters": [
           {
-            "name": "targetUserId",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
             "name": "body",
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/UserServiceFollowUserBody"
+              "$ref": "#/definitions/v1CreateEventRequest"
             }
           }
         ],
         "tags": [
-          "UserService"
+          "EventService"
         ]
       }
     },
-    "/api/v1/users/{userId}": {
-      "get": {
-        "operationId": "UserService_GetUserByID",
+    "/api/v1/events/delete/{eventId}": {
+      "delete": {
+        "operationId": "EventService_DeleteEvent",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1GetUserByIDResponse"
+              "$ref": "#/definitions/v1StandardResponse"
             }
           },
           "default": {
@@ -186,22 +105,81 @@
         },
         "parameters": [
           {
-            "name": "userId",
+            "name": "eventId",
             "in": "path",
             "required": true,
             "type": "string"
           }
         ],
         "tags": [
-          "UserService"
+          "EventService"
+        ]
+      }
+    },
+    "/api/v1/events/edit": {
+      "put": {
+        "operationId": "EventService_EditEvent",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1StandardResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1EditEventRequest"
+            }
+          }
+        ],
+        "tags": [
+          "EventService"
+        ]
+      }
+    },
+    "/api/v1/events/{eventId}": {
+      "get": {
+        "operationId": "EventService_GetEventByID",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetEventByIDResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "eventId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "EventService"
         ]
       }
     }
   },
   "definitions": {
-    "UserServiceFollowUserBody": {
-      "type": "object"
-    },
     "protobufAny": {
       "type": "object",
       "properties": {
@@ -230,16 +208,97 @@
         }
       }
     },
-    "v1EditUserRequest": {
+    "v1Comment": {
       "type": "object",
       "properties": {
+        "id": {
+          "type": "string"
+        },
+        "threadId": {
+          "type": "string"
+        },
+        "userName": {
+          "type": "string"
+        },
         "userId": {
           "type": "string"
         },
-        "name": {
+        "userImage": {
           "type": "string"
         },
-        "description": {
+        "content": {
+          "type": "string"
+        },
+        "image": {
+          "type": "string"
+        },
+        "parentCommentId": {
+          "type": "string"
+        },
+        "likeCount": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "createdAt": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "string"
+        },
+        "lat": {
+          "type": "number",
+          "format": "double"
+        },
+        "lng": {
+          "type": "number",
+          "format": "double"
+        },
+        "likes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "contentType": {
+          "type": "string"
+        }
+      }
+    },
+    "v1CreateEventRequest": {
+      "type": "object",
+      "properties": {
+        "content": {
+          "type": "string"
+        },
+        "image": {
+          "type": "string"
+        },
+        "lat": {
+          "type": "number",
+          "format": "double"
+        },
+        "lng": {
+          "type": "number",
+          "format": "double"
+        },
+        "eventDate": {
+          "type": "string"
+        },
+        "contentType": {
+          "type": "string"
+        }
+      }
+    },
+    "v1EditEventRequest": {
+      "type": "object",
+      "properties": {
+        "eventId": {
+          "type": "string"
+        },
+        "eventDate": {
+          "type": "string"
+        },
+        "content": {
           "type": "string"
         },
         "image": {
@@ -247,11 +306,83 @@
         }
       }
     },
-    "v1GetUserByIDResponse": {
+    "v1Event": {
       "type": "object",
       "properties": {
-        "user": {
-          "$ref": "#/definitions/v1User"
+        "id": {
+          "type": "string"
+        },
+        "userName": {
+          "type": "string"
+        },
+        "userId": {
+          "type": "string"
+        },
+        "userImage": {
+          "type": "string"
+        },
+        "content": {
+          "type": "string"
+        },
+        "image": {
+          "type": "string"
+        },
+        "likeCount": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "createdAt": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "string"
+        },
+        "lat": {
+          "type": "number",
+          "format": "double"
+        },
+        "lng": {
+          "type": "number",
+          "format": "double"
+        },
+        "likes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "eventDate": {
+          "type": "string"
+        },
+        "contentType": {
+          "type": "string"
+        }
+      }
+    },
+    "v1GetEventByIDResponse": {
+      "type": "object",
+      "properties": {
+        "event": {
+          "$ref": "#/definitions/v1Event"
+        },
+        "comment": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Comment"
+          }
+        }
+      }
+    },
+    "v1GetEventsResponse": {
+      "type": "object",
+      "properties": {
+        "events": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Event"
+          }
         }
       }
     },
@@ -263,49 +394,6 @@
         },
         "message": {
           "type": "string"
-        }
-      }
-    },
-    "v1User": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "name": {
-          "type": "string"
-        },
-        "description": {
-          "type": "string"
-        },
-        "image": {
-          "type": "string"
-        },
-        "createdAt": {
-          "type": "string"
-        },
-        "updatedAt": {
-          "type": "string"
-        },
-        "followerCount": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "followingCount": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "followers": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "followings": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
         }
       }
     }

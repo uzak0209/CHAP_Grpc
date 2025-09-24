@@ -1,6 +1,5 @@
-import { Providers } from '../components/Providers';
-import '../../styles/globals.css';
-import 'leaflet/dist/leaflet.css';
+import { Providers } from './Providers';
+
 import GlobalSidebar from '@/components/GlobalSidebar';
 import SidebarToggle from '@/components/SidebarToggle';
 import { Sidebar } from 'lucide-react';
