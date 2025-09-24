@@ -78,6 +78,29 @@
         ]
       }
     },
+    "/api/v1/users/me": {
+      "get": {
+        "summary": "ユーザー操作",
+        "operationId": "UserService_GetMe",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetUserByIDResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "UserService"
+        ]
+      }
+    },
     "/api/v1/users/{targetUserId}/follow": {
       "delete": {
         "operationId": "UserService_UnfollowUser",
@@ -146,7 +169,6 @@
     },
     "/api/v1/users/{userId}": {
       "get": {
-        "summary": "ユーザー操作",
         "operationId": "UserService_GetUserByID",
         "responses": {
           "200": {

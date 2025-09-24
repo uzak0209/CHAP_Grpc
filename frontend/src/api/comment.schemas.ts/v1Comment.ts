@@ -20,4 +20,5 @@ export interface V1Comment {
   lat?: number;
   lng?: number;
   likes?: string[];
+  contentType?: string;
 }

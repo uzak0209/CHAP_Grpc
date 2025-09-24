@@ -1,14 +1,17 @@
 package handler
 
 import (
-	pd "CHAP_Grpc/backend/api/pd"
-	"CHAP_Grpc/backend/infra/model"
-	"CHAP_Grpc/backend/infra/repository"
-	"CHAP_Grpc/backend/utils"
 	context "context"
 	"log"
 
+	"github.com/uzak0209/CHAP_Grpc/backend/api/pd"
+	"github.com/uzak0209/CHAP_Grpc/backend/infra/model"
+	"github.com/uzak0209/CHAP_Grpc/backend/infra/repository"
+	"github.com/uzak0209/CHAP_Grpc/backend/utils"
+
 	"github.com/google/uuid"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 // AuthServerはAuthサービスの実装です。
@@ -26,27 +29,28 @@ func NewAuthServer() *AuthServer {
 }
 
 // 例: Loginメソッドの実装
-func (s *AuthServer) Login(ctx context.Context, req *pd.SignInRequest) (*pd.AuthResponse, error) {
+func (s *AuthServer) SignIn(ctx context.Context, req *pd.SignInRequest) (*pd.AuthResponse, error) {
 	log.Println("Login called")
 
 	// リポジトリからユーザー情報を取得
 	auth, err := s.authRepo.GetAuthByEmail(req.Email)
 	if err != nil {
-		log.Printf("Login error: %v", err)
-		return &pd.AuthResponse{Success: false}, nil
+		// avoid leaking whether the user exists; return unauthenticated for invalid credentials
+		log.Printf("SignIn - lookup error: %v", err)
+		return nil, status.Error(codes.Unauthenticated, "invalid credentials")
 	}
 
 	// パスワード検証（実際はハッシュ化されたパスワードとの比較）
 	if auth.Password != req.Password {
-		log.Println("Invalid password")
-		return &pd.AuthResponse{Success: false}, nil
+		log.Println("SignIn - invalid password")
+		return nil, status.Error(codes.Unauthenticated, "invalid credentials")
 	}
 
 	// JWT トークンを生成
 	token, err := utils.GenerateJWT(auth.UserID.String())
 	if err != nil {
-		log.Printf("JWT generation error: %v", err)
-		return &pd.AuthResponse{Success: false}, nil
+		log.Printf("SignIn - JWT generation error: %v", err)
+		return nil, status.Error(codes.Internal, "failed to generate token")
 	}
 
 	return &pd.AuthResponse{
@@ -67,7 +71,7 @@ func (s *AuthServer) SignUp(ctx context.Context, req *pd.SignUpRequest) (*pd.Aut
 
 	if err := s.userRepo.Create(ctx, user); err != nil {
 		log.Printf("SignUp - CreateUser error: %v", err)
-		return &pd.AuthResponse{Success: false}, nil
+		return nil, status.Error(codes.Internal, "failed to create user")
 	}
 
 	// 次に認証情報を作成
@@ -80,14 +84,14 @@ func (s *AuthServer) SignUp(ctx context.Context, req *pd.SignUpRequest) (*pd.Aut
 
 	if err := s.authRepo.CreateAuth(auth); err != nil {
 		log.Printf("SignUp - CreateAuth error: %v", err)
-		return &pd.AuthResponse{Success: false}, nil
+		return nil, status.Error(codes.Internal, "failed to create auth record")
 	}
 
 	// JWT トークンを生成
 	token, err := utils.GenerateJWT(user.ID.String())
 	if err != nil {
-		log.Printf("JWT generation error: %v", err)
-		return &pd.AuthResponse{Success: false}, nil
+		log.Printf("SignUp - JWT generation error: %v", err)
+		return nil, status.Error(codes.Internal, "failed to generate token")
 	}
 
 	return &pd.AuthResponse{

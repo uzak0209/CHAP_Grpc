@@ -9,7 +9,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
-	"CHAP_Grpc/backend/api/pd"
+	"github.com/uzak0209/CHAP_Grpc/backend/api/pd"
 )
 
 func StartGateway(grpcEndpoint string, gatewayAddr string) error {

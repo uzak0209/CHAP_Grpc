@@ -1,9 +1,10 @@
 package middleware
 
 import (
-	"CHAP_Grpc/backend/utils"
 	"context"
 	"log"
+
+	"github.com/uzak0209/CHAP_Grpc/backend/utils"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"

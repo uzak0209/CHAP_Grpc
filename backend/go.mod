@@ -1,13 +1,16 @@
-module CHAP_Grpc/backend
+module github.com/uzak0209/CHAP_Grpc/backend
 
 go 1.23.0
+
+toolchain go1.24.7
 
 require (
 	github.com/golang-jwt/jwt/v5 v5.3.0
 	github.com/google/uuid v1.6.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.27.2
+	github.com/joho/godotenv v1.5.1
 	google.golang.org/genproto/googleapis/api v0.0.0-20250818200422-3122310a409c
-	google.golang.org/grpc v1.75.0
+	google.golang.org/grpc v1.75.1
 	google.golang.org/protobuf v1.36.7
 	gorm.io/driver/postgres v1.6.0
 	gorm.io/gorm v1.30.0

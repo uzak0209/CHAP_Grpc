@@ -1,15 +1,17 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useAuthStore } from '@/store/useAuthStore';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
-import { useAuthStore } from "@/store/useAuthStore";
+
 import { useAuthServiceSignIn, useAuthServiceSignUp } from '@/api/auth';
 import "../../api/axios";
+import { getMe } from '@/store/useMe';
 
 type AuthMode = 'login' | 'register';
 
@@ -18,13 +20,13 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [displayName, setDisplayName] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
   const [authMode, setAuthMode] = useState<AuthMode>('login');
+
+
+  const router = useRouter();
+  const authStore = useAuthStore();
   const [isLoading, setIsLoading] = useState(false);
   const [currentError, setCurrentError] = useState<string | null>(null);
-
-  const authStore = useAuthStore((state) => state);
-  const router = useRouter();
 
   // orvalで生成されたmutation
   const signUpMutation = useAuthServiceSignUp();
@@ -33,7 +35,7 @@ export default function LoginPage() {
   // ログイン成功時のリダイレクト処理
   useEffect(() => {
     if (authStore.isAuthenticated) {
-      router.push('/timeline');
+      router.push('/map');
     }
   }, [authStore.isAuthenticated, router]);
 
@@ -43,15 +45,13 @@ export default function LoginPage() {
     setCurrentError(null);
 
     if (authMode === 'register') {
-      if (password !== confirmPassword) {
-        setCurrentError('パスワードが一致しません');
-        return;
-      }
       setIsLoading(true);
       signUpMutation.mutate(
         { data: { email, password, name: displayName } },
         {
-          onSuccess: () => {
+          onSuccess: (res: any) => {
+            const token = res?.data?.token ?? res?.token;
+            if (token) localStorage.setItem('token', token);
             authStore.setAuthenticated(true);
             setIsLoading(false);
           },
@@ -66,9 +66,12 @@ export default function LoginPage() {
       signInMutation.mutate(
         { data: { email, password } },
         {
-          onSuccess: () => {
+          onSuccess: (res: any) => {
+            const token = res?.data?.token ?? res?.token;
+            if (token) localStorage.setItem('token', token);
             authStore.setAuthenticated(true);
             setIsLoading(false);
+            getMe();
           },
           onError: (err: any) => {
             setCurrentError('ログインに失敗しました');
@@ -182,22 +185,6 @@ export default function LoginPage() {
                 />
               </div>
 
-              {authMode === 'register' && (
-                <div className="space-y-2">
-                  <Label htmlFor="confirmPassword" className="text-gray-700 font-medium">
-                    パスワード確認
-                  </Label>
-                  <Input
-                    id="confirmPassword"
-                    type="password"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    placeholder="••••••••"
-                    className="h-12 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
-                    required
-                  />
-                </div>
-              )}
 
               <Button
                 type="submit"

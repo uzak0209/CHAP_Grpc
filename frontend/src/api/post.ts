@@ -38,7 +38,7 @@ import type {
   V1GetPostsByUserIDResponse,
   V1GetPostsResponse,
   V1StandardResponse
-} from './post.schemas.ts';
+} from './';
 
 type AwaitedInput<T> = PromiseLike<T> | T;
 

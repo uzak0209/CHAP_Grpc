@@ -36,7 +36,7 @@ import type {
   V1EditUserRequest,
   V1GetUserByIDResponse,
   V1StandardResponse
-} from './user.schemas.ts';
+} from './';
 
 type AwaitedInput<T> = PromiseLike<T> | T;
 
@@ -156,6 +156,92 @@ const {mutation: mutationOptions, axios: axiosOptions} = options ?
       return useMutation(mutationOptions , queryClient);
     }
     
+/**
+ * @summary ユーザー操作
+ */
+export const userServiceGetMe = (
+     options?: AxiosRequestConfig
+ ): Promise<AxiosResponse<V1GetUserByIDResponse>> => {
+    
+    
+    return axios.default.get(
+      `/api/v1/users/me`,options
+    );
+  }
+
+
+export const getUserServiceGetMeQueryKey = () => {
+    return [`/api/v1/users/me`] as const;
+    }
+
+    
+export const getUserServiceGetMeQueryOptions = <TData = Awaited<ReturnType<typeof userServiceGetMe>>, TError = AxiosError<RpcStatus>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof userServiceGetMe>>, TError, TData>>, axios?: AxiosRequestConfig}
+) => {
+
+const {query: queryOptions, axios: axiosOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getUserServiceGetMeQueryKey();
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof userServiceGetMe>>> = ({ signal }) => userServiceGetMe({ signal, ...axiosOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof userServiceGetMe>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type UserServiceGetMeQueryResult = NonNullable<Awaited<ReturnType<typeof userServiceGetMe>>>
+export type UserServiceGetMeQueryError = AxiosError<RpcStatus>
+
+
+export function useUserServiceGetMe<TData = Awaited<ReturnType<typeof userServiceGetMe>>, TError = AxiosError<RpcStatus>>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof userServiceGetMe>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof userServiceGetMe>>,
+          TError,
+          Awaited<ReturnType<typeof userServiceGetMe>>
+        > , 'initialData'
+      >, axios?: AxiosRequestConfig}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useUserServiceGetMe<TData = Awaited<ReturnType<typeof userServiceGetMe>>, TError = AxiosError<RpcStatus>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof userServiceGetMe>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof userServiceGetMe>>,
+          TError,
+          Awaited<ReturnType<typeof userServiceGetMe>>
+        > , 'initialData'
+      >, axios?: AxiosRequestConfig}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useUserServiceGetMe<TData = Awaited<ReturnType<typeof userServiceGetMe>>, TError = AxiosError<RpcStatus>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof userServiceGetMe>>, TError, TData>>, axios?: AxiosRequestConfig}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary ユーザー操作
+ */
+
+export function useUserServiceGetMe<TData = Awaited<ReturnType<typeof userServiceGetMe>>, TError = AxiosError<RpcStatus>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof userServiceGetMe>>, TError, TData>>, axios?: AxiosRequestConfig}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getUserServiceGetMeQueryOptions(options)
+
+  const query = useQuery(queryOptions , queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
 export const userServiceUnfollowUser = (
     targetUserId: string, options?: AxiosRequestConfig
  ): Promise<AxiosResponse<V1StandardResponse>> => {
@@ -268,9 +354,6 @@ const {mutation: mutationOptions, axios: axiosOptions} = options ?
       return useMutation(mutationOptions , queryClient);
     }
     
-/**
- * @summary ユーザー操作
- */
 export const userServiceGetUserByID = (
     userId: string, options?: AxiosRequestConfig
  ): Promise<AxiosResponse<V1GetUserByIDResponse>> => {
@@ -333,9 +416,6 @@ export function useUserServiceGetUserByID<TData = Awaited<ReturnType<typeof user
  userId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof userServiceGetUserByID>>, TError, TData>>, axios?: AxiosRequestConfig}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-/**
- * @summary ユーザー操作
- */
 
 export function useUserServiceGetUserByID<TData = Awaited<ReturnType<typeof userServiceGetUserByID>>, TError = AxiosError<RpcStatus>>(
  userId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof userServiceGetUserByID>>, TError, TData>>, axios?: AxiosRequestConfig}

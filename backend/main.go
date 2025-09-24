@@ -4,9 +4,9 @@ import (
 	"log"
 	"sync"
 
-	"CHAP_Grpc/backend/handler"
-	"CHAP_Grpc/backend/infra/db"
-	"CHAP_Grpc/backend/middleware"
+	"github.com/uzak0209/CHAP_Grpc/backend/handler"
+	"github.com/uzak0209/CHAP_Grpc/backend/infra/db"
+	"github.com/uzak0209/CHAP_Grpc/backend/middleware"
 )
 
 func main() {

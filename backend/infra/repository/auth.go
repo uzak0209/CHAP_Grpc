@@ -1,8 +1,9 @@
 package repository
 
 import (
-	"CHAP_Grpc/backend/infra/db"
-	"CHAP_Grpc/backend/infra/model"
+	"github.com/uzak0209/CHAP_Grpc/backend/infra/db"
+
+	"github.com/uzak0209/CHAP_Grpc/backend/infra/model"
 
 	"gorm.io/gorm"
 )

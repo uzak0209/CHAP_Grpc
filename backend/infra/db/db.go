@@ -1,9 +1,10 @@
 package db
 
 import (
-	"CHAP_Grpc/backend/infra/model"
 	"log"
 	"os"
+
+	"github.com/uzak0209/CHAP_Grpc/backend/infra/model"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"

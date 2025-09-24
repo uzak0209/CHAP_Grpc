@@ -7,10 +7,10 @@ import (
 
 	"github.com/google/uuid"
 
-	"CHAP_Grpc/backend/api/pd"
-	"CHAP_Grpc/backend/infra/model"
-	"CHAP_Grpc/backend/infra/repository"
-	"CHAP_Grpc/backend/utils"
+	"github.com/uzak0209/CHAP_Grpc/backend/api/pd"
+	"github.com/uzak0209/CHAP_Grpc/backend/infra/model"
+	"github.com/uzak0209/CHAP_Grpc/backend/infra/repository"
+	"github.com/uzak0209/CHAP_Grpc/backend/utils"
 )
 
 // UserServerはUserサービスの実装です。
@@ -32,6 +32,40 @@ func (s *UserServer) GetUser(ctx context.Context, req *pd.GetUserByIDRequest) (*
 	user, err := s.userRepo.GetByID(ctx, req.UserId)
 	if err != nil {
 		log.Printf("GetUser error: %v", err)
+		return &pd.GetUserByIDResponse{}, err
+	}
+
+	responseUser := pd.GetUserByIDResponse{
+		User: &pd.User{
+			Id:             user.ID.String(),
+			Name:           user.Name,
+			Description:    user.Description,
+			Image:          user.Image,
+			FollowerCount:  user.FollowerCount,
+			FollowingCount: user.FollowingCount,
+			CreatedAt:      user.CreatedAt.Format(time.RFC3339),
+			UpdatedAt:      user.UpdatedAt.Format(time.RFC3339),
+			Followers:      []string{},
+			Followings:     []string{},
+		},
+	}
+	s.userRepo.CalcFollowRelations(ctx, &responseUser)
+
+	return &responseUser, nil
+}
+func (s *UserServer) GetMe(ctx context.Context, req *pd.Empty) (*pd.GetUserByIDResponse, error) {
+	log.Println("GetMe called")
+
+	// JWTからuserIDを取得
+	userID, err := utils.ExtractUserIDFromContext(ctx)
+	if err != nil {
+		log.Printf("Failed to extract userID from JWT: %v", err)
+		return &pd.GetUserByIDResponse{}, err
+	}
+
+	user, err := s.userRepo.GetByID(ctx, userID)
+	if err != nil {
+		log.Printf("GetMe error: %v", err)
 		return &pd.GetUserByIDResponse{}, err
 	}
 

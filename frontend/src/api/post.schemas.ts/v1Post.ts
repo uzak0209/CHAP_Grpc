@@ -18,4 +18,5 @@ export interface V1Post {
   lat?: number;
   lng?: number;
   likes?: string[];
+  contentType?: string;
 }

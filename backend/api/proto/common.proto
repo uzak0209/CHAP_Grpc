@@ -8,3 +8,4 @@ message StandardResponse {
   bool success = 1;
   string message = 2;
 }
+message Empty {}

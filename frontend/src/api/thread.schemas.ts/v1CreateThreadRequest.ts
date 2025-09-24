@@ -10,4 +10,5 @@ export interface V1CreateThreadRequest {
   image?: string;
   lat?: number;
   lng?: number;
+  contentType?: string;
 }

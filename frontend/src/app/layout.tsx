@@ -1,5 +1,10 @@
-import { Providers } from '../components/Providers';
-import '../../styles/globals.css';
+import '../styles/globals.css';
+import { Providers } from './Providers';
+
+import GlobalSidebar from '@/components/GlobalSidebar';
+import SidebarToggle from '@/components/SidebarToggle';
+import { Sidebar } from 'lucide-react';
+// Note: do not call useUIState directly in this server component — use GlobalSidebar (client) to read state.
 
 export const metadata = {
   title: 'Next.js',
@@ -12,6 +17,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <Providers>
           {children}
+          <SidebarToggle />
+          <GlobalSidebar />
         </Providers>
       </body>
     </html>

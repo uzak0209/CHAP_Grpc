@@ -259,6 +259,9 @@
           "items": {
             "type": "string"
           }
+        },
+        "contentType": {
+          "type": "string"
         }
       }
     },
@@ -278,6 +281,9 @@
         "lng": {
           "type": "number",
           "format": "double"
+        },
+        "contentType": {
+          "type": "string"
         }
       }
     },
@@ -383,6 +389,9 @@
           "items": {
             "type": "string"
           }
+        },
+        "contentType": {
+          "type": "string"
         }
       }
     }

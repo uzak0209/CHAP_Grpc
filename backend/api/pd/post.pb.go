@@ -36,6 +36,7 @@ type Post struct {
 	Lat           float64                `protobuf:"fixed64,10,opt,name=lat,proto3" json:"lat,omitempty"`
 	Lng           float64                `protobuf:"fixed64,11,opt,name=lng,proto3" json:"lng,omitempty"`
 	Likes         []string               `protobuf:"bytes,12,rep,name=likes,proto3" json:"likes,omitempty"`
+	ContentType   string                 `protobuf:"bytes,13,opt,name=content_type,json=contentType,proto3" json:"content_type,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -152,6 +153,13 @@ func (x *Post) GetLikes() []string {
 		return x.Likes
 	}
 	return nil
+}
+
+func (x *Post) GetContentType() string {
+	if x != nil {
+		return x.ContentType
+	}
+	return ""
 }
 
 type GetPostsRequest struct {
@@ -344,6 +352,7 @@ type CreatePostRequest struct {
 	Image         string                 `protobuf:"bytes,2,opt,name=image,proto3" json:"image,omitempty"`
 	Lat           float64                `protobuf:"fixed64,3,opt,name=lat,proto3" json:"lat,omitempty"`
 	Lng           float64                `protobuf:"fixed64,4,opt,name=lng,proto3" json:"lng,omitempty"`
+	ContentType   string                 `protobuf:"bytes,5,opt,name=content_type,json=contentType,proto3" json:"content_type,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -404,6 +413,13 @@ func (x *CreatePostRequest) GetLng() float64 {
 		return x.Lng
 	}
 	return 0
+}
+
+func (x *CreatePostRequest) GetContentType() string {
+	if x != nil {
+		return x.ContentType
+	}
+	return ""
 }
 
 type EditPostRequest struct {
@@ -515,7 +531,7 @@ var File_post_proto protoreflect.FileDescriptor
 const file_post_proto_rawDesc = "" +
 	"\n" +
 	"\n" +
-	"post.proto\x12\fchap.post.v1\x1a\fcommon.proto\x1a\x1cgoogle/api/annotations.proto\"\xb2\x02\n" +
+	"post.proto\x12\fchap.post.v1\x1a\fcommon.proto\x1a\x1cgoogle/api/annotations.proto\"\xd5\x02\n" +
 	"\x04Post\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1b\n" +
 	"\tuser_name\x18\x02 \x01(\tR\buserName\x12\x17\n" +
@@ -533,7 +549,8 @@ const file_post_proto_rawDesc = "" +
 	"\x03lat\x18\n" +
 	" \x01(\x01R\x03lat\x12\x10\n" +
 	"\x03lng\x18\v \x01(\x01R\x03lng\x12\x14\n" +
-	"\x05likes\x18\f \x03(\tR\x05likes\"5\n" +
+	"\x05likes\x18\f \x03(\tR\x05likes\x12!\n" +
+	"\fcontent_type\x18\r \x01(\tR\vcontentType\"5\n" +
 	"\x0fGetPostsRequest\x12\x10\n" +
 	"\x03lat\x18\x01 \x01(\x01R\x03lat\x12\x10\n" +
 	"\x03lng\x18\x02 \x01(\x01R\x03lng\"<\n" +
@@ -542,12 +559,13 @@ const file_post_proto_rawDesc = "" +
 	"\x17GetPostsByUserIDRequest\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\"D\n" +
 	"\x18GetPostsByUserIDResponse\x12(\n" +
-	"\x05posts\x18\x01 \x03(\v2\x12.chap.post.v1.PostR\x05posts\"g\n" +
+	"\x05posts\x18\x01 \x03(\v2\x12.chap.post.v1.PostR\x05posts\"\x8a\x01\n" +
 	"\x11CreatePostRequest\x12\x18\n" +
 	"\acontent\x18\x01 \x01(\tR\acontent\x12\x14\n" +
 	"\x05image\x18\x02 \x01(\tR\x05image\x12\x10\n" +
 	"\x03lat\x18\x03 \x01(\x01R\x03lat\x12\x10\n" +
-	"\x03lng\x18\x04 \x01(\x01R\x03lng\"Z\n" +
+	"\x03lng\x18\x04 \x01(\x01R\x03lng\x12!\n" +
+	"\fcontent_type\x18\x05 \x01(\tR\vcontentType\"Z\n" +
 	"\x0fEditPostRequest\x12\x17\n" +
 	"\apost_id\x18\x01 \x01(\tR\x06postId\x12\x18\n" +
 	"\acontent\x18\x02 \x01(\tR\acontent\x12\x14\n" +

@@ -48,6 +48,7 @@ message Comment{
   double lat =12;
   double lng =13;
   repeated string likes=14;
+  string content_type =15;
 }
 
 message GetCommentsByThreadIDRequest {

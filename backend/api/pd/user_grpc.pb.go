@@ -19,6 +19,7 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
+	UserService_GetMe_FullMethodName        = "/chap.user.v1.UserService/GetMe"
 	UserService_GetUserByID_FullMethodName  = "/chap.user.v1.UserService/GetUserByID"
 	UserService_EditUser_FullMethodName     = "/chap.user.v1.UserService/EditUser"
 	UserService_DeleteUser_FullMethodName   = "/chap.user.v1.UserService/DeleteUser"
@@ -31,6 +32,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type UserServiceClient interface {
 	// ユーザー操作
+	GetMe(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*GetUserByIDResponse, error)
 	GetUserByID(ctx context.Context, in *GetUserByIDRequest, opts ...grpc.CallOption) (*GetUserByIDResponse, error)
 	EditUser(ctx context.Context, in *EditUserRequest, opts ...grpc.CallOption) (*StandardResponse, error)
 	DeleteUser(ctx context.Context, in *DeleteUserRequest, opts ...grpc.CallOption) (*StandardResponse, error)
@@ -44,6 +46,16 @@ type userServiceClient struct {
 
 func NewUserServiceClient(cc grpc.ClientConnInterface) UserServiceClient {
 	return &userServiceClient{cc}
+}
+
+func (c *userServiceClient) GetMe(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*GetUserByIDResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetUserByIDResponse)
+	err := c.cc.Invoke(ctx, UserService_GetMe_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *userServiceClient) GetUserByID(ctx context.Context, in *GetUserByIDRequest, opts ...grpc.CallOption) (*GetUserByIDResponse, error) {
@@ -101,6 +113,7 @@ func (c *userServiceClient) UnfollowUser(ctx context.Context, in *UnfollowUserRe
 // for forward compatibility.
 type UserServiceServer interface {
 	// ユーザー操作
+	GetMe(context.Context, *Empty) (*GetUserByIDResponse, error)
 	GetUserByID(context.Context, *GetUserByIDRequest) (*GetUserByIDResponse, error)
 	EditUser(context.Context, *EditUserRequest) (*StandardResponse, error)
 	DeleteUser(context.Context, *DeleteUserRequest) (*StandardResponse, error)
@@ -116,6 +129,9 @@ type UserServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedUserServiceServer struct{}
 
+func (UnimplementedUserServiceServer) GetMe(context.Context, *Empty) (*GetUserByIDResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetMe not implemented")
+}
 func (UnimplementedUserServiceServer) GetUserByID(context.Context, *GetUserByIDRequest) (*GetUserByIDResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUserByID not implemented")
 }
@@ -150,6 +166,24 @@ func RegisterUserServiceServer(s grpc.ServiceRegistrar, srv UserServiceServer) {
 		t.testEmbeddedByValue()
 	}
 	s.RegisterService(&UserService_ServiceDesc, srv)
+}
+
+func _UserService_GetMe_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).GetMe(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_GetMe_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).GetMe(ctx, req.(*Empty))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _UserService_GetUserByID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -249,6 +283,10 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "chap.user.v1.UserService",
 	HandlerType: (*UserServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "GetMe",
+			Handler:    _UserService_GetMe_Handler,
+		},
 		{
 			MethodName: "GetUserByID",
 			Handler:    _UserService_GetUserByID_Handler,

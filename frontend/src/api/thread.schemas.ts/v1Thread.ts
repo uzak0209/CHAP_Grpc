@@ -19,4 +19,5 @@ export interface V1Thread {
   lng?: number;
   likes?: string[];
   comments?: string[];
+  contentType?: string;
 }
