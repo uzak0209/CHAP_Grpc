@@ -10,4 +10,5 @@ export interface V1CreatePostRequest {
   image?: string;
   lat?: number;
   lng?: number;
+  contentType?: string;
 }

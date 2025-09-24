@@ -1,15 +1,17 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useAuthStore } from '@/store/useAuthStore';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
-import { useAuthStore } from "@/store/useAuthStore";
+
 import { useAuthServiceSignIn, useAuthServiceSignUp } from '@/api/auth';
 import "../../api/axios";
+import { getMe } from '@/store/useMe';
 
 type AuthMode = 'login' | 'register';
 
@@ -19,11 +21,12 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [displayName, setDisplayName] = useState('');
   const [authMode, setAuthMode] = useState<AuthMode>('login');
+
+
+  const router = useRouter();
+  const authStore = useAuthStore();
   const [isLoading, setIsLoading] = useState(false);
   const [currentError, setCurrentError] = useState<string | null>(null);
-
-  const authStore = useAuthStore((state) => state);
-  const router = useRouter();
 
   // orvalで生成されたmutation
   const signUpMutation = useAuthServiceSignUp();
@@ -46,7 +49,9 @@ export default function LoginPage() {
       signUpMutation.mutate(
         { data: { email, password, name: displayName } },
         {
-          onSuccess: () => {
+          onSuccess: (res: any) => {
+            const token = res?.data?.token ?? res?.token;
+            if (token) localStorage.setItem('token', token);
             authStore.setAuthenticated(true);
             setIsLoading(false);
           },
@@ -61,9 +66,12 @@ export default function LoginPage() {
       signInMutation.mutate(
         { data: { email, password } },
         {
-          onSuccess: () => {
+          onSuccess: (res: any) => {
+            const token = res?.data?.token ?? res?.token;
+            if (token) localStorage.setItem('token', token);
             authStore.setAuthenticated(true);
             setIsLoading(false);
+            getMe();
           },
           onError: (err: any) => {
             setCurrentError('ログインに失敗しました');

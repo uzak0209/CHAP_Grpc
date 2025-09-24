@@ -54,4 +54,15 @@ export default {
       },
     },
   },
+    event: {
+    input: '../docs/event.swagger.json',
+    output: {
+      client: 'react-query',
+      target: './src/api/event.ts',
+      schemas: './src/api/event.schemas.ts',
+      override: {
+        host: 'http://localhost:8081',
+      },
+    },
+  },
 }

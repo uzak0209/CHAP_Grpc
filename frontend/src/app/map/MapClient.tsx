@@ -1,9 +1,29 @@
-'use client';
+"use client";
 
-import React, { useRef } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, ZoomControl, Tooltip } from 'react-leaflet';
+import React, { useRef } from "react";
+// Leaflet needs its CSS to render tiles/controls correctly. Import in the client
+// component so the styles apply only in the browser.
+// @ts-ignore
+import 'leaflet/dist/leaflet.css';
+import { MapContainer, TileLayer, Marker, Popup, ZoomControl, Tooltip, useMap } from 'react-leaflet';
 import type { LatLngExpression } from 'leaflet';
 import L from 'leaflet';
+import { useEffect } from 'react';
+
+function MapResize() {
+  const map = useMap();
+  useEffect(() => {
+    const id = setTimeout(() => {
+      try {
+        map.invalidateSize();
+      } catch (e) {
+        // ignore
+      }
+    }, 100);
+    return () => clearTimeout(id);
+  }, [map]);
+  return null;
+}
 
 export default function MapClient() {
   const position: LatLngExpression = [35.681236, 139.767125];
@@ -14,6 +34,7 @@ export default function MapClient() {
     <div ref={containerRef} style={{ position: 'fixed', inset: 0, zIndex: 0, background: 'white' }}>
       {/* disable default zoomControl (top-right) and add a ZoomControl positioned bottomright */}
       <MapContainer center={position} zoom={13} style={{ height: '100%', width: '100%' }} zoomControl={false}>
+        <MapResize />
         <ZoomControl position="bottomright" />
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

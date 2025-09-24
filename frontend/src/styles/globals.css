@@ -152,3 +152,8 @@
     color: var(--foreground);
   }
 }
+
+/* Ensure root elements stretch so fixed/fullscreen children size correctly. */
+html, body, #__next {
+  height: 100%;
+}

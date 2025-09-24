@@ -1,5 +1,6 @@
 'use client';
 
+import '@/lib/axios'; // <- import to register interceptor side-effect
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import type { ReactNode } from 'react';

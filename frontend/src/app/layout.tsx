@@ -1,3 +1,4 @@
+import '../styles/globals.css';
 import { Providers } from './Providers';
 
 import GlobalSidebar from '@/components/GlobalSidebar';
