@@ -2,11 +2,12 @@ import { postServiceCreatePost, postServiceGetPosts } from "@/api/post"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 
 import type { ThreadServiceGetThreadsParams} from "@/api/thread.schemas.ts";
+import type { V1GetThreadsResponse } from "@/api/thread.schemas.ts/v1GetThreadsResponse";
 import { threadServiceCreateThread, threadServiceGetThreads } from "@/api/thread";
-import type { V1CreateCommentRequest } from "@/api/comment.schemas.ts";
+import type { V1CreateThreadRequest } from "@/api/thread.schemas.ts";
 
 export function useGetThreads(params?: ThreadServiceGetThreadsParams) {
-  return useQuery({
+  return useQuery<V1GetThreadsResponse | undefined>({
     queryKey: ["threads", params ?? null], // params を queryKey に含める
     queryFn: async () => {
       const response = await threadServiceGetThreads(params); // params をリクエストに渡す
@@ -22,7 +23,7 @@ export function useCreateThreads() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (data?: V1CreateCommentRequest) => {
+    mutationFn: async (data?: V1CreateThreadRequest) => {
       const response = await threadServiceCreateThread(data as any);
       return response.data;
     },

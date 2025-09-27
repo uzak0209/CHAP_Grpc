@@ -29,9 +29,9 @@ func (r *PostRepository) Delete(ctx context.Context, id string) error {
 func (r *PostRepository) GetPosts(ctx context.Context, lat, lng float64) ([]*model.PostDBModel, error) {
 	var posts []*model.PostDBModel
 	err := db.DB.WithContext(ctx).
-		Where("content_type = ? OR content_type IS NULL OR content_type = ?", "event", "event").
+		Where("content_type = ? OR content_type =?", "disaster", "entertainment").
 		Or("content_type = ? AND lat BETWEEN ? AND ? AND lng BETWEEN ? AND ?",
-			"communication", lat-0.1, lat+0.1, lng-0.1, lng+0.1).
+			"community", lat-0.1, lat+0.1, lng-0.1, lng+0.1).
 		Order("created_at DESC").
 		Find(&posts).Error
 	return posts, err

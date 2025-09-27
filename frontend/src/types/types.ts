@@ -1,5 +1,5 @@
 export enum Category {
-    COMMUNICATION = "communication"
+    COMMUNICATION = "community"
     , DISASTER = "disaster"
     ,ENTERTAINMENT = "entertainment"
 }

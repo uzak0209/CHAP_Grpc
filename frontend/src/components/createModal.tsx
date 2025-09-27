@@ -104,26 +104,45 @@ export function CreateModal({
         image: "",
       };
 
+          // small jitter for privacy/non-disaster posts: shift coordinates by up to ~50 meters
+          const jitterCoordinate = (c: Coordinate, maxMeters = 50): Coordinate => {
+            // 1 deg latitude ~= 111320 meters
+            const metersToDegLat = (m: number) => m / 3112;
+            const metersToDegLng = (m: number, lat: number) => m / (3112 * Math.cos((lat * Math.PI) / 180));
+
+            const rand = () => (Math.random() - 0.5) * 2; // -1 .. 1
+            const latOffset = metersToDegLat(rand() * maxMeters);
+            const lngOffset = metersToDegLng(rand() * maxMeters, c.lat);
+
+            return { lat: c.lat + latOffset, lng: c.lng + lngOffset } as Coordinate;
+          };
+
+          const effectiveCoordinate: Coordinate | undefined = baseData.coordinate
+            ? effectiveCategory !== "disaster"
+              ? jitterCoordinate(baseData.coordinate)
+              : baseData.coordinate
+            : undefined;
+
       switch (contentType) {
         case "thread": {
           // build payload for thread creation
           const payload = {
             content: baseData.content,
             image: baseData.image,
-            lat: baseData.coordinate?.lat,
-            lng: baseData.coordinate?.lng,
+            lat: effectiveCoordinate?.lat,
+            lng: effectiveCoordinate?.lng,
             contentType: category,
           } as V1CreateThreadRequest;
 
-          await createThreadMutation.mutateAsync(payload as any);
+          await createThreadMutation.mutateAsync(payload);
           break;
         }
         case "post": {
           const payload = {
             content: baseData.content,
             image: baseData.image,
-            lat: baseData.coordinate?.lat,
-            lng: baseData.coordinate?.lng,
+            lat: effectiveCoordinate?.lat,
+            lng: effectiveCoordinate?.lng,
             contentType: category,
           } as V1CreatePostRequest;
 
@@ -136,8 +155,8 @@ export function CreateModal({
           const payload = {
             content: baseData.content,
             image: baseData.image,
-            lat: baseData.coordinate?.lat,
-            lng: baseData.coordinate?.lng,
+            lat: effectiveCoordinate?.lat,
+            lng: effectiveCoordinate?.lng,
             eventDate: eventDateTime.toISOString(),
             contentType: category,
           } as V1CreateEventRequest;
@@ -237,7 +256,7 @@ export function CreateModal({
 
           {/* カテゴリ選択 */}
           <div>
-            <Label htmlFor="category">カテゴリ（任意）</Label>
+            <Label htmlFor="category">カテゴリ</Label>
             <Select
               value={category}
               onValueChange={(value: Category) => setCategory(value)}
@@ -247,9 +266,7 @@ export function CreateModal({
               </SelectTrigger>
               <SelectContent className="bg-white text-gray-900 border border-gray-200 shadow-lg shadow-black/10 backdrop-blur-none">
                 {/* categoryOptions がプロジェクト内に定義されていない場合は簡易的に候補を表示 */}
-                {CATEGORY_OPTIONS.filter(
-                  (option) => option.value !== "entertainment"
-                ).map((option) => (
+                {CATEGORY_OPTIONS.map((option) => (
                   <SelectItem
                     key={option.value}
                     value={option.value}
@@ -317,7 +334,8 @@ export function CreateModal({
               disabled={
                 !content.trim() ||
                 loading ||
-                (contentType === "event" && !eventDate)
+                (contentType === "event" && !eventDate)||
+                category==""
               }
               className="flex-1"
             >
