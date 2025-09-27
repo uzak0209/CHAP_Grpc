@@ -15,7 +15,8 @@ service ThreadService {
   }
   rpc GetThreads(GetThreadsRequest) returns (GetThreadsResponse) {
     option (google.api.http) = {
-      get: "/api/v1/threads"
+      post: "/api/v1/threads"
+      body: "*"
     };
   }
   rpc CreateThread(CreateThreadRequest) returns (chap.common.v1.StandardResponse) {

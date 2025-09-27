@@ -12,6 +12,7 @@ export * from './v1Comment';
 export * from './v1CreateThreadRequest';
 export * from './v1EditThreadRequest';
 export * from './v1GetThreadByIDResponse';
+export * from './v1GetThreadsRequest';
 export * from './v1GetThreadsResponse';
 export * from './v1StandardResponse';
 export * from './v1Thread';

@@ -17,7 +17,7 @@
   ],
   "paths": {
     "/api/v1/threads": {
-      "get": {
+      "post": {
         "operationId": "ThreadService_GetThreads",
         "responses": {
           "200": {
@@ -35,18 +35,12 @@
         },
         "parameters": [
           {
-            "name": "lat",
-            "in": "query",
-            "required": false,
-            "type": "number",
-            "format": "double"
-          },
-          {
-            "name": "lng",
-            "in": "query",
-            "required": false,
-            "type": "number",
-            "format": "double"
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1GetThreadsRequest"
+            }
           }
         ],
         "tags": [
@@ -313,6 +307,19 @@
             "type": "object",
             "$ref": "#/definitions/v1Comment"
           }
+        }
+      }
+    },
+    "v1GetThreadsRequest": {
+      "type": "object",
+      "properties": {
+        "lat": {
+          "type": "number",
+          "format": "double"
+        },
+        "lng": {
+          "type": "number",
+          "format": "double"
         }
       }
     },

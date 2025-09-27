@@ -17,7 +17,7 @@
   ],
   "paths": {
     "/api/v1/events": {
-      "get": {
+      "post": {
         "operationId": "EventService_GetEvents",
         "responses": {
           "200": {
@@ -35,18 +35,12 @@
         },
         "parameters": [
           {
-            "name": "lat",
-            "in": "query",
-            "required": false,
-            "type": "number",
-            "format": "double"
-          },
-          {
-            "name": "lng",
-            "in": "query",
-            "required": false,
-            "type": "number",
-            "format": "double"
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1GetEventsRequest"
+            }
           }
         ],
         "tags": [
@@ -371,6 +365,19 @@
             "type": "object",
             "$ref": "#/definitions/v1Comment"
           }
+        }
+      }
+    },
+    "v1GetEventsRequest": {
+      "type": "object",
+      "properties": {
+        "lat": {
+          "type": "number",
+          "format": "double"
+        },
+        "lng": {
+          "type": "number",
+          "format": "double"
         }
       }
     },

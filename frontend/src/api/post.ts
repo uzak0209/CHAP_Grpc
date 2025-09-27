@@ -31,11 +31,11 @@ import type {
 } from 'axios';
 
 import type {
-  PostServiceGetPostsParams,
   RpcStatus,
   V1CreatePostRequest,
   V1EditPostRequest,
   V1GetPostsByUserIDResponse,
+  V1GetPostsRequest,
   V1GetPostsResponse,
   V1StandardResponse
 } from './';
@@ -51,90 +51,64 @@ type AwaitedInput<T> = PromiseLike<T> | T;
  * @summary 投稿操作
  */
 export const postServiceGetPosts = (
-    params?: PostServiceGetPostsParams, options?: AxiosRequestConfig
+    v1GetPostsRequest: V1GetPostsRequest, options?: AxiosRequestConfig
  ): Promise<AxiosResponse<V1GetPostsResponse>> => {
     
     
-    return axios.default.get(
-      `/api/v1/posts`,{
-    ...options,
-        params: {...params, ...options?.params},}
+    return axios.default.post(
+      `/api/v1/posts`,
+      v1GetPostsRequest,options
     );
   }
 
 
-export const getPostServiceGetPostsQueryKey = (params?: PostServiceGetPostsParams,) => {
-    return [`/api/v1/posts`, ...(params ? [params]: [])] as const;
-    }
 
-    
-export const getPostServiceGetPostsQueryOptions = <TData = Awaited<ReturnType<typeof postServiceGetPosts>>, TError = AxiosError<RpcStatus>>(params?: PostServiceGetPostsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof postServiceGetPosts>>, TError, TData>>, axios?: AxiosRequestConfig}
-) => {
+export const getPostServiceGetPostsMutationOptions = <TError = AxiosError<RpcStatus>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postServiceGetPosts>>, TError,{data: V1GetPostsRequest}, TContext>, axios?: AxiosRequestConfig}
+): UseMutationOptions<Awaited<ReturnType<typeof postServiceGetPosts>>, TError,{data: V1GetPostsRequest}, TContext> => {
 
-const {query: queryOptions, axios: axiosOptions} = options ?? {};
-
-  const queryKey =  queryOptions?.queryKey ?? getPostServiceGetPostsQueryKey(params);
-
-  
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof postServiceGetPosts>>> = ({ signal }) => postServiceGetPosts(params, { signal, ...axiosOptions });
+const mutationKey = ['postServiceGetPosts'];
+const {mutation: mutationOptions, axios: axiosOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, axios: undefined};
 
       
 
-      
 
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof postServiceGetPosts>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postServiceGetPosts>>, {data: V1GetPostsRequest}> = (props) => {
+          const {data} = props ?? {};
 
-export type PostServiceGetPostsQueryResult = NonNullable<Awaited<ReturnType<typeof postServiceGetPosts>>>
-export type PostServiceGetPostsQueryError = AxiosError<RpcStatus>
+          return  postServiceGetPosts(data,axiosOptions)
+        }
+
+        
 
 
-export function usePostServiceGetPosts<TData = Awaited<ReturnType<typeof postServiceGetPosts>>, TError = AxiosError<RpcStatus>>(
- params: undefined |  PostServiceGetPostsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof postServiceGetPosts>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof postServiceGetPosts>>,
-          TError,
-          Awaited<ReturnType<typeof postServiceGetPosts>>
-        > , 'initialData'
-      >, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function usePostServiceGetPosts<TData = Awaited<ReturnType<typeof postServiceGetPosts>>, TError = AxiosError<RpcStatus>>(
- params?: PostServiceGetPostsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof postServiceGetPosts>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof postServiceGetPosts>>,
-          TError,
-          Awaited<ReturnType<typeof postServiceGetPosts>>
-        > , 'initialData'
-      >, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function usePostServiceGetPosts<TData = Awaited<ReturnType<typeof postServiceGetPosts>>, TError = AxiosError<RpcStatus>>(
- params?: PostServiceGetPostsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof postServiceGetPosts>>, TError, TData>>, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-/**
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PostServiceGetPostsMutationResult = NonNullable<Awaited<ReturnType<typeof postServiceGetPosts>>>
+    export type PostServiceGetPostsMutationBody = V1GetPostsRequest
+    export type PostServiceGetPostsMutationError = AxiosError<RpcStatus>
+
+    /**
  * @summary 投稿操作
  */
+export const usePostServiceGetPosts = <TError = AxiosError<RpcStatus>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postServiceGetPosts>>, TError,{data: V1GetPostsRequest}, TContext>, axios?: AxiosRequestConfig}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof postServiceGetPosts>>,
+        TError,
+        {data: V1GetPostsRequest},
+        TContext
+      > => {
 
-export function usePostServiceGetPosts<TData = Awaited<ReturnType<typeof postServiceGetPosts>>, TError = AxiosError<RpcStatus>>(
- params?: PostServiceGetPostsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof postServiceGetPosts>>, TError, TData>>, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+      const mutationOptions = getPostServiceGetPostsMutationOptions(options);
 
-  const queryOptions = getPostServiceGetPostsQueryOptions(params,options)
-
-  const query = useQuery(queryOptions , queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
-
-  return query;
-}
-
-
-
-
+      return useMutation(mutationOptions , queryClient);
+    }
+    
 export const postServiceCreatePost = (
     v1CreatePostRequest: V1CreatePostRequest, options?: AxiosRequestConfig
  ): Promise<AxiosResponse<V1StandardResponse>> => {

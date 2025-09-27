@@ -9,7 +9,8 @@ service PostService {
   // 投稿操作
   rpc GetPosts(GetPostsRequest) returns (GetPostsResponse) {
     option (google.api.http) = {
-      get: "/api/v1/posts"
+      post: "/api/v1/posts"
+      body: "*"
     };
   }
   rpc GetPostsByUserID(GetPostsByUserIDRequest) returns (GetPostsByUserIDResponse) {
