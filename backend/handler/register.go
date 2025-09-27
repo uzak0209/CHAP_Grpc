@@ -37,6 +37,10 @@ func RegisterAllServices(grpcServer *grpc.Server) {
 	threadHandler := &ThreadServer{}
 	pd.RegisterThreadServiceServer(grpcServer, threadHandler)
 	log.Println("ThreadService registered")
+
+	eventHandler := &EventServer{}
+	pd.RegisterEventServiceServer(grpcServer, eventHandler)
+	log.Println("EventService registered")
 }
 
 // StartServerはgRPCサーバーを起動します

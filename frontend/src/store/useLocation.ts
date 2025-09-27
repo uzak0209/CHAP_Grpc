@@ -12,14 +12,15 @@ export const useLocationStore = create<LocationState>((set) => ({
 }));
 
 export function useLocation() {
+  console.log(getCurrentLocation())
   return useLocationStore((s) => ({
     currentLocation: s.currentLocation,
     setCurrentLocation: s.setCurrentLocation,
   }));
 }
 
-
 export function getCurrentLocation(): Option<Coordinate> {
+    console.log(useLocationStore.getState().currentLocation)
   return useLocationStore.getState().currentLocation;
 }
 

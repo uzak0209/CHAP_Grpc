@@ -12,11 +12,7 @@ service UserService {
       get: "/api/v1/users/me"
     };
   }
-  rpc GetUserByID(GetUserByIDRequest) returns (GetUserByIDResponse) {
-    option (google.api.http) = {
-      get: "/api/v1/users/{user_id}"
-    };
-  }
+ 
   rpc EditUser(EditUserRequest) returns (chap.common.v1.StandardResponse) {
     option (google.api.http) = {
       put: "/api/v1/users/edit"

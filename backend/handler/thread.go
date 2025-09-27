@@ -84,11 +84,17 @@ func (s *ThreadServer) GetThreads(ctx context.Context, req *pd.GetThreadsRequest
 	responseThreads := make([]*pd.Thread, len(threads))
 	for i, thread := range threads {
 		responseThreads[i] = &pd.Thread{
-			Id:        thread.ID.String(),
-			UserId:    thread.UserID.String(),
-			Content:   thread.Content,
-			CreatedAt: thread.CreatedAt.Format(time.RFC3339),
-			UpdatedAt: thread.UpdatedAt.Format(time.RFC3339),
+			Id:          thread.ID.String(),
+			UserId:      thread.UserID.String(),
+			UserImage:   thread.UserImage,
+			LikeCount:   thread.LikeCount,
+			UserName:    thread.UserName,
+			Content:     thread.Content,
+			CreatedAt:   thread.CreatedAt.Format(time.RFC3339),
+			UpdatedAt:   thread.UpdatedAt.Format(time.RFC3339),
+			Lat:         thread.Lat,
+			Lng:         thread.Lng,
+			ContentType: thread.ContentType,
 		}
 	}
 

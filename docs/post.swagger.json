@@ -17,7 +17,7 @@
   ],
   "paths": {
     "/api/v1/posts": {
-      "get": {
+      "post": {
         "summary": "投稿操作",
         "operationId": "PostService_GetPosts",
         "responses": {
@@ -36,18 +36,12 @@
         },
         "parameters": [
           {
-            "name": "lat",
-            "in": "query",
-            "required": false,
-            "type": "number",
-            "format": "double"
-          },
-          {
-            "name": "lng",
-            "in": "query",
-            "required": false,
-            "type": "number",
-            "format": "double"
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1GetPostsRequest"
+            }
           }
         ],
         "tags": [
@@ -254,6 +248,19 @@
             "type": "object",
             "$ref": "#/definitions/v1Post"
           }
+        }
+      }
+    },
+    "v1GetPostsRequest": {
+      "type": "object",
+      "properties": {
+        "lat": {
+          "type": "number",
+          "format": "double"
+        },
+        "lng": {
+          "type": "number",
+          "format": "double"
         }
       }
     },

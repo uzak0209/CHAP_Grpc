@@ -11,6 +11,7 @@ export * from './rpcStatus';
 export * from './v1CreatePostRequest';
 export * from './v1EditPostRequest';
 export * from './v1GetPostsByUserIDResponse';
+export * from './v1GetPostsRequest';
 export * from './v1GetPostsResponse';
 export * from './v1Post';
 export * from './v1StandardResponse';

@@ -31,11 +31,11 @@ import type {
 } from 'axios';
 
 import type {
-  EventServiceGetEventsParams,
   RpcStatus,
   V1CreateEventRequest,
   V1EditEventRequest,
   V1GetEventByIDResponse,
+  V1GetEventsRequest,
   V1GetEventsResponse,
   V1StandardResponse
 } from './';
@@ -48,87 +48,61 @@ type AwaitedInput<T> = PromiseLike<T> | T;
 
 
 export const eventServiceGetEvents = (
-    params?: EventServiceGetEventsParams, options?: AxiosRequestConfig
+    v1GetEventsRequest: V1GetEventsRequest, options?: AxiosRequestConfig
  ): Promise<AxiosResponse<V1GetEventsResponse>> => {
     
     
-    return axios.default.get(
-      `/api/v1/events`,{
-    ...options,
-        params: {...params, ...options?.params},}
+    return axios.default.post(
+      `/api/v1/events`,
+      v1GetEventsRequest,options
     );
   }
 
 
-export const getEventServiceGetEventsQueryKey = (params?: EventServiceGetEventsParams,) => {
-    return [`/api/v1/events`, ...(params ? [params]: [])] as const;
+
+export const getEventServiceGetEventsMutationOptions = <TError = AxiosError<RpcStatus>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof eventServiceGetEvents>>, TError,{data: V1GetEventsRequest}, TContext>, axios?: AxiosRequestConfig}
+): UseMutationOptions<Awaited<ReturnType<typeof eventServiceGetEvents>>, TError,{data: V1GetEventsRequest}, TContext> => {
+
+const mutationKey = ['eventServiceGetEvents'];
+const {mutation: mutationOptions, axios: axiosOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, axios: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof eventServiceGetEvents>>, {data: V1GetEventsRequest}> = (props) => {
+          const {data} = props ?? {};
+
+          return  eventServiceGetEvents(data,axiosOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type EventServiceGetEventsMutationResult = NonNullable<Awaited<ReturnType<typeof eventServiceGetEvents>>>
+    export type EventServiceGetEventsMutationBody = V1GetEventsRequest
+    export type EventServiceGetEventsMutationError = AxiosError<RpcStatus>
+
+    export const useEventServiceGetEvents = <TError = AxiosError<RpcStatus>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof eventServiceGetEvents>>, TError,{data: V1GetEventsRequest}, TContext>, axios?: AxiosRequestConfig}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof eventServiceGetEvents>>,
+        TError,
+        {data: V1GetEventsRequest},
+        TContext
+      > => {
+
+      const mutationOptions = getEventServiceGetEventsMutationOptions(options);
+
+      return useMutation(mutationOptions , queryClient);
     }
-
     
-export const getEventServiceGetEventsQueryOptions = <TData = Awaited<ReturnType<typeof eventServiceGetEvents>>, TError = AxiosError<RpcStatus>>(params?: EventServiceGetEventsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventServiceGetEvents>>, TError, TData>>, axios?: AxiosRequestConfig}
-) => {
-
-const {query: queryOptions, axios: axiosOptions} = options ?? {};
-
-  const queryKey =  queryOptions?.queryKey ?? getEventServiceGetEventsQueryKey(params);
-
-  
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof eventServiceGetEvents>>> = ({ signal }) => eventServiceGetEvents(params, { signal, ...axiosOptions });
-
-      
-
-      
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof eventServiceGetEvents>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type EventServiceGetEventsQueryResult = NonNullable<Awaited<ReturnType<typeof eventServiceGetEvents>>>
-export type EventServiceGetEventsQueryError = AxiosError<RpcStatus>
-
-
-export function useEventServiceGetEvents<TData = Awaited<ReturnType<typeof eventServiceGetEvents>>, TError = AxiosError<RpcStatus>>(
- params: undefined |  EventServiceGetEventsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventServiceGetEvents>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof eventServiceGetEvents>>,
-          TError,
-          Awaited<ReturnType<typeof eventServiceGetEvents>>
-        > , 'initialData'
-      >, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useEventServiceGetEvents<TData = Awaited<ReturnType<typeof eventServiceGetEvents>>, TError = AxiosError<RpcStatus>>(
- params?: EventServiceGetEventsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventServiceGetEvents>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof eventServiceGetEvents>>,
-          TError,
-          Awaited<ReturnType<typeof eventServiceGetEvents>>
-        > , 'initialData'
-      >, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useEventServiceGetEvents<TData = Awaited<ReturnType<typeof eventServiceGetEvents>>, TError = AxiosError<RpcStatus>>(
- params?: EventServiceGetEventsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventServiceGetEvents>>, TError, TData>>, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-
-export function useEventServiceGetEvents<TData = Awaited<ReturnType<typeof eventServiceGetEvents>>, TError = AxiosError<RpcStatus>>(
- params?: EventServiceGetEventsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventServiceGetEvents>>, TError, TData>>, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getEventServiceGetEventsQueryOptions(params,options)
-
-  const query = useQuery(queryOptions , queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
-
-  return query;
-}
-
-
-
-
 export const eventServiceCreateEvent = (
     v1CreateEventRequest: V1CreateEventRequest, options?: AxiosRequestConfig
  ): Promise<AxiosResponse<V1StandardResponse>> => {

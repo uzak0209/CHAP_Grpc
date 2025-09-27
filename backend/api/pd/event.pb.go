@@ -609,10 +609,10 @@ const file_event_proto_rawDesc = "" +
 	"\acontent\x18\x03 \x01(\tR\acontent\x12\x14\n" +
 	"\x05image\x18\x04 \x01(\tR\x05image\"/\n" +
 	"\x12DeleteEventRequest\x12\x19\n" +
-	"\bevent_id\x18\x01 \x01(\tR\aeventId2\xd6\x04\n" +
+	"\bevent_id\x18\x01 \x01(\tR\aeventId2\xd9\x04\n" +
 	"\fEventService\x12z\n" +
-	"\fGetEventByID\x12\".chap.event.v1.GetEventByIDRequest\x1a#.chap.event.v1.GetEventByIDResponse\"!\x82\xd3\xe4\x93\x02\x1b\x12\x19/api/v1/events/{event_id}\x12f\n" +
-	"\tGetEvents\x12\x1f.chap.event.v1.GetEventsRequest\x1a .chap.event.v1.GetEventsResponse\"\x16\x82\xd3\xe4\x93\x02\x10\x12\x0e/api/v1/events\x12t\n" +
+	"\fGetEventByID\x12\".chap.event.v1.GetEventByIDRequest\x1a#.chap.event.v1.GetEventByIDResponse\"!\x82\xd3\xe4\x93\x02\x1b\x12\x19/api/v1/events/{event_id}\x12i\n" +
+	"\tGetEvents\x12\x1f.chap.event.v1.GetEventsRequest\x1a .chap.event.v1.GetEventsResponse\"\x19\x82\xd3\xe4\x93\x02\x13:\x01*\"\x0e/api/v1/events\x12t\n" +
 	"\vCreateEvent\x12!.chap.event.v1.CreateEventRequest\x1a .chap.common.v1.StandardResponse\" \x82\xd3\xe4\x93\x02\x1a:\x01*\"\x15/api/v1/events/create\x12n\n" +
 	"\tEditEvent\x12\x1f.chap.event.v1.EditEventRequest\x1a .chap.common.v1.StandardResponse\"\x1e\x82\xd3\xe4\x93\x02\x18:\x01*\x1a\x13/api/v1/events/edit\x12|\n" +
 	"\vDeleteEvent\x12!.chap.event.v1.DeleteEventRequest\x1a .chap.common.v1.StandardResponse\"(\x82\xd3\xe4\x93\x02\"* /api/v1/events/delete/{event_id}B1Z/github.com/uzak0209/CHAP_Grpc/backend/api/pd;pdb\x06proto3"

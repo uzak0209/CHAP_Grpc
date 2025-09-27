@@ -32,10 +32,10 @@ import type {
 
 import type {
   RpcStatus,
-  ThreadServiceGetThreadsParams,
   V1CreateThreadRequest,
   V1EditThreadRequest,
   V1GetThreadByIDResponse,
+  V1GetThreadsRequest,
   V1GetThreadsResponse,
   V1StandardResponse
 } from './';
@@ -48,87 +48,61 @@ type AwaitedInput<T> = PromiseLike<T> | T;
 
 
 export const threadServiceGetThreads = (
-    params?: ThreadServiceGetThreadsParams, options?: AxiosRequestConfig
+    v1GetThreadsRequest: V1GetThreadsRequest, options?: AxiosRequestConfig
  ): Promise<AxiosResponse<V1GetThreadsResponse>> => {
     
     
-    return axios.default.get(
-      `/api/v1/threads`,{
-    ...options,
-        params: {...params, ...options?.params},}
+    return axios.default.post(
+      `/api/v1/threads`,
+      v1GetThreadsRequest,options
     );
   }
 
 
-export const getThreadServiceGetThreadsQueryKey = (params?: ThreadServiceGetThreadsParams,) => {
-    return [`/api/v1/threads`, ...(params ? [params]: [])] as const;
+
+export const getThreadServiceGetThreadsMutationOptions = <TError = AxiosError<RpcStatus>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof threadServiceGetThreads>>, TError,{data: V1GetThreadsRequest}, TContext>, axios?: AxiosRequestConfig}
+): UseMutationOptions<Awaited<ReturnType<typeof threadServiceGetThreads>>, TError,{data: V1GetThreadsRequest}, TContext> => {
+
+const mutationKey = ['threadServiceGetThreads'];
+const {mutation: mutationOptions, axios: axiosOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, axios: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof threadServiceGetThreads>>, {data: V1GetThreadsRequest}> = (props) => {
+          const {data} = props ?? {};
+
+          return  threadServiceGetThreads(data,axiosOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ThreadServiceGetThreadsMutationResult = NonNullable<Awaited<ReturnType<typeof threadServiceGetThreads>>>
+    export type ThreadServiceGetThreadsMutationBody = V1GetThreadsRequest
+    export type ThreadServiceGetThreadsMutationError = AxiosError<RpcStatus>
+
+    export const useThreadServiceGetThreads = <TError = AxiosError<RpcStatus>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof threadServiceGetThreads>>, TError,{data: V1GetThreadsRequest}, TContext>, axios?: AxiosRequestConfig}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof threadServiceGetThreads>>,
+        TError,
+        {data: V1GetThreadsRequest},
+        TContext
+      > => {
+
+      const mutationOptions = getThreadServiceGetThreadsMutationOptions(options);
+
+      return useMutation(mutationOptions , queryClient);
     }
-
     
-export const getThreadServiceGetThreadsQueryOptions = <TData = Awaited<ReturnType<typeof threadServiceGetThreads>>, TError = AxiosError<RpcStatus>>(params?: ThreadServiceGetThreadsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof threadServiceGetThreads>>, TError, TData>>, axios?: AxiosRequestConfig}
-) => {
-
-const {query: queryOptions, axios: axiosOptions} = options ?? {};
-
-  const queryKey =  queryOptions?.queryKey ?? getThreadServiceGetThreadsQueryKey(params);
-
-  
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof threadServiceGetThreads>>> = ({ signal }) => threadServiceGetThreads(params, { signal, ...axiosOptions });
-
-      
-
-      
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof threadServiceGetThreads>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type ThreadServiceGetThreadsQueryResult = NonNullable<Awaited<ReturnType<typeof threadServiceGetThreads>>>
-export type ThreadServiceGetThreadsQueryError = AxiosError<RpcStatus>
-
-
-export function useThreadServiceGetThreads<TData = Awaited<ReturnType<typeof threadServiceGetThreads>>, TError = AxiosError<RpcStatus>>(
- params: undefined |  ThreadServiceGetThreadsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof threadServiceGetThreads>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof threadServiceGetThreads>>,
-          TError,
-          Awaited<ReturnType<typeof threadServiceGetThreads>>
-        > , 'initialData'
-      >, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useThreadServiceGetThreads<TData = Awaited<ReturnType<typeof threadServiceGetThreads>>, TError = AxiosError<RpcStatus>>(
- params?: ThreadServiceGetThreadsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof threadServiceGetThreads>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof threadServiceGetThreads>>,
-          TError,
-          Awaited<ReturnType<typeof threadServiceGetThreads>>
-        > , 'initialData'
-      >, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useThreadServiceGetThreads<TData = Awaited<ReturnType<typeof threadServiceGetThreads>>, TError = AxiosError<RpcStatus>>(
- params?: ThreadServiceGetThreadsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof threadServiceGetThreads>>, TError, TData>>, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-
-export function useThreadServiceGetThreads<TData = Awaited<ReturnType<typeof threadServiceGetThreads>>, TError = AxiosError<RpcStatus>>(
- params?: ThreadServiceGetThreadsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof threadServiceGetThreads>>, TError, TData>>, axios?: AxiosRequestConfig}
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getThreadServiceGetThreadsQueryOptions(params,options)
-
-  const query = useQuery(queryOptions , queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
-
-  return query;
-}
-
-
-
-
 export const threadServiceCreateThread = (
     v1CreateThreadRequest: V1CreateThreadRequest, options?: AxiosRequestConfig
  ): Promise<AxiosResponse<V1StandardResponse>> => {

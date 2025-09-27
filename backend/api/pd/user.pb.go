@@ -462,10 +462,9 @@ const file_user_proto_rawDesc = "" +
 	"\x11FollowUserRequest\x12$\n" +
 	"\x0etarget_user_id\x18\x02 \x01(\tR\ftargetUserId\";\n" +
 	"\x13UnfollowUserRequest\x12$\n" +
-	"\x0etarget_user_id\x18\x02 \x01(\tR\ftargetUserId2\xcd\x05\n" +
+	"\x0etarget_user_id\x18\x02 \x01(\tR\ftargetUserId2\xd8\x04\n" +
 	"\vUserService\x12[\n" +
-	"\x05GetMe\x12\x15.chap.common.v1.Empty\x1a!.chap.user.v1.GetUserByIDResponse\"\x18\x82\xd3\xe4\x93\x02\x12\x12\x10/api/v1/users/me\x12s\n" +
-	"\vGetUserByID\x12 .chap.user.v1.GetUserByIDRequest\x1a!.chap.user.v1.GetUserByIDResponse\"\x1f\x82\xd3\xe4\x93\x02\x19\x12\x17/api/v1/users/{user_id}\x12j\n" +
+	"\x05GetMe\x12\x15.chap.common.v1.Empty\x1a!.chap.user.v1.GetUserByIDResponse\"\x18\x82\xd3\xe4\x93\x02\x12\x12\x10/api/v1/users/me\x12j\n" +
 	"\bEditUser\x12\x1d.chap.user.v1.EditUserRequest\x1a .chap.common.v1.StandardResponse\"\x1d\x82\xd3\xe4\x93\x02\x17:\x01*\x1a\x12/api/v1/users/edit\x12w\n" +
 	"\n" +
 	"DeleteUser\x12\x1f.chap.user.v1.DeleteUserRequest\x1a .chap.common.v1.StandardResponse\"&\x82\xd3\xe4\x93\x02 *\x1e/api/v1/users/delete/{user_id}\x12\x81\x01\n" +
@@ -500,19 +499,17 @@ var file_user_proto_goTypes = []any{
 var file_user_proto_depIdxs = []int32{
 	0, // 0: chap.user.v1.GetUserByIDResponse.user:type_name -> chap.user.v1.User
 	7, // 1: chap.user.v1.UserService.GetMe:input_type -> chap.common.v1.Empty
-	1, // 2: chap.user.v1.UserService.GetUserByID:input_type -> chap.user.v1.GetUserByIDRequest
-	3, // 3: chap.user.v1.UserService.EditUser:input_type -> chap.user.v1.EditUserRequest
-	4, // 4: chap.user.v1.UserService.DeleteUser:input_type -> chap.user.v1.DeleteUserRequest
-	5, // 5: chap.user.v1.UserService.FollowUser:input_type -> chap.user.v1.FollowUserRequest
-	6, // 6: chap.user.v1.UserService.UnfollowUser:input_type -> chap.user.v1.UnfollowUserRequest
-	2, // 7: chap.user.v1.UserService.GetMe:output_type -> chap.user.v1.GetUserByIDResponse
-	2, // 8: chap.user.v1.UserService.GetUserByID:output_type -> chap.user.v1.GetUserByIDResponse
-	8, // 9: chap.user.v1.UserService.EditUser:output_type -> chap.common.v1.StandardResponse
-	8, // 10: chap.user.v1.UserService.DeleteUser:output_type -> chap.common.v1.StandardResponse
-	8, // 11: chap.user.v1.UserService.FollowUser:output_type -> chap.common.v1.StandardResponse
-	8, // 12: chap.user.v1.UserService.UnfollowUser:output_type -> chap.common.v1.StandardResponse
-	7, // [7:13] is the sub-list for method output_type
-	1, // [1:7] is the sub-list for method input_type
+	3, // 2: chap.user.v1.UserService.EditUser:input_type -> chap.user.v1.EditUserRequest
+	4, // 3: chap.user.v1.UserService.DeleteUser:input_type -> chap.user.v1.DeleteUserRequest
+	5, // 4: chap.user.v1.UserService.FollowUser:input_type -> chap.user.v1.FollowUserRequest
+	6, // 5: chap.user.v1.UserService.UnfollowUser:input_type -> chap.user.v1.UnfollowUserRequest
+	2, // 6: chap.user.v1.UserService.GetMe:output_type -> chap.user.v1.GetUserByIDResponse
+	8, // 7: chap.user.v1.UserService.EditUser:output_type -> chap.common.v1.StandardResponse
+	8, // 8: chap.user.v1.UserService.DeleteUser:output_type -> chap.common.v1.StandardResponse
+	8, // 9: chap.user.v1.UserService.FollowUser:output_type -> chap.common.v1.StandardResponse
+	8, // 10: chap.user.v1.UserService.UnfollowUser:output_type -> chap.common.v1.StandardResponse
+	6, // [6:11] is the sub-list for method output_type
+	1, // [1:6] is the sub-list for method input_type
 	1, // [1:1] is the sub-list for extension type_name
 	1, // [1:1] is the sub-list for extension extendee
 	0, // [0:1] is the sub-list for field type_name

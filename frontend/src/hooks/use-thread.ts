@@ -2,16 +2,18 @@ import { postServiceCreatePost, postServiceGetPosts } from "@/api/post"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 
 import type { ThreadServiceGetThreadsParams} from "@/api/thread.schemas.ts";
+import type { V1GetThreadsResponse } from "@/api/thread.schemas.ts/v1GetThreadsResponse";
 import { threadServiceCreateThread, threadServiceGetThreads } from "@/api/thread";
-import type { V1CreateCommentRequest } from "@/api/comment.schemas.ts";
+import type { V1CreateThreadRequest } from "@/api/thread.schemas.ts";
 
-export function useGetThread(params: ThreadServiceGetThreadsParams) {
-  return useQuery({
-    queryKey: ["threads", params], // params を queryKey に含める
+export function useGetThreads(params?: ThreadServiceGetThreadsParams) {
+  return useQuery<V1GetThreadsResponse | undefined>({
+    queryKey: ["threads", params ?? null], // params を queryKey に含める
     queryFn: async () => {
       const response = await threadServiceGetThreads(params); // params をリクエストに渡す
       return response.data;
     },
+    enabled: !!params,
     staleTime: 1000 * 30, // キャッシュの有効期限を5分に設定
     refetchOnWindowFocus: false, // ウィンドウフォーカス時の再フェッチを無効化
   });
@@ -21,8 +23,8 @@ export function useCreateThreads() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (params: V1CreateCommentRequest) => {
-      const response = await threadServiceCreateThread(params); // params をリクエストに渡す
+    mutationFn: async (data?: V1CreateThreadRequest) => {
+      const response = await threadServiceCreateThread(data as any);
       return response.data;
     },
     onSuccess: () => {

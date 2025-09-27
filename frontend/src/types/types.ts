@@ -1,5 +1,5 @@
 export enum Category {
-    COMMUNICATION = "communication"
+    COMMUNICATION = "community"
     , DISASTER = "disaster"
     ,ENTERTAINMENT = "entertainment"
 }
@@ -8,11 +8,15 @@ export enum ContentType{
     THREAD="thread",
     POST = "post"
 }
-export interface Coordinate {
+export type Coordinate= {
   lat: number;
   lng: number;
 }
-
+export const CATEGORY_OPTIONS = [
+  { value: 'entertainment' as const, label: 'エンターテイメント' },
+  { value: 'community' as const, label: '地域住民コミュニケーション' },
+  { value: 'disaster' as const, label: '災害情報' }
+];
 
 // マップ制御関数の型
 export interface MapControlFunctions {

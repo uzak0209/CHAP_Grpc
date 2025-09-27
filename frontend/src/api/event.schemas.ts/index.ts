@@ -13,5 +13,6 @@ export * from './v1CreateEventRequest';
 export * from './v1EditEventRequest';
 export * from './v1Event';
 export * from './v1GetEventByIDResponse';
+export * from './v1GetEventsRequest';
 export * from './v1GetEventsResponse';
 export * from './v1StandardResponse';
