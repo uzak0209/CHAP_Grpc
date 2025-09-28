@@ -5,6 +5,7 @@ import (
 	"net"
 
 	"github.com/uzak0209/CHAP_Grpc/backend/api/pd"
+	"github.com/uzak0209/CHAP_Grpc/backend/infra/repository"
 	"github.com/uzak0209/CHAP_Grpc/backend/middleware"
 
 	"google.golang.org/grpc"
@@ -13,7 +14,14 @@ import (
 
 // RegisterAllServicesは全サービスをgRPCサーバーに登録します
 func RegisterAllServices(grpcServer *grpc.Server) {
-	// Auth service
+	// Initialize repositories (use constructors when available)
+	userRepoPtr := repository.NewUserRepository()
+	postRepo := repository.PostRepository{}
+	commentRepo := repository.NewCommentRepository()
+	threadRepo := repository.ThreadRepository{}
+	eventRepo := repository.EventRepository{}
+
+	// Auth service (constructor handles repos internally)
 	authHandler := NewAuthServer()
 	pd.RegisterAuthServiceServer(grpcServer, authHandler)
 	log.Println("AuthService registered")
@@ -24,21 +32,22 @@ func RegisterAllServices(grpcServer *grpc.Server) {
 	log.Println("UserService registered")
 
 	// Post service
-	postHandler := &PostServer{}
+	postHandler := NewPostServer(postRepo, *userRepoPtr)
 	pd.RegisterPostServiceServer(grpcServer, postHandler)
 	log.Println("PostService registered")
 
 	// Comment service
-	commentHandler := &CommentServer{}
+	commentHandler := NewCommentServer(commentRepo)
 	pd.RegisterCommentServiceServer(grpcServer, commentHandler)
 	log.Println("CommentService registered")
 
 	// Thread service
-	threadHandler := &ThreadServer{}
+	threadHandler := NewThreadServer(threadRepo, commentRepo, *userRepoPtr)
 	pd.RegisterThreadServiceServer(grpcServer, threadHandler)
 	log.Println("ThreadService registered")
 
-	eventHandler := &EventServer{}
+	// Event service
+	eventHandler := NewEventServer(eventRepo, *userRepoPtr)
 	pd.RegisterEventServiceServer(grpcServer, eventHandler)
 	log.Println("EventService registered")
 }

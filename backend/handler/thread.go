@@ -104,11 +104,11 @@ func (s *ThreadServer) GetThreads(ctx context.Context, req *pd.GetThreadsRequest
 }
 
 // 他のメソッドも同様に追加
-func (s *ThreadServer) GetThreadByID(ctx context.Context, req *pd.GetThreadByIDRequest) (*pd.GetThreadByIDResponse, error) {
+func (s *ThreadServer) GetThreadsByID(ctx context.Context, req *pd.GetThreadByIDRequest) (*pd.GetThreadByIDResponse, error) {
 	if req == nil || req.ThreadId == "" {
 		return nil, status.Error(codes.InvalidArgument, "thread id is required")
 	}
-
+	log.Print("GetThreadByID called with ThreadId: ", req.ThreadId)
 	thread, err := s.threadRepo.GetByID(ctx, req.ThreadId)
 	if err != nil {
 		log.Printf("Failed to get thread: %v", err)

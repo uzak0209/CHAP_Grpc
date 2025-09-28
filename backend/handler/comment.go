@@ -96,7 +96,6 @@ func (s *CommentServer) CreateComment(ctx context.Context, req *pd.CreateComment
 
 func (s *CommentServer) GetCommentsByThreadID(ctx context.Context, req *pd.GetCommentsByThreadIDRequest) (*pd.GetCommentsByThreadIDResponse, error) {
 	log.Printf("GetCommentsByThreadID called with thread_id: %s", req.GetThreadId())
-
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "request is nil")
 	}
@@ -106,9 +105,13 @@ func (s *CommentServer) GetCommentsByThreadID(ctx context.Context, req *pd.GetCo
 
 	// コメント取得
 	comments, err := s.commentRepo.GetByThreadID(ctx, req.GetThreadId())
+
 	if err != nil {
 		log.Printf("Failed to get comments: %v", err)
 		return nil, status.Error(codes.Internal, "failed to get comments")
+	}
+	if comments == nil {
+		comments = []*model.CommentDBModel{}
 	}
 
 	// レスポンス作成

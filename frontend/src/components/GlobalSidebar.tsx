@@ -15,15 +15,11 @@ export default function GlobalSidebar() {
   // Render nothing on server; this is a client-only component.
   if (!isOpen) return null;
 
+  // Render the provider and sidebar directly. Avoid wrapping with a full-screen
+  // fixed overlay which can interfere with interaction (pointer-events / focus).
   return (
-    <div className="fixed inset-0 z-50 pointer-events-none">
-      {/* Pointer events enabled inside the sidebar itself via its own styles */}
-      <div className="pointer-events-auto">
-        {/* Wrap AppSidebar in SidebarProvider and sync its open state with useUIState */}
-        <SidebarProvider open={isOpen} onOpenChange={(open) => useUIState.setState({ isSidebarOpen: open })}>
-          <AppSidebar />
-        </SidebarProvider>
-      </div>
-    </div>
+    <SidebarProvider open={isOpen} onOpenChange={(open) => useUIState.setState({ isSidebarOpen: open })}>
+      <AppSidebar />
+    </SidebarProvider>
   );
 }

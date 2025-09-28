@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"log"
 
 	"github.com/uzak0209/CHAP_Grpc/backend/infra/db"
 	"github.com/uzak0209/CHAP_Grpc/backend/infra/model"
@@ -15,8 +16,12 @@ func (r *ThreadRepository) Create(ctx context.Context, thread *model.ThreadDBMod
 
 func (r *ThreadRepository) GetByID(ctx context.Context, id string) (*model.ThreadDBModel, error) {
 	var thread model.ThreadDBModel
+	log.Print("id:", id)
 	err := db.DB.WithContext(ctx).First(&thread, "id = ?", id).Error
-	return &thread, err
+	if err != nil {
+		return nil, err
+	}
+	return &thread, nil
 }
 
 func (r *ThreadRepository) Update(ctx context.Context, thread *model.ThreadDBModel) error {
