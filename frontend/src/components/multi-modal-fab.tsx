@@ -20,6 +20,7 @@ export function MultiModalFAB({ className = '' }: MultiModalFABProps) {
   const [showPostModal, setShowPostModal] = useState(false);
   const [showThreadModal, setShowThreadModal] = useState(false);
   const [showEventModal, setShowEventModal] = useState(false);
+  const [showSpotModal, setShowSpotModal] = useState(false);
 
   // イベント作成後の処理
   const handleEventModalClose = () => {
@@ -54,6 +55,15 @@ export function MultiModalFAB({ className = '' }: MultiModalFABProps) {
         setShowEventModal(true);
       },
       bgColor: 'bg-orange-600 hover:bg-orange-700'
+    }
+    ,{
+      icon: <Image className="h-5 w-5" />,
+      label: '地点登録',
+      onClick: () => {
+        setIsOpen(false);
+        setShowSpotModal(true);
+      },
+      bgColor: 'bg-red-600 hover:bg-red-700'
     }
   ];
 
@@ -123,6 +133,11 @@ export function MultiModalFAB({ className = '' }: MultiModalFABProps) {
         isOpen={showEventModal} 
         onClose={handleEventModalClose} 
         contentType={ContentType.EVENT}
+      />
+      <CreateModal
+        isOpen={showSpotModal}
+        onClose={() => setShowSpotModal(false)}
+        contentType={ContentType.SPOT}
       />
     </>
   );

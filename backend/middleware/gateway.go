@@ -62,6 +62,10 @@ func StartGateway(grpcEndpoint string, gatewayAddr string) error {
 		log.Printf("Failed to register EventService: %v", err)
 		return err
 	}
+	if err := pd.RegisterSpotServiceHandler(ctx, mux, conn); err != nil {
+		log.Printf("Failed to register SpotService: %v", err)
+		return err
+	}
 
 	log.Printf("gRPC-Gateway server starting on %s", gatewayAddr)
 

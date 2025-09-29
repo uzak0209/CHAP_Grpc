@@ -12,11 +12,13 @@ import {
   Popup,
   ZoomControl,
   useMap,
+  useMapEvents,
   CircleMarker,
 } from "react-leaflet";
 import type { LatLngExpression } from "leaflet";
 import L, { LatLng, latLng } from "leaflet";
 import { useEffect } from "react";
+import { Some } from "oxide.ts";
 import { useRouter } from "next/navigation";
 import { captureCurrentLocation, useLocationStore } from "@/store/useLocation";
 import type { V1Event } from "@/api/event.schemas.ts/v1Event";
@@ -63,6 +65,35 @@ function MoveToLocation() {
   return null;
 }
 
+function MapCenterSync() {
+  const map = useMap();
+  const setMapCenter = useLocationStore((s) => s.setMapCenter);
+
+  useEffect(() => {
+    // set initial center once on mount
+    try {
+      const c = map.getCenter();
+      setMapCenter(Some({ lat: c.lat, lng: c.lng }));
+    } catch (e) {
+      // ignore
+    }
+  }, [map, setMapCenter]);
+
+  // update center on moveend
+  useMapEvents({
+    moveend: () => {
+      try {
+        const c = map.getCenter();
+        setMapCenter(Some({ lat: c.lat, lng: c.lng }));
+      } catch (e) {
+        // ignore
+      }
+    },
+  });
+
+  return null;
+}
+
 export default function MapClient() {
   const router = useRouter();
   const currentLocation = useLocationStore((s) => s.currentLocation);
@@ -101,9 +132,10 @@ export default function MapClient() {
         style={{ height: "100%", width: "100%" }}
         zoomControl={false}
       >
-        <MapResize />
+  <MapResize />
 
-        <MoveToLocation />
+  <MoveToLocation />
+  <MapCenterSync />
 
         <ZoomControl position="topright" />
         <TileLayer

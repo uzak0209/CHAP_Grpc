@@ -34,13 +34,13 @@ function SimpleSpinner() {
 const ThreadResponse = ({
   number,
   content,
-  userId,
+  userName,
   createdTime,
   isOP = false,
 }: {
   number: number;
   content: string;
-  userId: string;
+  userName: string;
   createdTime: string;
   isOP?: boolean;
 }) => (
@@ -57,7 +57,7 @@ const ThreadResponse = ({
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 text-xs text-gray-500 mb-1">
-          <span className="font-mono">{isOP ? "★" : ""}名無しさん@{userId?.slice(0, 8)}</span>
+          <span className="font-mono">{isOP ? "★" + userName : userName}</span>
           <span>{new Date(createdTime).toLocaleString("ja-JP")}</span>
           {isOP && <span className="text-red-600 font-bold">[スレ主]</span>}
         </div>
@@ -179,9 +179,9 @@ export default function ThreadDetailPage() {
               <h2 className="text-sm font-bold text-gray-700">レス一覧 ({(replies ?? []).length + 1}件)</h2>
             </div>
             <div className="divide-y">
-              <ThreadResponse number={1} content={thread.content ?? ""} userId={thread.userId ?? ""} createdTime={thread.createdAt ?? new Date().toISOString()} isOP={true} />
+              <ThreadResponse number={1} content={thread.content ?? ""} userName={thread.userName ?? ""} createdTime={thread.createdAt ?? new Date().toISOString()} isOP={true} />
               {(replies ?? []).map((reply: any, index: number) => (
-                <ThreadResponse key={reply.id} number={index + 2} content={reply.content} userId={reply.userId} createdTime={reply.createdAt} />
+                <ThreadResponse key={reply.id} number={index + 2} content={reply.content} userName={reply.userName} createdTime={reply.createdAt} />
               ))}
               {(replies ?? []).length === 0 && (
                 <div className="p-4 text-center text-gray-500">まだレスがありません。最初のレスを投稿してみましょう！</div>

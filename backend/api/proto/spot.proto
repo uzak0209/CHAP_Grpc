@@ -1,0 +1,62 @@
+syntax = "proto3";
+package chap.spot.v1;
+option go_package = "github.com/uzak0209/CHAP_Grpc/backend/api/pd;pd";
+
+import "common.proto";
+import "google/api/annotations.proto";
+
+service SpotService {
+  // スポット操作
+  rpc GetSpots(chap.common.v1.Empty) returns (GetSpotsResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/spots"
+      body: "*"
+    };
+  }
+  rpc CreateSpot(CreateSpotRequest) returns (chap.common.v1.StandardResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/spots/create"
+      body: "*"
+    };
+  }
+  rpc EditSpot(EditSpotRequest) returns (chap.common.v1.StandardResponse) {
+    option (google.api.http) = {
+      put: "/api/v1/spots/edit"
+      body: "*"
+    };
+  }
+  rpc DeleteSpot(DeleteSpotRequest) returns (chap.common.v1.StandardResponse) {
+    option (google.api.http) = {
+      delete: "/api/v1/spots/delete/{spot_id}"
+    };
+  }
+}
+message Spot{
+    string id =1;
+    string title =2;
+    string description =3;
+    double lat =4;
+    double lng =5;
+    string created_at =6;
+    string updated_at =7;
+}
+message GetSpotsResponse {
+  repeated Spot spots = 1;
+}
+message CreateSpotRequest {
+    string title =1;
+    string description =2;
+    string image =3;
+    double lat =4;
+    double lng =5;
+}
+message EditSpotRequest {
+    string id =1;
+    string title =2;
+    string description =3;
+    double lat =4;
+    double lng =5;
+}
+message DeleteSpotRequest {
+    string spot_id = 1;
+}

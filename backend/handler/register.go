@@ -20,6 +20,7 @@ func RegisterAllServices(grpcServer *grpc.Server) {
 	commentRepo := repository.NewCommentRepository()
 	threadRepo := repository.ThreadRepository{}
 	eventRepo := repository.EventRepository{}
+	spotRepo := repository.SpotRepository{}
 
 	// Auth service (constructor handles repos internally)
 	authHandler := NewAuthServer()
@@ -37,10 +38,14 @@ func RegisterAllServices(grpcServer *grpc.Server) {
 	log.Println("PostService registered")
 
 	// Comment service
-	commentHandler := NewCommentServer(commentRepo)
+	commentHandler := NewCommentServer(commentRepo, *userRepoPtr)
 	pd.RegisterCommentServiceServer(grpcServer, commentHandler)
 	log.Println("CommentService registered")
 
+	// Spot service
+	spotHandler := NewSpotServer(spotRepo, *userRepoPtr)
+	pd.RegisterSpotServiceServer(grpcServer, spotHandler)
+	log.Println("SpotService registered")
 	// Thread service
 	threadHandler := NewThreadServer(threadRepo, commentRepo, *userRepoPtr)
 	pd.RegisterThreadServiceServer(grpcServer, threadHandler)

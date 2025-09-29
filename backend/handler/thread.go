@@ -124,6 +124,7 @@ func (s *ThreadServer) GetThreadsByID(ctx context.Context, req *pd.GetThreadByID
 		responseComments[i] = &pd.Comment{
 			Id:        comment.ID.String(),
 			UserId:    comment.UserID.String(),
+			UserName:  comment.UserName,
 			Content:   comment.Content,
 			CreatedAt: comment.CreatedAt.Format(time.RFC3339),
 			UpdatedAt: comment.UpdatedAt.Format(time.RFC3339),
@@ -134,6 +135,9 @@ func (s *ThreadServer) GetThreadsByID(ctx context.Context, req *pd.GetThreadByID
 		Thread: &pd.Thread{
 			Id:        thread.ID.String(),
 			UserId:    thread.UserID.String(),
+			UserImage: thread.UserImage,
+			LikeCount: thread.LikeCount,
+			UserName:  thread.UserName,
 			Content:   thread.Content,
 			CreatedAt: thread.CreatedAt.Format(time.RFC3339),
 			UpdatedAt: thread.UpdatedAt.Format(time.RFC3339),

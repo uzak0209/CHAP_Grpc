@@ -18,11 +18,13 @@ import (
 type CommentServer struct {
 	pd.UnimplementedCommentServiceServer
 	commentRepo repository.CommentRepository
+	userRepo    repository.UserRepository
 }
 
-func NewCommentServer(commentRepo repository.CommentRepository) *CommentServer {
+func NewCommentServer(commentRepo repository.CommentRepository, userRepo repository.UserRepository) *CommentServer {
 	return &CommentServer{
 		commentRepo: commentRepo,
+		userRepo:    userRepo,
 	}
 }
 
@@ -70,11 +72,18 @@ func (s *CommentServer) CreateComment(ctx context.Context, req *pd.CreateComment
 		}, nil
 	}
 
+	user, err := s.userRepo.GetByID(ctx, userUUID.String())
+	if err != nil {
+		log.Printf("Failed to fetch user details: %v", err)
+		return &pd.StandardResponse{Success: false, Message: "failed to fetch user details"}, nil
+	}
+
 	// コメント作成
 	comment := &model.CommentDBModel{
 		ID:        uuid.New(),
 		ThreadID:  threadID,
 		UserID:    userUUID,
+		UserName:  user.Name,
 		Content:   req.GetContent(),
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
@@ -121,6 +130,7 @@ func (s *CommentServer) GetCommentsByThreadID(ctx context.Context, req *pd.GetCo
 			Id:        comment.ID.String(),
 			ThreadId:  comment.ThreadID.String(),
 			UserId:    comment.UserID.String(),
+			UserName:  comment.UserName,
 			Content:   comment.Content,
 			CreatedAt: comment.CreatedAt.Format(time.RFC3339),
 			UpdatedAt: comment.UpdatedAt.Format(time.RFC3339),

@@ -65,4 +65,15 @@ export default {
       },
     },
   },
+    spot: {
+    input: '../docs/spot.swagger.json',
+    output: {
+      client: 'react-query',
+      target: './src/api/spot.ts',
+      schemas: './src/api/spot.schemas.ts',
+      override: {
+        host: 'http://localhost:8081',
+      },
+    },
+  },
 }
