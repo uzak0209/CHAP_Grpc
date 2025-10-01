@@ -104,11 +104,11 @@ func (s *ThreadServer) GetThreads(ctx context.Context, req *pd.GetThreadsRequest
 }
 
 // 他のメソッドも同様に追加
-func (s *ThreadServer) GetThreadByID(ctx context.Context, req *pd.GetThreadByIDRequest) (*pd.GetThreadByIDResponse, error) {
+func (s *ThreadServer) GetThreadsByID(ctx context.Context, req *pd.GetThreadByIDRequest) (*pd.GetThreadByIDResponse, error) {
 	if req == nil || req.ThreadId == "" {
 		return nil, status.Error(codes.InvalidArgument, "thread id is required")
 	}
-
+	log.Print("GetThreadByID called with ThreadId: ", req.ThreadId)
 	thread, err := s.threadRepo.GetByID(ctx, req.ThreadId)
 	if err != nil {
 		log.Printf("Failed to get thread: %v", err)
@@ -124,6 +124,7 @@ func (s *ThreadServer) GetThreadByID(ctx context.Context, req *pd.GetThreadByIDR
 		responseComments[i] = &pd.Comment{
 			Id:        comment.ID.String(),
 			UserId:    comment.UserID.String(),
+			UserName:  comment.UserName,
 			Content:   comment.Content,
 			CreatedAt: comment.CreatedAt.Format(time.RFC3339),
 			UpdatedAt: comment.UpdatedAt.Format(time.RFC3339),
@@ -134,6 +135,9 @@ func (s *ThreadServer) GetThreadByID(ctx context.Context, req *pd.GetThreadByIDR
 		Thread: &pd.Thread{
 			Id:        thread.ID.String(),
 			UserId:    thread.UserID.String(),
+			UserImage: thread.UserImage,
+			LikeCount: thread.LikeCount,
+			UserName:  thread.UserName,
 			Content:   thread.Content,
 			CreatedAt: thread.CreatedAt.Format(time.RFC3339),
 			UpdatedAt: thread.UpdatedAt.Format(time.RFC3339),

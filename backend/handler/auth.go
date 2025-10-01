@@ -65,7 +65,7 @@ func (s *AuthServer) SignUp(ctx context.Context, req *pd.SignUpRequest) (*pd.Aut
 	// まず新しいユーザーを作成
 	user := &model.UserDBModel{
 		ID:    uuid.New(), // UUIDを生成
-		Name:  req.Email,  // Emailをnameとして使用（必要に応じて変更）
+		Name:  req.Name,   // Emailをnameとして使用（必要に応じて変更）
 		Valid: true,
 	}
 

@@ -7,6 +7,7 @@ export enum ContentType{
     EVENT="event" ,
     THREAD="thread",
     POST = "post"
+    ,SPOT="spot"
 }
 export type Coordinate= {
   lat: number;

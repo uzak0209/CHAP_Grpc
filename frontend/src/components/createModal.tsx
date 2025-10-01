@@ -1,6 +1,11 @@
 "use client";
 
-import { useState, useEffect, type ChangeEvent, type KeyboardEvent } from "react";
+import {
+  useState,
+  useEffect,
+  type ChangeEvent,
+  type KeyboardEvent,
+} from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -16,7 +21,11 @@ import {
 import { X, Hash, Calendar } from "lucide-react";
 import { Category, CATEGORY_OPTIONS, ContentType } from "@/types/types";
 import type { Coordinate } from "@/types/types";
-import { useLocation, useLocationStore } from "@/store/useLocation";
+import {
+  useLocation,
+  useLocationStore,
+} from "@/store/useLocation";
+import { useCreateSpot } from "@/hooks/use-spot";
 import { useCreateEvent } from "@/hooks/use-event";
 import { useCreateThreads } from "@/hooks/use-thread";
 import { postServiceCreatePost } from "@/api/post";
@@ -49,6 +58,7 @@ export function CreateModal({
   const createPostMutation = useCreatePost();
   const createEventMutation = useCreateEvent();
   const createThreadMutation = useCreateThreads();
+  const createSpotMutation = useCreateSpot();
 
   // モーダルが開くたびにフォームをリセットする
   useEffect(() => {
@@ -104,24 +114,25 @@ export function CreateModal({
         image: "",
       };
 
-          // small jitter for privacy/non-disaster posts: shift coordinates by up to ~50 meters
-          const jitterCoordinate = (c: Coordinate, maxMeters = 50): Coordinate => {
-            // 1 deg latitude ~= 111320 meters
-            const metersToDegLat = (m: number) => m / 3112;
-            const metersToDegLng = (m: number, lat: number) => m / (3112 * Math.cos((lat * Math.PI) / 180));
+      // small jitter for privacy/non-disaster posts: shift coordinates by up to ~50 meters
+      const jitterCoordinate = (c: Coordinate, maxMeters = 50): Coordinate => {
+        // 1 deg latitude ~= 111320 meters
+        const metersToDegLat = (m: number) => m / 3112;
+        const metersToDegLng = (m: number, lat: number) =>
+          m / (3112 * Math.cos((lat * Math.PI) / 180));
 
-            const rand = () => (Math.random() - 0.5) * 2; // -1 .. 1
-            const latOffset = metersToDegLat(rand() * maxMeters);
-            const lngOffset = metersToDegLng(rand() * maxMeters, c.lat);
+        const rand = () => (Math.random() - 0.5) * 2; // -1 .. 1
+        const latOffset = metersToDegLat(rand() * maxMeters);
+        const lngOffset = metersToDegLng(rand() * maxMeters, c.lat);
 
-            return { lat: c.lat + latOffset, lng: c.lng + lngOffset } as Coordinate;
-          };
+        return { lat: c.lat + latOffset, lng: c.lng + lngOffset } as Coordinate;
+      };
 
-          const effectiveCoordinate: Coordinate | undefined = baseData.coordinate
-            ? effectiveCategory !== "disaster"
-              ? jitterCoordinate(baseData.coordinate)
-              : baseData.coordinate
-            : undefined;
+      const effectiveCoordinate: Coordinate | undefined = baseData.coordinate
+        ? effectiveCategory !== "disaster"
+          ? jitterCoordinate(baseData.coordinate)
+          : baseData.coordinate
+        : undefined;
 
       switch (contentType) {
         case "thread": {
@@ -162,6 +173,27 @@ export function CreateModal({
           } as V1CreateEventRequest;
 
           await createEventMutation.mutateAsync(payload);
+          break;
+        }
+        case "spot": {
+
+          // For spot, use the viewCenter (always-updated map center) if available, otherwise fall back to currentLocation
+          const viewCenter = useLocationStore.getState().viewCenter;
+          const coord =
+            viewCenter && viewCenter.isSome && viewCenter.isSome()
+              ? viewCenter.unwrap()
+              : baseData.coordinate;
+
+          const payload = {
+            title: content.slice(0, 64),
+            description: content,
+            image: "",
+            lat: coord?.lat,
+            lng: coord?.lng,
+          } as V1CreatePostRequest & { title?: string };
+
+          // call spot create mutation
+          await createSpotMutation.mutateAsync(payload as any);
           break;
         }
       }
@@ -254,71 +286,31 @@ export function CreateModal({
             </div>
           )}
 
-          {/* カテゴリ選択 */}
-          <div>
-            <Label htmlFor="category">カテゴリ</Label>
-            <Select
-              value={category}
-              onValueChange={(value: Category) => setCategory(value)}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="なし" />
-              </SelectTrigger>
-              <SelectContent className="bg-white text-gray-900 border border-gray-200 shadow-lg shadow-black/10 backdrop-blur-none">
-                {/* categoryOptions がプロジェクト内に定義されていない場合は簡易的に候補を表示 */}
-                {CATEGORY_OPTIONS.map((option) => (
-                  <SelectItem
-                    key={option.value}
-                    value={option.value}
-                    className="focus:bg-blue-600 focus:text-white hover:bg-blue-50 aria-selected:bg-blue-600 aria-selected:text-white"
-                  >
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* タグ入力 */}
-          <div>
-            <Label htmlFor="tags">タグ（任意）</Label>
-            <div className="flex gap-2">
-              <Input
-                id="tags"
-                placeholder="タグを入力"
-                value={tagInput}
-                onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                  setTagInput(e.target.value)
-                }
-                onKeyPress={(e: KeyboardEvent<HTMLInputElement>) =>
-                  e.key === "Enter" ? addTag() : undefined
-                }
-              />
-              <Button onClick={addTag} variant="outline" size="sm">
-                <Hash className="h-4 w-4" />
-              </Button>
-            </div>
-
-            {/* タグ表示 */}
-            {tags.length > 0 && (
-              <div className="flex flex-wrap gap-2 mt-2">
-                {tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="inline-flex items-center gap-1 px-2 py-1 bg-purple-100 text-purple-800 rounded-full text-sm"
-                  >
-                    #{tag}
-                    <button
-                      onClick={() => removeTag(tag)}
-                      className="hover:bg-purple-200 rounded-full p-0.5"
+          {contentType !== "spot" && (
+            <div>
+              <Label htmlFor="category">カテゴリ</Label>
+              <Select
+                value={category}
+                onValueChange={(value: Category) => setCategory(value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="なし" />
+                </SelectTrigger>
+                <SelectContent className="bg-white text-gray-900 border border-gray-200 shadow-lg shadow-black/10 backdrop-blur-none">
+                  {/* categoryOptions がプロジェクト内に定義されていない場合は簡易的に候補を表示 */}
+                  {CATEGORY_OPTIONS.map((option) => (
+                    <SelectItem
+                      key={option.value}
+                      value={option.value}
+                      className="focus:bg-blue-600 focus:text-white hover:bg-blue-50 aria-selected:bg-blue-600 aria-selected:text-white"
                     >
-                      <X className="h-3 w-3" />
-                    </button>
-                  </span>
-                ))}
-              </div>
-            )}
-          </div>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
 
           <div className="flex gap-2 pt-4">
             <Button
@@ -334,8 +326,8 @@ export function CreateModal({
               disabled={
                 !content.trim() ||
                 loading ||
-                (contentType === "event" && !eventDate)||
-                category==""
+                (contentType === "event" && !eventDate) ||
+                (category == ""&& contentType !== "spot") 
               }
               className="flex-1"
             >

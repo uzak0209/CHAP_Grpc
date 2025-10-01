@@ -12,11 +12,14 @@ import {
   Popup,
   ZoomControl,
   useMap,
+  useMapEvents,
   CircleMarker,
 } from "react-leaflet";
 import type { LatLngExpression } from "leaflet";
 import L, { LatLng, latLng } from "leaflet";
 import { useEffect } from "react";
+import { Some } from "oxide.ts";
+import { useRouter } from "next/navigation";
 import { captureCurrentLocation, useLocationStore } from "@/store/useLocation";
 import type { V1Event } from "@/api/event.schemas.ts/v1Event";
 import { useGetPosts } from "@/hooks/use-post";
@@ -26,6 +29,9 @@ import type { postServiceGetPosts } from "@/api/post";
 import type { V1Thread } from "@/api/thread.schemas.ts";
 import type { V1Post } from "@/api/post.schemas.ts";
 import { useUIState } from "@/store/useUIState";
+import { Heart } from "lucide-react";
+import { useSpotServiceGetSpots } from "@/api/spot";
+import { useGetSpots } from "@/hooks/use-spot";
 
 function MapResize() {
   const map = useMap();
@@ -61,7 +67,80 @@ function MoveToLocation() {
   return null;
 }
 
+function PanOnLocation() {
+  const map = useMap();
+  const currentLocation = useLocationStore((s) => s.currentLocation);
+
+  useEffect(() => {
+    if (currentLocation && currentLocation.isSome && currentLocation.isSome()) {
+      const coord = currentLocation.unwrap();
+      try {
+        // use a short timeout to allow map to initialize
+        const id = setTimeout(() => map.setView([coord.lat, coord.lng], map.getZoom()), 50);
+        return () => clearTimeout(id);
+      } catch (e) {
+        // ignore
+      }
+    }
+  }, [currentLocation, map]);
+
+  return null;
+}
+
+function MapCenterSync() {
+  const map = useMap();
+  const setMapCenter = useLocationStore((s) => s.setMapCenter);
+  const setViewCenter = useLocationStore((s) => s.setViewCenter);
+
+  useEffect(() => {
+    try {
+      const c = map.getCenter();
+      setMapCenter(Some({ lat: c.lat, lng: c.lng }));
+      setViewCenter(Some({ lat: c.lat, lng: c.lng }));
+    } catch (e) {
+      // ignore
+    }
+  }, [map, setMapCenter, setViewCenter]);
+
+  useMapEvents({
+    moveend: () => {
+      try {
+        const c = map.getCenter();
+        setMapCenter(Some({ lat: c.lat, lng: c.lng }));
+        setViewCenter(Some({ lat: c.lat, lng: c.lng }));
+      } catch (e) {
+        // ignore
+      }
+    },
+  });
+
+  return null;
+}
+
+import { None } from "oxide.ts";
+function PanToMapCenter() {
+  const map = useMap();
+  const mapCenter = useLocationStore((s) => s.mapCenter);
+  const setMapCenter = useLocationStore((s) => s.setMapCenter);
+
+  useEffect(() => {
+    if (mapCenter.isSome()) {
+      try {
+        const c = mapCenter.unwrap();
+        // パンしてからmapCenterをリセット
+        map.setView([c.lat, c.lng], map.getZoom());
+        setTimeout(() => setMapCenter(None), 0);
+      } catch (e) {
+        // ignore
+      }
+    }
+  }, [mapCenter, map, setMapCenter]);
+
+  return null;
+}
+
 export default function MapClient() {
+  const router = useRouter();
   const currentLocation = useLocationStore((s) => s.currentLocation);
   const uiState=useUIState();
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -86,6 +165,7 @@ export default function MapClient() {
   const postsQuery = useGetPosts(locationParams);
   const eventsQuery = useGetEvents(locationParams);
   const threadsQuery = useGetThreads(locationParams);
+  const spotsQuery = useGetSpots();
   console.log(uiState.selectedCategory);
   return (
     <div
@@ -98,9 +178,12 @@ export default function MapClient() {
         style={{ height: "100%", width: "100%" }}
         zoomControl={false}
       >
-        <MapResize />
+  <MapResize />
 
-        <MoveToLocation />
+  <MoveToLocation />
+  <PanOnLocation />
+  <PanToMapCenter />
+  <MapCenterSync />
 
         <ZoomControl position="topright" />
         <TileLayer
@@ -156,8 +239,6 @@ export default function MapClient() {
                 <Popup>
                   <div className="min-w-[140px] text-sm">
                     <div className="font-medium mb-1">現在地</div>
-                    <div className="text-xs text-gray-600">緯度: {coord.lat.toFixed(6)}</div>
-                    <div className="text-xs text-gray-600">経度: {coord.lng.toFixed(6)}</div>
                   </div>
                 </Popup>
               </CircleMarker>
@@ -167,10 +248,13 @@ export default function MapClient() {
                 ev.lat !== undefined && ev.lng !== undefined ? (
                   <Marker key={ev.id} position={[ev.lat, ev.lng]} icon={redIcon}>
                     <Popup>
-                      <div className="min-w-[160px] text-sm">
-                        <div className="font-medium mb-1">{ev.contentType ?? "登録地点"}</div>
-                        <div className="text-xs text-gray-600">{ev.content}</div>
-                        <div className="text-xs text-gray-600">by {ev.userName}</div>
+                      <div className="min-w-[160px]">
+                        <div className="text-base text-gray-800 mb-1">{ev.content}</div>
+                        <div className="text-sm text-gray-600 mb-2">by {ev.userName}</div>
+                        <div className="flex items-center gap-2 text-sm text-gray-600">
+                          <Heart className="w-4 h-4" />
+                          <span>{ev.likeCount ?? 0}</span>
+                        </div>
                       </div>
                     </Popup>
                   </Marker>
@@ -178,12 +262,23 @@ export default function MapClient() {
               )}
               {threadsQuery.data?.threads?.filter(th=>uiState.selectedCategory.toString()==th.contentType).map((th:V1Thread) =>
                 th.lat !== undefined && th.lng !== undefined ? (
-                  <Marker key={th.id} position={[th.lat, th.lng]} icon={yellowIcon}>
+                  <Marker
+                    key={th.id}
+                    position={[th.lat, th.lng]}
+                    icon={yellowIcon}
+                  >
                     <Popup>
-                      <div className="min-w-[160px] text-sm">
-                        <div className="font-medium mb-1">{th.contentType ?? "登録地点"}</div>
-                        <div className="text-xs text-gray-600">{th.content}</div>
-                        <div className="text-xs text-gray-600">by {th.userName}</div>
+                      <div
+                        className="min-w-[160px] cursor-pointer"
+                        role="button"
+                        onClick={() => router.push(`/thread/${th.id}`)}
+                      >
+                        <div className="text-base text-gray-800 mb-1">{th.content}</div>
+                        <div className="text-sm text-gray-600 mb-2">by {th.userName}</div>
+                        <div className="flex items-center gap-2 text-sm text-gray-600">
+                          <Heart className="w-4 h-4" />
+                          <span>{th.likeCount ?? 0}</span>
+                        </div>
                       </div>
                     </Popup>
                   </Marker>
@@ -193,15 +288,30 @@ export default function MapClient() {
                 po.lat !== undefined && po.lng !== undefined ? (
                   <Marker key={po.id} position={[po.lat, po.lng]} icon={blueIcon}>
                     <Popup>
-                      <div className="min-w-[160px] text-sm">
-                        <div className="font-medium mb-1">{po.contentType ?? "登録地点"}</div>
-                        <div className="text-xs text-gray-600">{po.content}</div>
-                        <div className="text-xs text-gray-600">by {po.userName}</div>
+                      <div className="min-w-[160px]">
+                        <div className="text-base text-gray-800 mb-1">{po.content}</div>
+                        <div className="text-sm text-gray-600 mb-2">by {po.userName}</div>
+                        <div className="flex items-center gap-2 text-sm text-gray-600">
+                          <Heart className="w-4 h-4" />
+                          <span>{po.likeCount ?? 0}</span>
+                        </div>
                       </div>
                     </Popup>
                   </Marker>
                 ) : null
               )}  
+              {spotsQuery.data?.spots?.map((sp) =>
+                sp.lat !== undefined && sp.lng !== undefined ? (
+                  <Marker key={sp.id} position={[sp.lat, sp.lng]} icon={pin}>
+                    <Popup>
+                      <div className="min-w-[160px]">
+                        <div className="text-base text-gray-800 mb-1">{sp.title}</div>
+                        <div className="text-sm text-gray-600 mb-2">{sp.description}</div>
+                      </div>
+                    </Popup>
+                  </Marker>
+                ) : null
+              )}
             </>
           );
         })()}

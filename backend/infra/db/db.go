@@ -39,6 +39,7 @@ func InitDB() {
 		&model.PostLikeDBModel{},
 		&model.ThreadLikeDBModel{},
 		&model.EventLikeDBModel{},
+		&model.SpotDBModel{},
 	); err != nil {
 		log.Printf("Migration warning: %v", err)
 		log.Println("Continuing with server startup...")

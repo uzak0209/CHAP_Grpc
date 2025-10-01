@@ -10,6 +10,9 @@ import {
   MessageSquare
 } from "lucide-react";
 import React from "react";
+import { useRouter } from "next/navigation";
+import { Some } from "oxide.ts";
+import { useLocationStore } from "@/store/useLocation";
 
 import { Category } from "@/types/types";
 
@@ -27,6 +30,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { useUIState } from "@/store/useUIState";
+import { useGetSpots } from "@/hooks/use-spot";
 
 // Menu items.
 const items = [
@@ -64,6 +68,9 @@ export function AppSidebar() {
     console.log("AppSidebar - selecting category:", category);
     setSelectedCategory(category);
   };
+  const spotsQuery = useGetSpots();
+  const router = useRouter();
+
 
   return (
     <Sidebar className="bg-white/95 backdrop-blur-sm border-r shadow-md">
@@ -154,6 +161,39 @@ export function AppSidebar() {
                   </span>
                 </div>
               </label>
+            </div>
+          </SidebarGroupContent>
+        </SidebarGroup>
+        <SidebarGroup>
+          <SidebarGroupLabel>地点リスト</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <div className="space-y-2 px-2 max-h-60 overflow-y-auto">
+              {spotsQuery.data?.spots?.map((spot) => (
+                <div
+                  key={spot.id}
+                  className="p-2 bg-gray-100 rounded-md cursor-pointer hover:bg-gray-200 transition-colors"
+                  onClick={() => {
+                    // close sidebar if open
+                    if (isSidebarOpen) toggleSidebar();
+
+                    // set global map center to this spot (if coords exist)
+                    if (spot.lat !== undefined && spot.lng !== undefined) {
+                      try {
+                        useLocationStore.setState({ mapCenter: Some({ lat: spot.lat, lng: spot.lng }) });
+                      } catch (e) {
+                        // ignore failures to avoid breaking UI
+                      }
+                    }
+
+                    // navigate to map page
+                    try { router.push('/map'); } catch (e) { /* ignore */ }
+                  }}
+                >
+                  <div className="text-sm font-medium text-gray-900">
+                    {spot.title}
+                  </div>
+                </div>
+              ))}
             </div>
           </SidebarGroupContent>
         </SidebarGroup>
