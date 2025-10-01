@@ -24,7 +24,6 @@ import type { Coordinate } from "@/types/types";
 import {
   useLocation,
   useLocationStore,
-  getMapCenter,
 } from "@/store/useLocation";
 import { useCreateSpot } from "@/hooks/use-spot";
 import { useCreateEvent } from "@/hooks/use-event";
@@ -177,11 +176,12 @@ export function CreateModal({
           break;
         }
         case "spot": {
-          // For spot, use the map center if available, otherwise fall back to currentLocation
-          const mapCenter = getMapCenter();
+
+          // For spot, use the viewCenter (always-updated map center) if available, otherwise fall back to currentLocation
+          const viewCenter = useLocationStore.getState().viewCenter;
           const coord =
-            mapCenter && mapCenter.isSome && mapCenter.isSome()
-              ? mapCenter.unwrap()
+            viewCenter && viewCenter.isSome && viewCenter.isSome()
+              ? viewCenter.unwrap()
               : baseData.coordinate;
 
           const payload = {

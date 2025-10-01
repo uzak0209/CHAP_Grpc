@@ -30,6 +30,8 @@ import type { V1Thread } from "@/api/thread.schemas.ts";
 import type { V1Post } from "@/api/post.schemas.ts";
 import { useUIState } from "@/store/useUIState";
 import { Heart } from "lucide-react";
+import { useSpotServiceGetSpots } from "@/api/spot";
+import { useGetSpots } from "@/hooks/use-spot";
 
 function MapResize() {
   const map = useMap();
@@ -65,31 +67,74 @@ function MoveToLocation() {
   return null;
 }
 
+function PanOnLocation() {
+  const map = useMap();
+  const currentLocation = useLocationStore((s) => s.currentLocation);
+
+  useEffect(() => {
+    if (currentLocation && currentLocation.isSome && currentLocation.isSome()) {
+      const coord = currentLocation.unwrap();
+      try {
+        // use a short timeout to allow map to initialize
+        const id = setTimeout(() => map.setView([coord.lat, coord.lng], map.getZoom()), 50);
+        return () => clearTimeout(id);
+      } catch (e) {
+        // ignore
+      }
+    }
+  }, [currentLocation, map]);
+
+  return null;
+}
+
 function MapCenterSync() {
   const map = useMap();
   const setMapCenter = useLocationStore((s) => s.setMapCenter);
+  const setViewCenter = useLocationStore((s) => s.setViewCenter);
 
   useEffect(() => {
-    // set initial center once on mount
     try {
       const c = map.getCenter();
       setMapCenter(Some({ lat: c.lat, lng: c.lng }));
+      setViewCenter(Some({ lat: c.lat, lng: c.lng }));
     } catch (e) {
       // ignore
     }
-  }, [map, setMapCenter]);
+  }, [map, setMapCenter, setViewCenter]);
 
-  // update center on moveend
   useMapEvents({
     moveend: () => {
       try {
         const c = map.getCenter();
         setMapCenter(Some({ lat: c.lat, lng: c.lng }));
+        setViewCenter(Some({ lat: c.lat, lng: c.lng }));
       } catch (e) {
         // ignore
       }
     },
   });
+
+  return null;
+}
+
+import { None } from "oxide.ts";
+function PanToMapCenter() {
+  const map = useMap();
+  const mapCenter = useLocationStore((s) => s.mapCenter);
+  const setMapCenter = useLocationStore((s) => s.setMapCenter);
+
+  useEffect(() => {
+    if (mapCenter.isSome()) {
+      try {
+        const c = mapCenter.unwrap();
+        // パンしてからmapCenterをリセット
+        map.setView([c.lat, c.lng], map.getZoom());
+        setTimeout(() => setMapCenter(None), 0);
+      } catch (e) {
+        // ignore
+      }
+    }
+  }, [mapCenter, map, setMapCenter]);
 
   return null;
 }
@@ -120,6 +165,7 @@ export default function MapClient() {
   const postsQuery = useGetPosts(locationParams);
   const eventsQuery = useGetEvents(locationParams);
   const threadsQuery = useGetThreads(locationParams);
+  const spotsQuery = useGetSpots();
   console.log(uiState.selectedCategory);
   return (
     <div
@@ -135,6 +181,8 @@ export default function MapClient() {
   <MapResize />
 
   <MoveToLocation />
+  <PanOnLocation />
+  <PanToMapCenter />
   <MapCenterSync />
 
         <ZoomControl position="topright" />
@@ -252,6 +300,18 @@ export default function MapClient() {
                   </Marker>
                 ) : null
               )}  
+              {spotsQuery.data?.spots?.map((sp) =>
+                sp.lat !== undefined && sp.lng !== undefined ? (
+                  <Marker key={sp.id} position={[sp.lat, sp.lng]} icon={pin}>
+                    <Popup>
+                      <div className="min-w-[160px]">
+                        <div className="text-base text-gray-800 mb-1">{sp.title}</div>
+                        <div className="text-sm text-gray-600 mb-2">{sp.description}</div>
+                      </div>
+                    </Popup>
+                  </Marker>
+                ) : null
+              )}
             </>
           );
         })()}

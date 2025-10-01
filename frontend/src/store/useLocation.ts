@@ -3,17 +3,24 @@ import { Some, None, Option,Result,Err,Ok } from "oxide.ts";
 import type { Coordinate } from "@/types/types";
 type LocationState = {
   currentLocation: Option<Coordinate>;
-  mapCenter: Option<Coordinate>;
+  mapCenter: Option<Coordinate>; // パン指示用
+  viewCenter: Option<Coordinate>; // 常時地図の中心
   setCurrentLocation: (location: Option<Coordinate>) => void;
   setMapCenter: (location: Option<Coordinate>) => void;
+  setViewCenter: (location: Option<Coordinate>) => void;
 };
 
 export const useLocationStore = create<LocationState>((set) => ({
   currentLocation: None,
   mapCenter: None,
+  viewCenter: None,
   setCurrentLocation: (location) => set({ currentLocation: location }),
   setMapCenter: (location) => set({ mapCenter: location }),
+  setViewCenter: (location) => set({ viewCenter: location }),
 }));
+export function getViewCenter(): Option<Coordinate> {
+  return useLocationStore.getState().viewCenter;
+}
 
 export function useLocation() {
   console.log(getCurrentLocation())
