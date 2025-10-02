@@ -104,3 +104,44 @@ func (s *EventServer) GetEvents(ctx context.Context, req *pd.GetEventsRequest) (
 
 	return &pd.GetEventsResponse{Events: responseEvents}, nil
 }
+
+func (s *EventServer) GetEventByID(ctx context.Context, req *pd.GetEventByIDRequest) (*pd.GetEventByIDResponse, error) {
+	log.Println("GetEventByID called")
+
+	if req == nil || req.EventId == "" {
+		return nil, status.Error(codes.InvalidArgument, "invalid request")
+	}
+
+	eventID, err := uuid.Parse(req.EventId)
+	if err != nil {
+		return nil, status.Error(codes.InvalidArgument, "invalid event ID format")
+	}
+
+	event, err := s.eventRepo.GetByID(ctx, eventID.String())
+	if err != nil {
+		log.Printf("Failed to get event by ID: %v", err)
+		return nil, status.Error(codes.Internal, "failed to get event")
+	}
+	if event == nil {
+		return nil, status.Error(codes.NotFound, "event not found")
+	}
+
+	responseEvent := &pd.Event{
+		Id:          event.ID.String(),
+		UserName:    event.UserName,
+		UserId:      event.UserID.String(),
+		UserImage:   event.UserImage,
+		Content:     event.Content,
+		Image:       event.Image,
+		LikeCount:   event.LikeCount,
+		CreatedAt:   event.CreatedAt.Format(time.RFC3339),
+		UpdatedAt:   event.UpdatedAt.Format(time.RFC3339),
+		Lat:         event.Lat,
+		Lng:         event.Lng,
+		EventDate:   event.EventDate.Format(time.RFC3339),
+		ContentType: event.ContentType,
+		Title:       event.Title,
+	}
+
+	return &pd.GetEventByIDResponse{Event: responseEvent}, nil
+}

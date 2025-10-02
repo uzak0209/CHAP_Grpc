@@ -5,7 +5,6 @@ import { useParams, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
-import { Input } from '@/components/ui/input';
 import { ArrowLeft, Send, ChevronRight, Heart, MessageCircle, MapPin } from 'lucide-react';
 import "../../../api/axios"
 
@@ -15,21 +14,7 @@ import type { V1Thread } from "@/api/thread.schemas.ts/v1Thread";
 import type { V1GetCommentsByThreadIDResponse } from "@/api/comment.schemas.ts/v1GetCommentsByThreadIDResponse";
 import type { V1CreateCommentRequest } from '@/api/comment.schemas.ts';
 
-// Simple placeholders if real layout/spinner not available
-function SimpleLayout({ children, title }: { children: React.ReactNode; title?: string }) {
-  return (
-    <div>
-      <header className="p-4 border-b bg-white">
-        <h1 className="text-xl font-bold">{title ?? "App"}</h1>
-      </header>
-      <main>{children}</main>
-    </div>
-  );
-}
 
-function SimpleSpinner() {
-  return <div className="animate-pulse bg-gray-200 rounded-full w-8 h-8" />;
-}
 
 const ThreadResponse = ({
   number,

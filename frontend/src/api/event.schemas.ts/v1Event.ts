@@ -20,4 +20,5 @@ export interface V1Event {
   likes?: string[];
   eventDate?: string;
   contentType?: string;
+  title?: string;
 }

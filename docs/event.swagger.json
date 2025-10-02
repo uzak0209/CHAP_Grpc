@@ -350,6 +350,9 @@
         },
         "contentType": {
           "type": "string"
+        },
+        "title": {
+          "type": "string"
         }
       }
     },

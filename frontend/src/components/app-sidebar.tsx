@@ -41,12 +41,12 @@ const items = [
   },
   {
     title: "イベント",
-    url: "/events",
+    url: "/event",
     icon: Calendar,
   },
   {
     title: "スレッド",
-    url: "/threads",
+    url: "/thread",
     icon: MessageSquare,
   },
   {

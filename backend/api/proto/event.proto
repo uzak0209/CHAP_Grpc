@@ -62,6 +62,7 @@ message Event{
     repeated string likes=12;
     string event_date =13;
     string content_type =14; 
+    string title =15;
 }
 
 message GetEventsRequest {

@@ -134,6 +134,7 @@ type Event struct {
 	Likes         []string               `protobuf:"bytes,12,rep,name=likes,proto3" json:"likes,omitempty"`
 	EventDate     string                 `protobuf:"bytes,13,opt,name=event_date,json=eventDate,proto3" json:"event_date,omitempty"`
 	ContentType   string                 `protobuf:"bytes,14,opt,name=content_type,json=contentType,proto3" json:"content_type,omitempty"`
+	Title         string                 `protobuf:"bytes,15,opt,name=title,proto3" json:"title,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -262,6 +263,13 @@ func (x *Event) GetEventDate() string {
 func (x *Event) GetContentType() string {
 	if x != nil {
 		return x.ContentType
+	}
+	return ""
+}
+
+func (x *Event) GetTitle() string {
+	if x != nil {
+		return x.Title
 	}
 	return ""
 }
@@ -567,7 +575,7 @@ const file_event_proto_rawDesc = "" +
 	"\bevent_id\x18\x01 \x01(\tR\aeventId\"v\n" +
 	"\x14GetEventByIDResponse\x12*\n" +
 	"\x05event\x18\x01 \x01(\v2\x14.chap.event.v1.EventR\x05event\x122\n" +
-	"\acomment\x18\x02 \x03(\v2\x18.chap.comment.v1.CommentR\acomment\"\xf5\x02\n" +
+	"\acomment\x18\x02 \x03(\v2\x18.chap.comment.v1.CommentR\acomment\"\x8b\x03\n" +
 	"\x05Event\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1b\n" +
 	"\tuser_name\x18\x02 \x01(\tR\buserName\x12\x17\n" +
@@ -588,7 +596,8 @@ const file_event_proto_rawDesc = "" +
 	"\x05likes\x18\f \x03(\tR\x05likes\x12\x1d\n" +
 	"\n" +
 	"event_date\x18\r \x01(\tR\teventDate\x12!\n" +
-	"\fcontent_type\x18\x0e \x01(\tR\vcontentType\"6\n" +
+	"\fcontent_type\x18\x0e \x01(\tR\vcontentType\x12\x14\n" +
+	"\x05title\x18\x0f \x01(\tR\x05title\"6\n" +
 	"\x10GetEventsRequest\x12\x10\n" +
 	"\x03lat\x18\x01 \x01(\x01R\x03lat\x12\x10\n" +
 	"\x03lng\x18\x02 \x01(\x01R\x03lng\"A\n" +
