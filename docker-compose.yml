@@ -1,14 +1,23 @@
+
 services:
   grpc-server:
-    build: ./backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
     ports:
       - "50051:50051"
       - "8081:8081"
     env_file:
       - ./backend/.env
-    restart: on-failure
+    volumes:
+      - ./backend:/app:delegated  # ホストのbackendディレクトリをコンテナの/appにマウント
+      - /app/tmp                  # tmpディレクトリは除外
+      - go_mod_cache:/go/pkg/mod  # go modulesキャッシュ
     networks:
       - grpc-network
+    restart: "no"
+    environment:
+      - GOOS=linux
   swagger-ui:
     build:
       context: ./docs
@@ -19,6 +28,29 @@ services:
       - SWAGGER_JSON=/swagger.json
     networks:
       - grpc-network
+  postgres:
+    image: postgres:15
+    container_name: chap_postgres
+    restart: always
+    environment:
+      POSTGRES_DB: chapdb
+      POSTGRES_USER: uzak
+      POSTGRES_PASSWORD: 0209
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+  adminer:
+    image: adminer
+    container_name: chap_adminer
+    restart: always
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
 networks:
   grpc-network:
     driver: bridge
+
+volumes:
+  go_mod_cache:
