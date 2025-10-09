@@ -40,7 +40,9 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
     networks:
-      - grpc-network
+      grpc-network:
+        aliases:
+          - db
   adminer:
     image: adminer
     container_name: chap_adminer

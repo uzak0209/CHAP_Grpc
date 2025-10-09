@@ -76,4 +76,15 @@ export default {
       },
     },
   },
+  image: {
+    input: '../docs/image.swagger.json',
+    output: {
+      client: 'react-query',
+      target: './src/api/image.ts',
+      schemas: './src/api/image.schemas.ts',
+      override: {
+        host: 'http://localhost:8081',
+      },
+    },
+  }
 }

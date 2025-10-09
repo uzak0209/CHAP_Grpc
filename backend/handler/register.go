@@ -55,6 +55,10 @@ func RegisterAllServices(grpcServer *grpc.Server) {
 	eventHandler := NewEventServer(eventRepo, *userRepoPtr)
 	pd.RegisterEventServiceServer(grpcServer, eventHandler)
 	log.Println("EventService registered")
+	// Image service
+	imageHandler := NewImageServer()
+	pd.RegisterImageServiceServer(grpcServer, imageHandler)
+	log.Println("ImageService registered")
 }
 
 // StartServerはgRPCサーバーを起動します

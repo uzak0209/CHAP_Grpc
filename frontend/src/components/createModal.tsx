@@ -28,6 +28,7 @@ import {
 import { useCreateSpot } from "@/hooks/use-spot";
 import { useCreateEvent } from "@/hooks/use-event";
 import { useCreateThreads } from "@/hooks/use-thread";
+import { useImageServiceUploadImage } from "@/api/image";
 import { postServiceCreatePost } from "@/api/post";
 import { eventServiceCreateEvent } from "@/api/event";
 import { threadServiceCreateThread } from "@/api/thread";
@@ -53,12 +54,15 @@ export function CreateModal({
   const [tagInput, setTagInput] = useState("");
   const [eventDate, setEventDate] = useState(""); // イベント開始日の状態
   const [loading, setLoading] = useState(false);
+    const [imageFile, setImageFile] = useState<File | null>(null);
+    const [imagePreview, setImagePreview] = useState<string | null>(null);
   const currentLocation = useLocationStore((s) => s.currentLocation);
   // React Query mutations (call hooks at top level)
   const createPostMutation = useCreatePost();
   const createEventMutation = useCreateEvent();
   const createThreadMutation = useCreateThreads();
   const createSpotMutation = useCreateSpot();
+  const uploadImageMutation = useImageServiceUploadImage();
 
   // モーダルが開くたびにフォームをリセットする
   useEffect(() => {
@@ -68,6 +72,11 @@ export function CreateModal({
       setTags([]);
       setTagInput("");
       setEventDate("");
+      setImageFile(null);
+      if (imagePreview) {
+        URL.revokeObjectURL(imagePreview);
+      }
+      setImagePreview(null);
     }
   }, [isOpen]);
 
@@ -98,6 +107,38 @@ export function CreateModal({
         ...tags.filter((t) => t !== effectiveCategory),
       ];
 
+      // 画像が選択されていればCloudflare Workers経由でR2にアップロードする
+      let uploadedImageUrl = "";
+      if (imageFile) {
+        try {
+          const result = await uploadImageMutation.mutateAsync({ data: {} as any });
+
+          const uploadUrl = result?.data?.imageUrl;
+          if (!uploadUrl) {
+            throw new Error("アップロード先のURLが取得できませんでした");
+          }
+
+          // 取得した URL に対してファイルを PUT でアップロードする
+          const putResponse = await fetch(uploadUrl, {
+            method: "POST",
+            headers: {
+              "Content-Type":  "multipart/form-data",
+            },
+            body: imageFile,
+          });
+
+          if (!putResponse.ok) {
+            const text = await putResponse.text().catch(() => "");
+            console.error("Image PUT failed", putResponse.status, text);
+            throw new Error("画像のアップロードに失敗しました (PUT)");
+          }
+          uploadedImageUrl = uploadUrl;
+        } catch (error) {
+          console.error("Image upload error:", error);
+          throw new Error("画像のアップロードに失敗しました");
+        }
+      }
+
       interface BaseData {
         content: string;
         category: Category;
@@ -111,7 +152,7 @@ export function CreateModal({
         coordinate: currentLocation.isSome()
           ? (currentLocation.unwrap() as Coordinate)
           : undefined,
-        image: "",
+        image: uploadedImageUrl || "",
       };
 
       // small jitter for privacy/non-disaster posts: shift coordinates by up to ~50 meters
@@ -187,7 +228,7 @@ export function CreateModal({
           const payload = {
             title: content.slice(0, 64),
             description: content,
-            image: "",
+            image: baseData.image, // 一貫してbaseData.imageを使用
             lat: coord?.lat,
             lng: coord?.lng,
           } as V1CreatePostRequest & { title?: string };
@@ -285,6 +326,43 @@ export function CreateModal({
               )}
             </div>
           )}
+
+          {/* 画像選択 */}
+          <div>
+            <Label htmlFor="image">画像 (任意)</Label>
+            <input
+              id="image"
+              type="file"
+              accept="image/*"
+              onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                const f = e.target.files && e.target.files[0];
+                if (f) {
+                  setImageFile(f);
+                  const url = URL.createObjectURL(f);
+                  if (imagePreview) URL.revokeObjectURL(imagePreview);
+                  setImagePreview(url);
+                }
+              }}
+              className="mt-1"
+            />
+            {imagePreview && (
+              <div className="mt-2">
+                <img src={imagePreview} alt="preview" className="max-h-40" />
+                <div>
+                  <Button
+                    variant="ghost"
+                    onClick={() => {
+                      setImageFile(null);
+                      if (imagePreview) URL.revokeObjectURL(imagePreview);
+                      setImagePreview(null);
+                    }}
+                  >
+                    削除
+                  </Button>
+                </div>
+              </div>
+            )}
+          </div>
 
           {contentType !== "spot" && (
             <div>
