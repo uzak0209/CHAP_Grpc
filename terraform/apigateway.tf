@@ -61,7 +61,7 @@ resource "aws_api_gateway_integration" "proxy_ec2" {
   http_method             = aws_api_gateway_method.proxy_any.http_method
   integration_http_method = "ANY"
   type                    = "HTTP_PROXY"
-  uri                     = "http://${aws_instance.web.public_ip}/{proxy}"
+  uri                     = "http://${aws_instance.web.public_ip}:8081/{proxy}"
   depends_on              = [aws_instance.web, aws_api_gateway_method.proxy_any]
 }
 
