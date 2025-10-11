@@ -1,23 +1,18 @@
-use lambda_http::{handler, lambda, Body, Context, Request, Response};
+use lambda_http::{run, service_fn, Body, Request, Response};
+use lambda_http::http::Method as HttpMethod;
 use std::convert::Infallible;
 use log::{error, info};
 use env_logger;
 
 use image::io::Reader as ImageReader;
-use image::{ImageOutputFormat, DynamicImage};
-use anyhow;
+use image::{ImageOutputFormat, DynamicImage, GenericImageView};
+use anyhow::Result;
+use url::form_urlencoded;
+use std::io::Cursor;
 
-#[tokio::main]
-async fn main() -> Result<()> {
-    env_logger::init();
-    info!("starting chap image lambda");
-    lambda::run(handler(func)).await?;
-    Ok(())
-}
-
-async fn func(event: Request, _: Context) -> std::result::Result<Response<Body>, Infallible> {
+async fn func(event: Request) -> std::result::Result<Response<Body>, Infallible> {
     // Only accept POST
-    if event.method() != &http::Method::POST {
+    if event.method() != &HttpMethod::POST {
         let resp = Response::builder()
             .status(405)
             .body("method not allowed".into())
@@ -29,13 +24,19 @@ async fn func(event: Request, _: Context) -> std::result::Result<Response<Body>,
     // width: target width in pixels (optional)
     // quality: 1-100 (for jpeg/webp)
     // format: jpeg|png|webp (default: jpeg)
-    let query = event.query_string_parameters();
-    let width = query.get("width").and_then(|s| s.parse::<u32>().ok());
-    let quality = query.get("quality").and_then(|s| s.parse::<u8>().ok()).unwrap_or(85);
-    let format = query.get("format").map(|s| s.as_str()).unwrap_or("jpeg");
+    // Parse raw query string into a simple map
+    let mut qs_map: std::collections::HashMap<String, String> = std::collections::HashMap::new();
+    if let Some(qs) = event.uri().query() {
+        for (k, v) in form_urlencoded::parse(qs.as_bytes()) {
+            qs_map.insert(k.into_owned(), v.into_owned());
+        }
+    }
+    let width = qs_map.get("width").and_then(|s| s.parse::<u32>().ok());
+    let quality = qs_map.get("quality").and_then(|s| s.parse::<u8>().ok()).unwrap_or(85);
+    let format = qs_map.get("format").map(|s| s.as_str()).unwrap_or("jpeg");
 
     // Body must be bytes
-    let body_bytes = match event.body() {
+    let body_bytes: Vec<u8> = match event.body() {
         Body::Binary(b) => b.clone(),
         Body::Text(s) => s.as_bytes().to_vec(),
         Body::Empty => {
@@ -75,24 +76,25 @@ async fn func(event: Request, _: Context) -> std::result::Result<Response<Body>,
         img
     };
 
-    // Encode
-    let mut out_buf: Vec<u8> = Vec::new();
+    // Encode into a cursor so we have Seek+Write
+    let mut cursor = Cursor::new(Vec::new());
     match format {
         "png" => {
-            processed.write_to(&mut out_buf, ImageOutputFormat::Png).unwrap();
+            processed.write_to(&mut cursor, ImageOutputFormat::Png).unwrap();
         }
         "webp" => {
-            processed
-                .write_to(&mut out_buf, ImageOutputFormat::WebP(Some(quality as u8)))
-                .unwrap();
+            // image crate's WebP doesn't accept quality via ImageOutputFormat in this version.
+            // We'll encode as WebP using the ImageOutputFormat::WebP lossless/quality neutral option if available,
+            // otherwise fall back to writing as WebP with default settings.
+            processed.write_to(&mut cursor, ImageOutputFormat::WebP).unwrap();
         }
         _ => {
             // default jpeg
-            processed
-                .write_to(&mut out_buf, ImageOutputFormat::Jpeg(quality))
-                .unwrap();
+            processed.write_to(&mut cursor, ImageOutputFormat::Jpeg(quality as u8)).unwrap();
         }
     }
+
+    let out_buf = cursor.into_inner();
 
     let content_type = match format {
         "png" => "image/png",
@@ -109,9 +111,12 @@ async fn func(event: Request, _: Context) -> std::result::Result<Response<Body>,
 }
 
 #[tokio::main]
-async fn main() -> anyhow::Result<()> {
+async fn main() -> Result<()> {
     env_logger::init();
     info!("starting chap image lambda");
-    lambda::run(handler(func)).await?;
+
+    // service_fn expects a function taking Request and returning a Result<Response<Body>, _>
+    let service = service_fn(|req: Request| async move { func(req).await });
+    run(service).await.map_err(|e| anyhow::anyhow!(e.to_string()))?;
     Ok(())
 }

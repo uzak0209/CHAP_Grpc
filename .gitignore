@@ -1,1 +1,3 @@
-/target
+/terraform/variables.tf
+terraform/generated_chap_key.pem
+/lambda/target/
