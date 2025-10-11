@@ -1,0 +1,62 @@
+services:
+  grpc-server:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "50051:50051"
+      - "8081:8081"
+    env_file:
+      - ./backend/.env
+    volumes:
+      - ./backend:/app:delegated  # ホストのbackendディレクトリをコンテナの/appにマウント
+      - /app/tmp                  # tmpディレクトリは除外
+      - go_mod_cache:/go/pkg/mod  # go modulesキャッシュ
+    networks:
+      - grpc-network
+    restart: "no"
+    environment:
+      - GOOS=linux
+  swagger-ui:
+    build:
+      context: ./docs
+      dockerfile: Dockerfile.swagger
+    ports:
+      - "3000:8080"
+    environment:
+      - SWAGGER_JSON=/swagger.json
+    networks:
+      - grpc-network
+  postgres:
+    image: postgres:15
+    container_name: chap_postgres
+    restart: always
+    environment:
+      POSTGRES_DB: chapdb
+      # Allow host connections without a password (trust). This makes local dev easier.
+      POSTGRES_HOST_AUTH_METHOD: trust
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      grpc-network:
+        aliases:
+          - db
+  adminer:
+    image: adminer
+    container_name: chap_adminer
+    restart: always
+    ports:
+      - "8082:8080"
+    depends_on:
+      - postgres
+    networks:
+      - grpc-network
+networks:
+  grpc-network:
+    driver: bridge
+
+volumes:
+  go_mod_cache:
+  pgdata:

@@ -1,14 +1,42 @@
 syntax = "proto3";
 package chap.post.v1;
-option go_package = "backend/api/generated/post";
+option go_package = "github.com/uzak0209/CHAP_Grpc/backend/api/pd;pd";
+
 import "common.proto";
+import "google/api/annotations.proto";
+
 service PostService {
   // 投稿操作
-  rpc GetPosts(GetPostsByUserIDRequest) returns (GetPostsByUserIDResponse);
-  rpc EditPost(EditPostRequest) returns (chap.common.v1.StandardResponse);
-  rpc CreatePost(CreatePostRequest) returns (chap.common.v1.StandardResponse);
-  rpc DeletePost(DeletePostRequest) returns (chap.common.v1.StandardResponse);
+  rpc GetPosts(GetPostsRequest) returns (GetPostsResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/posts"
+      body: "*"
+    };
+  }
+  rpc GetPostsByUserID(GetPostsByUserIDRequest) returns (GetPostsByUserIDResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/posts/{user_id}/posts"
+    };
+  }
+  rpc CreatePost(CreatePostRequest) returns (chap.common.v1.StandardResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/posts/create"
+      body: "*"
+    };
+  }
+  rpc EditPost(EditPostRequest) returns (chap.common.v1.StandardResponse) {
+    option (google.api.http) = {
+      put: "/api/v1/posts/edit"
+      body: "*"
+    };
+  }
+  rpc DeletePost(DeletePostRequest) returns (chap.common.v1.StandardResponse) {
+    option (google.api.http) = {
+      delete: "/api/v1/posts/delete/{post_id}"
+    };
+  }
 }
+
 message Post{
     string id =1;
     string user_name =2;
@@ -22,24 +50,40 @@ message Post{
     double lat =10;
     double lng =11;
     repeated string likes=12;
+    string content_type =13;
 }
+
+message GetPostsRequest {
+  double lat = 1;
+  double lng = 2;
+}
+
+message GetPostsResponse {
+  repeated Post posts = 1;
+}
+
 message GetPostsByUserIDRequest {
   string user_id = 1;
 }
+
 message GetPostsByUserIDResponse {
   repeated Post posts = 1;
 }
+
 message CreatePostRequest{
     string content =1;
     string image=2;
     double lat =3;
     double lng =4;
+    string content_type =5;
 }
+
 message EditPostRequest {
   string post_id = 1;
   string content = 2;
   string image=3;
 }
+
 message DeletePostRequest {
   string post_id = 1;
 }

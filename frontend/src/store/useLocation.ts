@@ -1,0 +1,69 @@
+import { create } from "zustand";
+import { Some, None, Option,Result,Err,Ok } from "oxide.ts";
+import type { Coordinate } from "@/types/types";
+type LocationState = {
+  currentLocation: Option<Coordinate>;
+  mapCenter: Option<Coordinate>; // パン指示用
+  viewCenter: Option<Coordinate>; // 常時地図の中心
+  setCurrentLocation: (location: Option<Coordinate>) => void;
+  setMapCenter: (location: Option<Coordinate>) => void;
+  setViewCenter: (location: Option<Coordinate>) => void;
+};
+
+export const useLocationStore = create<LocationState>((set) => ({
+  currentLocation: None,
+  mapCenter: None,
+  viewCenter: None,
+  setCurrentLocation: (location) => set({ currentLocation: location }),
+  setMapCenter: (location) => set({ mapCenter: location }),
+  setViewCenter: (location) => set({ viewCenter: location }),
+}));
+export function getViewCenter(): Option<Coordinate> {
+  return useLocationStore.getState().viewCenter;
+}
+
+export function useLocation() {
+  console.log(getCurrentLocation())
+  return useLocationStore((s) => ({
+    currentLocation: s.currentLocation,
+    setCurrentLocation: s.setCurrentLocation,
+  }));
+}
+
+export function getCurrentLocation(): Option<Coordinate> {
+    console.log(useLocationStore.getState().currentLocation)
+  return useLocationStore.getState().currentLocation;
+}
+
+export function getMapCenter(): Option<Coordinate> {
+  return useLocationStore.getState().mapCenter;
+}
+
+export function setMapCenter(location: Option<Coordinate>): void {
+  useLocationStore.setState({ mapCenter: location });
+}
+
+export function setCurrentLocation(location: Option<Coordinate>): void {
+  useLocationStore.setState({ currentLocation: location });
+}
+
+export async function captureCurrentLocation(): Promise<Result<void, string>> {
+  if (typeof navigator === "undefined" || !navigator.geolocation) {
+    setCurrentLocation(None);
+    return Promise.resolve(Err('geolocation-not-supported'));
+  }
+
+  return new Promise((resolve) => {
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setCurrentLocation(Some({ lat: pos.coords.latitude, lng: pos.coords.longitude }));
+        resolve(Ok(undefined)); // ✅ resolve で Promise に返す
+      },
+      (err) => {
+        setCurrentLocation(None);
+        resolve(Err(err?.message ?? 'geolocation-error')); // ✅ resolve で返す
+      },
+      { enableHighAccuracy: true, timeout: 5000 }
+    );
+  });
+}

@@ -2,15 +2,37 @@ syntax = "proto3";
 
 package chap.comment.v1;
 
-option go_package = "backend/api/generated/comment";
+option go_package = "github.com/uzak0209/CHAP_Grpc/backend/api/pd;pd";
 
 import "common.proto";
+import "google/api/annotations.proto";
+
 service CommentService {
   // コメント操作
-  rpc GetCommentsByThreadID(GetCommentsByThreadIDRequest) returns (GetCommentsByThreadIDResponse);
-  rpc CreateComment(CreateCommentRequest) returns (chap.common.v1.StandardResponse);
-  rpc DeleteComment(DeleteCommentRequest) returns (chap.common.v1.StandardResponse);
+  rpc GetCommentsByThreadID(GetCommentsByThreadIDRequest) returns (GetCommentsByThreadIDResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/comments/{thread_id}"
+    };
+  }
+  rpc CreateComment(CreateCommentRequest) returns (chap.common.v1.StandardResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/comments/create"
+      body: "*"
+    };
+  }
+  rpc EditComment(EditCommentRequest) returns (chap.common.v1.StandardResponse) {
+    option (google.api.http) = {
+      put: "/api/v1/comments/edit"
+      body: "*"
+    };
+  }
+  rpc DeleteComment(DeleteCommentRequest) returns (chap.common.v1.StandardResponse) {
+    option (google.api.http) = {
+      delete: "/api/v1/comments/delete/{comment_id}"
+    };
+  }
 }
+
 message Comment{
   string id =1;
   string thread_id =2;
@@ -26,16 +48,19 @@ message Comment{
   double lat =12;
   double lng =13;
   repeated string likes=14;
+  string content_type =15;
 }
+
 message GetCommentsByThreadIDRequest {
-  
   string thread_id = 1;
   double lat = 2;
   double lng = 3;
 }
+
 message GetCommentsByThreadIDResponse {
   repeated Comment comments = 1;
 }
+
 message CreateCommentRequest{
   string thread_id =1;
   string content =2;

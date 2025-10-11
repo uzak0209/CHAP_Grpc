@@ -1,0 +1,35 @@
+name: Deploy via SSM
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-1
+
+      - name: Build binary
+        run: cd backend && GOOS=linux GOARCH=amd64 go build -o app main.go
+
+      - name: Deploy to EC2 via SSM
+        run: |
+          aws ssm send-command \
+            --instance-ids i-0852a3729fc7699a4 \
+            --document-name "AWS-RunShellScript" \
+            --comment "Deploy new binary" \
+            --parameters 'commands=[
+              "mkdir -p /opt/app",
+              "cd /opt/app",
+              "rm -f app",
+              "echo \"$(base64 < ./app)\" | base64 -d > app",
+              "chmod +x app",
+              "nohup ./app > app.log 2>&1 &"
+            ]'

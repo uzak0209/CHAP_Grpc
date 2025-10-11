@@ -1,0 +1,18 @@
+syntax="proto3";
+package chap.image.v1;
+option go_package="github.com/uzak0209/CHAP_Grpc/backend/api/pd;pd";
+
+import "google/api/annotations.proto";
+service ImageService {
+  rpc UploadImage(UploadImageRequest) returns (UploadImageResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/images/upload"
+      body: "*"
+    };
+  }
+}
+message UploadImageRequest {
+}
+message UploadImageResponse {
+  string image_url = 1; // URL of the uploaded image
+}

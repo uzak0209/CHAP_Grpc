@@ -1,0 +1,95 @@
+syntax = "proto3";
+package chap.event.v1;
+option go_package = "github.com/uzak0209/CHAP_Grpc/backend/api/pd;pd";
+
+import "common.proto";
+import "comment.proto";
+import "google/api/annotations.proto";
+
+service EventService {
+ 
+  rpc GetEventByID(GetEventByIDRequest) returns (GetEventByIDResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/events/{event_id}"
+    };
+  }
+  rpc GetEvents(GetEventsRequest) returns (GetEventsResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/events"
+      body: "*"
+    };
+  }
+  rpc CreateEvent(CreateEventRequest) returns (chap.common.v1.StandardResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/events/create"
+      body: "*"
+    };
+  }
+  rpc EditEvent(EditEventRequest) returns (chap.common.v1.StandardResponse) {
+    option (google.api.http) = {
+      put: "/api/v1/events/edit"
+      body: "*"
+    };
+  }
+  rpc DeleteEvent(DeleteEventRequest) returns (chap.common.v1.StandardResponse) {
+    option (google.api.http) = {
+      delete: "/api/v1/events/delete/{event_id}"
+    };
+  }
+}
+
+message GetEventByIDRequest {
+  string event_id = 1;
+}
+
+message GetEventByIDResponse {
+  Event event = 1;
+  repeated chap.comment.v1.Comment comment = 2;
+}
+
+message Event{
+    string id =1;
+    string user_name =2;
+    string user_id =3;
+    string user_image =4;
+    string content =5;
+    string image=6;
+    int32 like_count =7;
+    string created_at =8;
+    string updated_at =9;
+    double lat =10;
+    double lng =11;
+    repeated string likes=12;
+    string event_date =13;
+    string content_type =14; 
+    string title =15;
+}
+
+message GetEventsRequest {
+  double lat = 1;
+  double lng = 2;
+}
+
+message GetEventsResponse {
+  repeated Event events = 1;
+}
+
+message CreateEventRequest{
+    string content =1;
+    string image=2;
+    double lat =3;
+    double lng =4;
+    string event_date =5;
+    string content_type =6;
+}
+
+message EditEventRequest {
+  string event_id = 1;
+  string event_date = 2;
+  string content = 3;
+  string image=4;
+}
+
+message DeleteEventRequest {
+  string event_id = 1;
+}
