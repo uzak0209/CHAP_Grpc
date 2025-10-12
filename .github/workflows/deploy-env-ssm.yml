@@ -1,14 +1,13 @@
-name: Deploy via SSM
+name: Deploy .env to EC2 via SSM
+
 on:
-  push:
-    branches: [ master ]
+    push:
+        branches: [ master ]
 
 jobs:
-  deploy:
+  deploy-env:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -16,54 +15,24 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-northeast-1
 
-      - name: Cache Go modules
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/go/pkg/mod
-            ~/.cache/go-build
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-
-
-      # 🐳 Dockerイメージキャッシュ (Amazon Linux)
-      - name: Cache Docker layers
-        uses: actions/cache@v4
-        with:
-          path: /tmp/.docker-cache
-          key: ${{ runner.os }}-docker-amazonlinux2
-      - name: Load Docker cache
+      - name: Generate .env from secrets
         run: |
-          mkdir -p /tmp/.docker-cache
-          docker load -i /tmp/.docker-cache/image.tar || true
+          echo "DB_DSN=\"${{ secrets.DB_DSN }}\"" > .env
+          echo "JWT_SECRET=\"${{ secrets.JWT_SECRET }}\"" >> .env
+          chmod 600 .env
 
-      # ✅ Amazon Linux 2 でビルド
-      - name: Build binary for Amazon Linux 2
+      - name: Send .env to EC2 via SSM
         run: |
-          docker pull amazonlinux:2
-          docker save amazonlinux:2 -o /tmp/.docker-cache/image.tar
-          docker run --rm -v $PWD:/app -w /app/backend amazonlinux:2 bash -c "
-            yum install -y golang && \
-            go version && \
-            go mod tidy && \
-            GOOS=linux GOARCH=amd64 go build -o app main.go
-          "
-          ls -lh backend/app
-
-      - name: Upload app to S3
-        run: |
-          aws s3 cp ./backend/app s3://chapexec/app
-
-      - name: Deploy to EC2 via SSM
-        run: |
+          ENV_B64=$(base64 -w0 .env)
           aws ssm send-command \
             --region ap-northeast-1 \
-            --instance-ids i-0852a3729fc7699a4 \
+            --instance-ids "i-0852a3729fc7699a4" \
             --document-name "AWS-RunShellScript" \
-            --comment "Download app from S3" \
+            --comment "Deploy .env file" \
             --parameters commands='[
-              "mkdir -p /opt/app",
               "cd /opt/app",
-              "aws s3 cp s3://chapexec/app ./app.new",
-              "if [ -s app.new ]; then mv -f app.new app; chmod +x app; nohup ./app > app.log 2>&1 & else echo download failed > error.log; fi"
-            ]'
+              "rm -f .env",
+              "echo '"$ENV_B64"' | base64 --decode > .env",
+              "chmod 600 .env"
+            ]' \
+            --output json
