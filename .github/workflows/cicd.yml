@@ -25,6 +25,7 @@ jobs:
             --instance-ids i-0852a3729fc7699a4 \
             --document-name "AWS-RunShellScript" \
             --comment "Deploy new binary" \
+            -- regions ap-northeast-1 \
             --parameters 'commands=[
               "mkdir -p /opt/app",
               "cd /opt/app",
