@@ -43,6 +43,7 @@ jobs:
 
       - name: Deploy to EC2 via SSM
         run: |
+          APP_B64=$(base64 -w0 ./backend/app)
           aws ssm send-command \
             --region ap-northeast-1 \
             --instance-ids i-0852a3729fc7699a4 \
@@ -52,7 +53,7 @@ jobs:
               "mkdir -p /opt/app",
               "cd /opt/app",
               "rm -f app",
-              "echo \"$(base64 < ./backend/app)\" | base64 -d > app",
+              "echo '$APP_B64' | base64 --decode > app",
               "chmod +x app",
               "nohup ./app > app.log 2>&1 &"
             ]'

@@ -29,5 +29,9 @@ jobs:
             --instance-ids "i-0852a3729fc7699a4" \
             --document-name "AWS-RunShellScript" \
             --comment "Deploy .env file" \
-            --parameters commands='["cd /opt/app", "echo $ENV_B64 | base64 --decode > .env", "chmod 600 .env"]' \
+            --parameters commands='[
+              "cd /opt/app",
+              "echo '"$ENV_B64"' | base64 --decode > .env",
+              "chmod 600 .env"
+            ]' \
             --output json
