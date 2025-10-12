@@ -26,20 +26,16 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-go-
 
-      - name: Cache built binary
-        uses: actions/cache@v4
-        with:
-          path: backend/app
-          key: ${{ runner.os }}-binary-${{ hashFiles('backend/main.go') }}
-
-      - name: Build binary
+      - name: Build binary for Amazon Linux 2
         run: |
-          cd backend
-          if [ ! -f app ]; then
+          docker run --rm -v $PWD:/app -w /app/backend amazonlinux:2 bash -c "
+            yum install -y golang && \
+            go version && \
+            go mod tidy && \
             GOOS=linux GOARCH=amd64 go build -o app main.go
-          else
-            echo "Using cached binary"
-          fi
+          "
+          ls -lh backend/app
+
       - name: Upload app to S3
         run: |
           aws s3 cp ./backend/app s3://chapexec/app
@@ -47,13 +43,13 @@ jobs:
       - name: Deploy to EC2 via SSM
         run: |
           aws ssm send-command \
-          --region ap-northeast-1 \
-          --instance-ids i-0852a3729fc7699a4 \
-          --document-name "AWS-RunShellScript" \
-          --comment "Download app from S3" \
-          --parameters commands='[
-            "mkdir -p /opt/app",
-            "cd /opt/app",
-            "aws s3 cp s3://chapexec/app ./app.new",
-            "if [ -s app.new ]; then mv -f app.new app; chmod +x app; nohup ./app > app.log 2>&1 & else echo download failed > error.log; fi"
-          ]'
+            --region ap-northeast-1 \
+            --instance-ids i-0852a3729fc7699a4 \
+            --document-name "AWS-RunShellScript" \
+            --comment "Download app from S3" \
+            --parameters commands='[
+              "mkdir -p /opt/app",
+              "cd /opt/app",
+              "aws s3 cp s3://chapexec/app ./app.new",
+              "if [ -s app.new ]; then mv -f app.new app; chmod +x app; nohup ./app > app.log 2>&1 & else echo download failed > error.log; fi"
+            ]'
