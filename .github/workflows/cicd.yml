@@ -16,17 +16,27 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-northeast-1
 
+      - name: Cache Go modules
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/go/pkg/mod
+            ~/.cache/go-build
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+              
       - name: Build binary
         run: cd backend && GOOS=linux GOARCH=amd64 go build -o app main.go
 
       - name: Deploy to EC2 via SSM
         run: |
           aws ssm send-command \
+            --region ap-northeast-1 \
             --instance-ids i-0852a3729fc7699a4 \
             --document-name "AWS-RunShellScript" \
             --comment "Deploy new binary" \
-            -- regions ap-northeast-1 \
-            --parameters 'commands=[
+            --parameters commands='[
               "mkdir -p /opt/app",
               "cd /opt/app",
               "rm -f app",
