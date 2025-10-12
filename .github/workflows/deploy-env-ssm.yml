@@ -31,6 +31,7 @@ jobs:
             --comment "Deploy .env file" \
             --parameters commands='[
               "cd /opt/app",
+              "rm -f .env",
               "echo '"$ENV_B64"' | base64 --decode > .env",
               "chmod 600 .env"
             ]' \
