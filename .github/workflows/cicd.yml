@@ -40,20 +40,22 @@ jobs:
           else
             echo "Using cached binary"
           fi
+      - name: Upload app to S3
+        run: |
+          aws s3 cp ./backend/app s3://chapexec/app
 
       - name: Deploy to EC2 via SSM
         run: |
-          APP_B64=$(base64 -w0 ./backend/app)
           aws ssm send-command \
             --region ap-northeast-1 \
             --instance-ids i-0852a3729fc7699a4 \
             --document-name "AWS-RunShellScript" \
-            --comment "Deploy new binary" \
+            --comment "Download app from S3" \
             --parameters commands='[
               "mkdir -p /opt/app",
               "cd /opt/app",
               "rm -f app",
-              "echo '$APP_B64' | base64 --decode > app",
+              "aws s3 cp s3://chapexec/app ./app",
               "chmod +x app",
               "nohup ./app > app.log 2>&1 &"
             ]'
