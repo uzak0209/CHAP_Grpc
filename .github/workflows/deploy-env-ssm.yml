@@ -22,7 +22,6 @@ jobs:
           chmod 600 .env
 
       - name: Send .env to EC2 via SSM
-
         run: |
           ENV_B64=$(base64 -w0 .env)
           aws ssm send-command \
@@ -30,5 +29,5 @@ jobs:
             --instance-ids "i-0852a3729fc7699a4" \
             --document-name "AWS-RunShellScript" \
             --comment "Deploy .env file" \
-            --parameters commands=["echo $ENV_B64 | base64 --decode > /home/ec2-user/app/.env && chmod 600 /home/ec2-user/app/.env"] \
+            --parameters commands='["cd /opt/app", "echo $ENV_B64 | base64 --decode > .env", "chmod 600 .env"]' \
             --output json
