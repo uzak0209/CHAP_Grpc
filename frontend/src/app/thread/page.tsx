@@ -12,7 +12,6 @@ import { MessageCircle, Users, Heart } from "lucide-react";
 import { useGetThreads } from "@/hooks/use-thread";
 import { useLocationStore, captureCurrentLocation } from "@/store/useLocation";
 import type { V1Thread } from "@/api/thread.schemas.ts/v1Thread";
-import "../../api/axios";
 // スレッドカードコンポーネント
 const ThreadCard = ({ thread }: { thread: V1Thread }) => {
   const router = useRouter();

@@ -6,8 +6,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { ArrowLeft, Send, ChevronRight, Heart, MessageCircle, MapPin } from 'lucide-react';
-import "../../../api/axios"
-
 import { threadServiceGetThreadsByID } from "@/api/thread";
 import { useCommentServiceGetCommentsByThreadID, useCommentServiceCreateComment } from "@/api/comment";
 import type { V1Thread } from "@/api/thread.schemas.ts/v1Thread";

@@ -5,9 +5,6 @@ export default {
       client: 'react-query',
       target: './src/api/auth.ts',
       schemas: './src/api/auth.schemas.ts',
-      override: {
-        host: 'http://localhost:8081',
-      },
     },
   },
   user: {
@@ -16,9 +13,6 @@ export default {
       client: 'react-query',
       target: './src/api/user.ts',
       schemas: './src/api/user.schemas.ts',
-      override: {
-        host: 'http://localhost:8081',
-      },
     },
   },
   post: {
@@ -27,9 +21,6 @@ export default {
       client: 'react-query',
       target: './src/api/post.ts',
       schemas: './src/api/post.schemas.ts',
-      override: {
-        host: 'http://localhost:8081',
-      },
     },
   },
   comment: {
@@ -38,9 +29,6 @@ export default {
       client: 'react-query',
       target: './src/api/comment.ts',
       schemas: './src/api/comment.schemas.ts',
-      override: {
-        host: 'http://localhost:8081',
-      },
     },
   },
   thread: {
@@ -49,9 +37,6 @@ export default {
       client: 'react-query',
       target: './src/api/thread.ts',
       schemas: './src/api/thread.schemas.ts',
-      override: {
-        host: 'http://localhost:8081',
-      },
     },
   },
     event: {
@@ -60,9 +45,6 @@ export default {
       client: 'react-query',
       target: './src/api/event.ts',
       schemas: './src/api/event.schemas.ts',
-      override: {
-        host: 'http://localhost:8081',
-      },
     },
   },
     spot: {
@@ -71,9 +53,6 @@ export default {
       client: 'react-query',
       target: './src/api/spot.ts',
       schemas: './src/api/spot.schemas.ts',
-      override: {
-        host: 'http://localhost:8081',
-      },
     },
   },
   image: {
@@ -82,9 +61,6 @@ export default {
       client: 'react-query',
       target: './src/api/image.ts',
       schemas: './src/api/image.schemas.ts',
-      override: {
-        host: 'http://localhost:8081',
-      },
     },
   }
 }

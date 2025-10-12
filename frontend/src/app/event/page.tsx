@@ -11,7 +11,7 @@ import { Calendar, Users } from "lucide-react";
 import { useGetEvents } from "@/hooks/use-event";
 import { useLocationStore, captureCurrentLocation } from "@/store/useLocation";
 import type { V1Event } from "@/api/event.schemas.ts/v1Event";
-import "../../api/axios";
+
 // イベントカードコンポーネント
 const EventCard = ({ event }: { event: V1Event }) => {
 	const router = useRouter();

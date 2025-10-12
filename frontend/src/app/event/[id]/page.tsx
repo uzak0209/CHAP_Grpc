@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { ArrowLeft, Send, Heart, MessageCircle } from 'lucide-react';
-import "../../../api/axios";
+
 
 import { eventServiceGetEventByID } from '@/api/event';
 // events don't have dedicated comment endpoints in this API; show description and image instead
