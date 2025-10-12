@@ -63,8 +63,8 @@ export default function EventsPage() {
 			captureCurrentLocation().catch(() => {});
 		}
 	}, [currentLocation]);
-
-	const eventsQuery = useGetEvents(locationParams);
+	
+	const eventsQuery = useGetEvents(locationParams ?? {});
 
 	const events = eventsQuery.data?.events ?? [];
 	const loading = eventsQuery.isLoading;

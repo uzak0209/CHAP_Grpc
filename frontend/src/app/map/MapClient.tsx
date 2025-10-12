@@ -162,9 +162,9 @@ export default function MapClient() {
     : undefined;
 
   // call hooks at top-level; they internally use `enabled` so they don't run until params exist
-  const postsQuery = useGetPosts(locationParams);
-  const eventsQuery = useGetEvents(locationParams);
-  const threadsQuery = useGetThreads(locationParams);
+  const postsQuery = useGetPosts(locationParams ?? {});
+  const eventsQuery = useGetEvents(locationParams ?? {});
+  const threadsQuery = useGetThreads(locationParams ?? {});
   const spotsQuery = useGetSpots();
   console.log(uiState.selectedCategory);
   return (

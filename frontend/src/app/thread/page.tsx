@@ -71,7 +71,7 @@ export default function ThreadsPage() {
     }
   }, [currentLocation]);
 
-  const threadsQuery = useGetThreads(locationParams);
+  const threadsQuery = useGetThreads(locationParams ?? {});
 
   const threads = threadsQuery.data?.threads ?? [];
   const loading = threadsQuery.isLoading;
