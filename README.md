@@ -27,17 +27,15 @@ make dev-down
 
 - **ホットリロード**: Goファイルを変更すると自動で再ビルド・再起動
 - **プロトバッファー自動生成**: `make generate`でprotoファイルから自動生成
-- **統合テスト**: `make test-integration`で全体テスト実行
 
 ### 使用技術
 
-- Go 1.21
+- Go 
 - gRPC
 - Protocol Buffers
 - Docker & Docker Compose
-- Envoy Proxy
 - PostgreSQL
-- JWT認証
+
 
 ## プロジェクト構成
 
