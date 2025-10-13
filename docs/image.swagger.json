@@ -79,7 +79,13 @@
       }
     },
     "v1UploadImageRequest": {
-      "type": "object"
+      "type": "object",
+      "properties": {
+        "filename": {
+          "type": "string",
+          "title": "Name of the image file"
+        }
+      }
     },
     "v1UploadImageResponse": {
       "type": "object",

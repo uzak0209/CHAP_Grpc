@@ -36,7 +36,7 @@ import type { V1CreatePostRequest } from "@/api/post.schemas.ts";
 import type { V1CreateEventRequest } from "@/api/event.schemas.ts";
 import type { V1CreateThreadRequest } from "@/api/thread.schemas.ts";
 import { useCreatePost } from "@/hooks/use-post";
-import { uploadImage } from "@/hooks/use-image";
+import { uploadImage, useGetUploadUrl } from "@/hooks/use-image";
 interface CreateModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -62,6 +62,7 @@ export function CreateModal({
   const createEventMutation = useCreateEvent();
   const createThreadMutation = useCreateThreads();
   const createSpotMutation = useCreateSpot();
+  const getUploadURLMutation= useGetUploadUrl();
 
   // モーダルが開くたびにフォームをリセットする
   useEffect(() => {
@@ -106,6 +107,7 @@ export function CreateModal({
         ...tags.filter((t) => t !== effectiveCategory),
       ];
 
+
       // 画像が選択されていればCloudflare Workers経由でR2にアップロードする
       let processedImageFile: File | null = null;
       if (imageFile) {
@@ -123,8 +125,36 @@ export function CreateModal({
           return;
         }
       }
-      const uploadedImageUrl: string | null  = null;
+      const upLoadUrl = await getUploadURLMutation.mutateAsync({ });
+      console.log("Obtained upload URL:", upLoadUrl);
       
+      if (processedImageFile) {
+        const Data = new FormData();
+        Data.append("file", processedImageFile);
+        
+        if (typeof upLoadUrl.imageUrl === "string" && upLoadUrl.imageUrl) {
+          const uploadResponse = await fetch(upLoadUrl.imageUrl, {
+            method: "POST",
+            body: Data,
+          });
+          if (!uploadResponse.ok) {
+            throw new Error(`Image upload failed with status ${uploadResponse.status}`);
+          }
+          const uploadResult = await uploadResponse.json();
+          console.log("Image successfully uploaded:", uploadResult);
+          // Assuming the response contains the image URL in 'imageURL' field
+          const imageUrl = uploadResult.imageURL;
+          if (imageUrl) {
+            // Use the uploaded image URL in your post/event/thread/spot creation
+            console.log("Image URL to use:", imageUrl);
+          }
+        } else {
+          throw new Error("Upload URL is invalid or undefined.");
+        }
+
+      }
+      const uploadedImageUrl: string | null  = null;
+
       
       interface BaseData {
         content: string;
