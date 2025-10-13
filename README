@@ -70,4 +70,4 @@ make prod-down        # 本番環境停止
 make clean            # コンテナ・ボリューム削除
 make generate         # プロトバッファー生成
 ```
-![アーキテクチャ](./chap-app.drawio.png)
+<img src="./chap-app.drawio.png" alt="アーキテクチャ" width="600"/>
