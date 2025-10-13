@@ -104,15 +104,39 @@ export function CreateModal({
         ...tags.filter((t) => t !== effectiveCategory),
       ];
 
-      // 画像が選択されていればCloudflare Workers経由でR2にアップロードする
-      let processedImageFile: File | null = null;
+      // 画像が選択されていればR2にアップロードする
+      let uploadedImageUrl: string | null = null;
       if (imageFile) {
         try {
-          const uploadResponse = await uploadImage(imageFile);
-          const imageBlob = await uploadResponse.blob();
-          processedImageFile = new File([imageBlob], imageFile.name, {
-            type: imageBlob.type || imageFile.type,
+          // プレサインドURL取得
+          const upLoadUrl = await getUploadURLMutation.mutateAsync({
+            filename: imageFile.name,
           });
+          console.log("Obtained upload URL:", upLoadUrl);
+
+          if (typeof upLoadUrl.imageUrl === "string" && upLoadUrl.imageUrl) {
+            // 画像を直接PUT（FormDataは使わない）
+            const uploadResponse = await fetch(upLoadUrl.imageUrl, {
+              method: "PUT",
+              headers: {
+                "Content-Type": imageFile.type || "image/jpeg",
+              },
+              body: imageFile, // ファイル直接、FormDataではない
+            });
+
+            if (!uploadResponse.ok) {
+              throw new Error(
+                `Image upload failed with status ${uploadResponse.status}`
+              );
+            }
+
+            console.log("Image successfully uploaded");
+            // アップロード後の画像URLを構築（通常はプレサインドURLからクエリパラメータを除いたもの）
+            const uploadedUrl = new URL(upLoadUrl.imageUrl);
+            uploadedImageUrl = `${uploadedUrl.protocol}//${uploadedUrl.host}${uploadedUrl.pathname}`;
+          } else {
+            throw new Error("Upload URL is invalid or undefined.");
+          }
         } catch (uploadError) {
           console.error("Image upload failed:", uploadError);
           alert("画像のアップロードに失敗しました。もう一度お試しください。");
@@ -120,41 +144,6 @@ export function CreateModal({
           return;
         }
       }
-      const upLoadUrl = await getUploadURLMutation.mutateAsync({
-        filename: imageFile?.name,
-      });
-      console.log("Obtained upload URL:", upLoadUrl);
-
-      if (processedImageFile) {
-        const Data = new FormData();
-        Data.append("file", processedImageFile);
-
-        if (typeof upLoadUrl.imageUrl === "string" && upLoadUrl.imageUrl) {
-          const uploadResponse = await fetch(upLoadUrl.imageUrl, {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/octet-stream",
-            },
-            body: Data,
-          });
-          if (!uploadResponse.ok) {
-            throw new Error(
-              `Image upload failed with status ${uploadResponse.status}`
-            );
-          }
-          const uploadResult = await uploadResponse.json();
-          console.log("Image successfully uploaded:", uploadResult);
-          // Assuming the response contains the image URL in 'imageURL' field
-          const imageUrl = uploadResult.imageURL;
-          if (imageUrl) {
-            // Use the uploaded image URL in your post/event/thread/spot creation
-            console.log("Image URL to use:", imageUrl);
-          }
-        } else {
-          throw new Error("Upload URL is invalid or undefined.");
-        }
-      }
-      const uploadedImageUrl: string | null = null;
 
       interface BaseData {
         content: string;
