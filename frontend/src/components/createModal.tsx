@@ -107,19 +107,25 @@ export function CreateModal({
       ];
 
       // 画像が選択されていればCloudflare Workers経由でR2にアップロードする
-      let uploadedImageUrl = "";
+      let processedImageFile: File | null = null;
       if (imageFile) {
         try {
-          const result = await uploadImage(imageFile);
+          const uploadResponse = await uploadImage(imageFile);
+          const imageBlob = await uploadResponse.blob();
+          processedImageFile = new File([imageBlob], imageFile.name, { 
+            type: imageBlob.type || imageFile.type 
+          });
 
-      }catch (uploadError) {
+        } catch (uploadError) {
           console.error("Image upload failed:", uploadError);
           alert("画像のアップロードに失敗しました。もう一度お試しください。");
           setLoading(false);
           return;
         }
       }
-
+      const uploadedImageUrl: string | null  = null;
+      
+      
       interface BaseData {
         content: string;
         category: Category;

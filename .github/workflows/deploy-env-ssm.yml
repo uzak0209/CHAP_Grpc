@@ -19,6 +19,8 @@ jobs:
         run: |
           echo "DB_DSN=\"${{ secrets.DB_DSN }}\"" > .env
           echo "JWT_SECRET=\"${{ secrets.JWT_SECRET }}\"" >> .env
+          echo "CLOUDFLARE_API_TOKEN=\"${{ secrets.CLOUDFLARE_API_TOKEN }}\"" >> .env
+          echo "CLOUDFLARE_ACCOUNT_ID=\"${{ secrets.CLOUDFLARE_ACCOUNT_ID }}\"" >> .env
           chmod 600 .env
 
       - name: Send .env to EC2 via SSM

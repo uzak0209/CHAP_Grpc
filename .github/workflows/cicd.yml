@@ -58,10 +58,21 @@ jobs:
             --region ap-northeast-1 \
             --instance-ids i-0852a3729fc7699a4 \
             --document-name "AWS-RunShellScript" \
-            --comment "Download app from S3" \
+            --comment "Download app from S3 and restart" \
             --parameters commands='[
               "mkdir -p /opt/app",
               "cd /opt/app",
               "aws s3 cp s3://chapexec/app ./app.new",
-              "sudo bash -c '\''if [ -s app.new ]; then mv -f app.new app; chmod +x app; nohup ./app > app.log 2>&1 & else echo download failed > error.log; fi'\''"
+              "sudo bash -c '\''if [ -s app.new ]; then",
+              "  echo \"Stopping existing app processes...\";",
+              "  pkill -f \"./app\" || true;",
+              "  sleep 2;",
+              "  echo \"Starting new app...\";",
+              "  mv -f app.new app;",
+              "  chmod +x app;",
+              "  nohup ./app > app.log 2>&1 &",
+              "  echo \"App restarted with PID: $!\";",
+              "else",
+              "  echo \"Download failed\" > error.log;",
+              "fi'\''"
             ]'
