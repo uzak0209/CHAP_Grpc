@@ -13,7 +13,10 @@ import (
 func main() {
 	log.Print("Starting application.")
 	log.Println("Initializing database...")
-	godotenv.Load(".env")
+	if err := godotenv.Load(".env"); err != nil {
+		log.Printf("could not load .env from current dir: %v", err)
+		_ = godotenv.Load("/opt/app/.env")
+	}
 	db.InitDB()
 	log.Println("Database initialized successfully")
 
