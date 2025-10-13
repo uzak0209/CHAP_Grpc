@@ -44,6 +44,7 @@ jobs:
           docker run --rm -v $PWD:/app -w /app/backend amazonlinux:2 bash -c "
             yum install -y golang && \
             go version && \
+            export GOPROXY=https://proxy.golang.org,direct && \
             go mod tidy && \
             GOOS=linux GOARCH=amd64 go build -o app main.go
           "
