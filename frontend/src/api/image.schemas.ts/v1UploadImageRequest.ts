@@ -5,4 +5,6 @@
  * OpenAPI spec version: version not set
  */
 
-export interface V1UploadImageRequest { [key: string]: unknown }
+export interface V1UploadImageRequest {
+  filename?: string;
+}

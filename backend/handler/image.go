@@ -6,6 +6,10 @@ import (
 	"os"
 	"time"
 
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/credentials"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 	pd "github.com/uzak0209/CHAP_Grpc/backend/api/pd"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -19,28 +23,52 @@ func NewImageServer() *ImageServer {
 	return &ImageServer{}
 }
 
-// UploadImage: R2 にアップロードするための一時的なURL（Bearer Token 方式）
+// UploadImage: R2 にアップロードする署名付き URL を返す
 func (s *ImageServer) UploadImage(ctx context.Context, req *pd.UploadImageRequest) (*pd.UploadImageResponse, error) {
 	bucket := os.Getenv("R2_BUCKET_NAME")
-	r2Token := os.Getenv("R2_API_TOKEN") // 新規作成した R2 API Token
+	r2AccessKey := os.Getenv("R2_ACCESS_KEY")
+	r2SecretKey := os.Getenv("R2_SECRET_KEY")
+	accountID := os.Getenv("CLOUDFLARE_ACCOUNT_ID")
 
-	if bucket == "" || r2Token == "" {
-		return nil, status.Error(codes.Internal, "R2_BUCKET_NAME or R2_API_TOKEN not configured")
+	if bucket == "" || r2AccessKey == "" || r2SecretKey == "" || accountID == "" {
+		return nil, status.Error(codes.Internal, "R2 credentials not configured")
 	}
 
 	key := fmt.Sprintf("uploads/%d_%s", time.Now().Unix(), req.Filename)
+	endpoint := fmt.Sprintf("https://%s.r2.cloudflarestorage.com", accountID)
 
-	// R2 エンドポイント URL
-	accountID := os.Getenv("CLOUDFLARE_ACCOUNT_ID")
-	if accountID == "" {
-		return nil, status.Error(codes.Internal, "CLOUDFLARE_ACCOUNT_ID not configured")
+	// AWS SDK 設定 (R2 は S3 互換)
+	cfg, err := config.LoadDefaultConfig(ctx,
+		config.WithRegion("auto"),
+		config.WithCredentialsProvider(credentials.NewStaticCredentialsProvider(r2AccessKey, r2SecretKey, "")),
+		config.WithEndpointResolver(aws.EndpointResolverFunc(
+			func(service, region string) (aws.Endpoint, error) {
+				return aws.Endpoint{
+					URL:           endpoint,
+					SigningRegion: "auto",
+				}, nil
+			},
+		)),
+	)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to load aws config: %v", err)
 	}
 
-	// Bearer Token 用 URL (PUT するフロント側が Authorization ヘッダにセットして使う)
-	uploadURL := fmt.Sprintf("https://%s.r2.cloudflarestorage.com/%s/%s", accountID, bucket, key)
+	client := s3.NewFromConfig(cfg)
+	presigner := s3.NewPresignClient(client)
 
-	// ここでフロントには「uploadURL + Bearer Token」を渡す想定
+	// 署名付き URL 発行 (PUT)
+	presigned, err := presigner.PresignPutObject(ctx, &s3.PutObjectInput{
+		Bucket: aws.String(bucket),
+		Key:    aws.String(key),
+	}, func(po *s3.PresignOptions) {
+		po.Expires = 15 * time.Minute
+	})
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to presign URL: %v", err)
+	}
+
 	return &pd.UploadImageResponse{
-		ImageUrl: uploadURL,
+		ImageUrl: presigned.URL, // ← フロントはこの URL に直接 PUT する
 	}, nil
 }

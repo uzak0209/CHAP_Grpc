@@ -21,10 +21,7 @@ import {
 import { X, Hash, Calendar } from "lucide-react";
 import { Category, CATEGORY_OPTIONS, ContentType } from "@/types/types";
 import type { Coordinate } from "@/types/types";
-import {
-  useLocation,
-  useLocationStore,
-} from "@/store/useLocation";
+import { useLocation, useLocationStore } from "@/store/useLocation";
 import { useCreateSpot } from "@/hooks/use-spot";
 import { useCreateEvent } from "@/hooks/use-event";
 import { useCreateThreads } from "@/hooks/use-thread";
@@ -54,15 +51,15 @@ export function CreateModal({
   const [tagInput, setTagInput] = useState("");
   const [eventDate, setEventDate] = useState(""); // イベント開始日の状態
   const [loading, setLoading] = useState(false);
-    const [imageFile, setImageFile] = useState<File | null>(null);
-    const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const currentLocation = useLocationStore((s) => s.currentLocation);
   // React Query mutations (call hooks at top level)
   const createPostMutation = useCreatePost();
   const createEventMutation = useCreateEvent();
   const createThreadMutation = useCreateThreads();
   const createSpotMutation = useCreateSpot();
-  const getUploadURLMutation= useGetUploadUrl();
+  const getUploadURLMutation = useGetUploadUrl();
 
   // モーダルが開くたびにフォームをリセットする
   useEffect(() => {
@@ -107,17 +104,15 @@ export function CreateModal({
         ...tags.filter((t) => t !== effectiveCategory),
       ];
 
-
       // 画像が選択されていればCloudflare Workers経由でR2にアップロードする
       let processedImageFile: File | null = null;
       if (imageFile) {
         try {
           const uploadResponse = await uploadImage(imageFile);
           const imageBlob = await uploadResponse.blob();
-          processedImageFile = new File([imageBlob], imageFile.name, { 
-            type: imageBlob.type || imageFile.type 
+          processedImageFile = new File([imageBlob], imageFile.name, {
+            type: imageBlob.type || imageFile.type,
           });
-
         } catch (uploadError) {
           console.error("Image upload failed:", uploadError);
           alert("画像のアップロードに失敗しました。もう一度お試しください。");
@@ -125,20 +120,27 @@ export function CreateModal({
           return;
         }
       }
-      const upLoadUrl = await getUploadURLMutation.mutateAsync({ });
+      const upLoadUrl = await getUploadURLMutation.mutateAsync({
+        filename: imageFile?.name,
+      });
       console.log("Obtained upload URL:", upLoadUrl);
-      
+
       if (processedImageFile) {
         const Data = new FormData();
         Data.append("file", processedImageFile);
-        
+
         if (typeof upLoadUrl.imageUrl === "string" && upLoadUrl.imageUrl) {
           const uploadResponse = await fetch(upLoadUrl.imageUrl, {
-            method: "POST",
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/octet-stream",
+            },
             body: Data,
           });
           if (!uploadResponse.ok) {
-            throw new Error(`Image upload failed with status ${uploadResponse.status}`);
+            throw new Error(
+              `Image upload failed with status ${uploadResponse.status}`
+            );
           }
           const uploadResult = await uploadResponse.json();
           console.log("Image successfully uploaded:", uploadResult);
@@ -151,11 +153,9 @@ export function CreateModal({
         } else {
           throw new Error("Upload URL is invalid or undefined.");
         }
-
       }
-      const uploadedImageUrl: string | null  = null;
+      const uploadedImageUrl: string | null = null;
 
-      
       interface BaseData {
         content: string;
         category: Category;
@@ -234,7 +234,6 @@ export function CreateModal({
           break;
         }
         case "spot": {
-
           // For spot, use the viewCenter (always-updated map center) if available, otherwise fall back to currentLocation
           const viewCenter = useLocationStore.getState().viewCenter;
           const coord =
@@ -422,7 +421,7 @@ export function CreateModal({
                 !content.trim() ||
                 loading ||
                 (contentType === "event" && !eventDate) ||
-                (category == ""&& contentType !== "spot") 
+                (category == "" && contentType !== "spot")
               }
               className="flex-1"
             >
