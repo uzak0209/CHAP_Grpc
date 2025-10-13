@@ -31,7 +31,7 @@ func main() {
 	go func() {
 		defer wg.Done()
 		log.Println("Starting gRPC-Gateway server on :443...")
-		if err := middleware.StartGateway("localhost:50051", ":443"); err != nil {
+		if err := middleware.StartGateway("localhost:50051", ":80"); err != nil {
 			log.Fatalf("failed to start gRPC-Gateway: %v", err)
 		}
 	}()
