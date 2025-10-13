@@ -4,6 +4,7 @@ import (
 	"log"
 	"sync"
 
+	"github.com/joho/godotenv"
 	"github.com/uzak0209/CHAP_Grpc/backend/handler"
 	"github.com/uzak0209/CHAP_Grpc/backend/infra/db"
 	"github.com/uzak0209/CHAP_Grpc/backend/middleware"
@@ -12,6 +13,7 @@ import (
 func main() {
 	log.Print("Starting application.")
 	log.Println("Initializing database...")
+	godotenv.Load(".env")
 	db.InitDB()
 	log.Println("Database initialized successfully")
 

@@ -4,7 +4,6 @@ import (
 	"log"
 	"os"
 
-	"github.com/joho/godotenv"
 	"github.com/uzak0209/CHAP_Grpc/backend/infra/model"
 
 	"gorm.io/driver/postgres"
@@ -14,7 +13,7 @@ import (
 var DB *gorm.DB
 
 func InitDB() {
-	godotenv.Load(".env")
+
 	dsn := os.Getenv("DB_DSN")
 	if dsn == "" {
 		log.Fatal("DB_DSN environment variable is not set")
