@@ -4,6 +4,7 @@ resource "aws_lambda_function" "image_compress" {
   role          = aws_iam_role.lambda_exec.arn
   handler       = "bootstrap"
   runtime       = "provided.al2"
+  architectures = ["x86_64"]
   source_code_hash = filebase64sha256("${path.module}/../lambda/chap_image_lambda.zip")
   publish = true
   memory_size = 256

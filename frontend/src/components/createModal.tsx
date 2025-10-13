@@ -28,7 +28,6 @@ import {
 import { useCreateSpot } from "@/hooks/use-spot";
 import { useCreateEvent } from "@/hooks/use-event";
 import { useCreateThreads } from "@/hooks/use-thread";
-import { useImageServiceUploadImage } from "@/api/image";
 import { postServiceCreatePost } from "@/api/post";
 import { eventServiceCreateEvent } from "@/api/event";
 import { threadServiceCreateThread } from "@/api/thread";
@@ -37,6 +36,7 @@ import type { V1CreatePostRequest } from "@/api/post.schemas.ts";
 import type { V1CreateEventRequest } from "@/api/event.schemas.ts";
 import type { V1CreateThreadRequest } from "@/api/thread.schemas.ts";
 import { useCreatePost } from "@/hooks/use-post";
+import { uploadImage } from "@/hooks/use-image";
 interface CreateModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -62,7 +62,6 @@ export function CreateModal({
   const createEventMutation = useCreateEvent();
   const createThreadMutation = useCreateThreads();
   const createSpotMutation = useCreateSpot();
-  const uploadImageMutation = useImageServiceUploadImage();
 
   // モーダルが開くたびにフォームをリセットする
   useEffect(() => {
@@ -111,31 +110,13 @@ export function CreateModal({
       let uploadedImageUrl = "";
       if (imageFile) {
         try {
-          const result = await uploadImageMutation.mutateAsync({ data: {} as any });
+          const result = await uploadImage(imageFile);
 
-          const uploadUrl = result?.data?.imageUrl;
-          if (!uploadUrl) {
-            throw new Error("アップロード先のURLが取得できませんでした");
-          }
-
-          // 取得した URL に対してファイルを PUT でアップロードする
-          const putResponse = await fetch(uploadUrl, {
-            method: "POST",
-            headers: {
-              "Content-Type":  "multipart/form-data",
-            },
-            body: imageFile,
-          });
-
-          if (!putResponse.ok) {
-            const text = await putResponse.text().catch(() => "");
-            console.error("Image PUT failed", putResponse.status, text);
-            throw new Error("画像のアップロードに失敗しました (PUT)");
-          }
-          uploadedImageUrl = uploadUrl;
-        } catch (error) {
-          console.error("Image upload error:", error);
-          throw new Error("画像のアップロードに失敗しました");
+      }catch (uploadError) {
+          console.error("Image upload failed:", uploadError);
+          alert("画像のアップロードに失敗しました。もう一度お試しください。");
+          setLoading(false);
+          return;
         }
       }
 
