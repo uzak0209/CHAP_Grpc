@@ -21,9 +21,8 @@ async fn func(event: Request) -> std::result::Result<Response<Body>, Infallible>
                     qs_map.insert(k.into_owned(), v.into_owned());
                 }
             }
-            let width = qs_map.get("width").and_then(|s| s.parse::<u32>().ok());
-            let quality = 30;
-            let format = qs_map.get("format").map(|s| s.as_str()).unwrap_or("jpeg");
+            let width = Some(500);
+            let quality = 70;
 
             let body_bytes: Vec<u8> = match event.body() {
                 Body::Binary(b) => b.clone(),
@@ -40,17 +39,20 @@ async fn func(event: Request) -> std::result::Result<Response<Body>, Infallible>
                 }
             };
 
-            // デコード1回
-            let img = match ImageReader::new(Cursor::new(&body_bytes)).with_guessed_format() {
-                Ok(reader) => match reader.decode() {
-                    Ok(i) => i,
-                    Err(_) => {
-                        let resp = Response::builder()
-                            .status(400)
-                            .header("Access-Control-Allow-Origin", "*")
-                            .body("invalid image".into())
-                            .unwrap();
-                        return Ok(resp);
+            // デコードと画像フォーマット検出
+            let (img, detected_format) = match ImageReader::new(Cursor::new(&body_bytes)).with_guessed_format() {
+                Ok(reader) => {
+                    let format = reader.format();
+                    match reader.decode() {
+                        Ok(i) => (i, format),
+                        Err(_) => {
+                            let resp = Response::builder()
+                                .status(400)
+                                .header("Access-Control-Allow-Origin", "*")
+                                .body("invalid image".into())
+                                .unwrap();
+                            return Ok(resp);
+                        }
                     }
                 },
                 Err(_) => {
@@ -77,18 +79,24 @@ async fn func(event: Request) -> std::result::Result<Response<Body>, Infallible>
                 img
             };
 
-            // エンコード1回
+            // エンコード（検出されたフォーマットと同じ形式で出力）
             let mut cursor = Cursor::new(Vec::new());
-            let content_type = match format {
-                "png" => {
+            let content_type = match detected_format {
+                Some(image::ImageFormat::Png) => {
                     img.write_to(&mut cursor, ImageOutputFormat::Png).unwrap();
                     "image/png"
                 }
-                "webp" => {
+                Some(image::ImageFormat::WebP) => {
                     img.write_to(&mut cursor, ImageOutputFormat::WebP).unwrap();
                     "image/webp"
                 }
+                Some(image::ImageFormat::Gif) => {
+                    // GIFは複雑なのでJPEGに変換
+                    img.write_to(&mut cursor, ImageOutputFormat::Jpeg(quality)).unwrap();
+                    "image/jpeg"
+                }
                 _ => {
+                    // JPEG または不明な場合はJPEGで出力
                     img.write_to(&mut cursor, ImageOutputFormat::Jpeg(quality)).unwrap();
                     "image/jpeg"
                 }
@@ -149,16 +157,15 @@ mod tests {
     #[tokio::test]
     async fn test_image_resize() {
         // sample.jpgを読み込み
-        let sample_bytes = fs::read("sample.jpg").expect("sample.jpg not found");
+        let sample_bytes = fs::read("gimp_upscale-eyecatch.png").expect("sample.jpg not found");
         println!("Original sample.jpg size: {} bytes", sample_bytes.len());
 
         // width指定でリサイズテスト
         let req = lambda_http::http::Request::builder()
             .method("POST")
-            .uri("https://example.com/?width=300&quality=80&format=jpeg")
+            .uri("https://example.com/")
             .body(Body::Binary(sample_bytes.clone()))
             .unwrap();
-
         let resp = func(req).await.unwrap();
         println!("Response status: {}", resp.status());
         println!("Response content-type: {:?}", resp.headers().get("Content-Type"));
@@ -172,8 +179,8 @@ mod tests {
         println!("Output size: {} bytes", output_bytes.len());
         
         // 結果を保存
-        fs::write("test_output_300w.jpg", &output_bytes).unwrap();
-        println!("Saved output to test_output_300w.jpg");
+        fs::write("test_output_300w.png", &output_bytes).unwrap();
+        println!("Saved output to test_output_300w.png");
 
         // 元サイズより小さくなっていることを確認
         assert!(output_bytes.len() < sample_bytes.len());
