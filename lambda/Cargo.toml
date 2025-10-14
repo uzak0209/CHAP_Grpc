@@ -18,6 +18,9 @@ imageproc = "0.24"
 bytes = "1.4"
 anyhow = "1.0"
 url = "2.4"
+base64 = "0.21"
+
+
 
 [profile.release]
 opt-level = 3

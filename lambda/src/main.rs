@@ -14,14 +14,15 @@ async fn func(event: Request) -> std::result::Result<Response<Body>, Infallible>
     match *event.method() {
         HttpMethod::POST => {
             // ...existing code...
-            let mut qs_map: std::collections::HashMap<String, String> = std::collections::HashMap::new();
+            let mut qs_map: std::collections::HashMap<String, String> =
+                std::collections::HashMap::new();
             if let Some(qs) = event.uri().query() {
                 for (k, v) in form_urlencoded::parse(qs.as_bytes()) {
                     qs_map.insert(k.into_owned(), v.into_owned());
                 }
             }
             let width = qs_map.get("width").and_then(|s| s.parse::<u32>().ok());
-            let quality = qs_map.get("quality").and_then(|s| s.parse::<u8>().ok()).unwrap_or(85);
+            let quality = 30;
             let format = qs_map.get("format").map(|s| s.as_str()).unwrap_or("jpeg");
 
             let body_bytes: Vec<u8> = match event.body() {
@@ -39,118 +40,61 @@ async fn func(event: Request) -> std::result::Result<Response<Body>, Infallible>
                 }
             };
 
-            // 200KB以下の場合はそのまま返す
-            const MAX_SIZE_BYTES: usize = 200 * 1024; // 200KB
-            if body_bytes.len() <= MAX_SIZE_BYTES {
-                let content_type = match ImageReader::new(std::io::Cursor::new(&body_bytes))
-                    .with_guessed_format()
-                    .ok()
-                    .and_then(|reader| reader.format())
-                {
-                    Some(image::ImageFormat::Png) => "image/png",
-                    Some(image::ImageFormat::WebP) => "image/webp", 
-                    _ => "image/jpeg",
-                };
-
-                let resp = Response::builder()
-                    .status(200)
-                    .header("Content-Type", content_type)
-                    .header("Access-Control-Allow-Origin", "*")
-                    .header("Access-Control-Allow-Methods", "GET,POST,OPTIONS")
-                    .header("Access-Control-Allow-Headers", "Content-Type")
-                    .body(Body::from(body_bytes))
-                    .unwrap();
-                return Ok(resp);
-            }
-
-            let img = match ImageReader::new(std::io::Cursor::new(&body_bytes)).with_guessed_format() {
+            // デコード1回
+            let img = match ImageReader::new(Cursor::new(&body_bytes)).with_guessed_format() {
                 Ok(reader) => match reader.decode() {
                     Ok(i) => i,
-                    Err(e) => {
-                        error!("decode error: {}", e);
+                    Err(_) => {
                         let resp = Response::builder()
                             .status(400)
                             .header("Access-Control-Allow-Origin", "*")
-                            .header("Access-Control-Allow-Methods", "GET,POST,OPTIONS")
-                            .header("Access-Control-Allow-Headers", "Content-Type")
                             .body("invalid image".into())
                             .unwrap();
                         return Ok(resp);
                     }
                 },
-                Err(e) => {
-                    error!("reader error: {}", e);
+                Err(_) => {
                     let resp = Response::builder()
                         .status(400)
                         .header("Access-Control-Allow-Origin", "*")
-                        .header("Access-Control-Allow-Methods", "GET,POST,OPTIONS")
-                        .header("Access-Control-Allow-Headers", "Content-Type")
                         .body("invalid image".into())
                         .unwrap();
                     return Ok(resp);
                 }
             };
 
-            // 200KB以下になるまでアスペクト比を保ったまま段階的にリサイズ
-            let mut processed = img.clone();
-            let mut scale_factor = 1.0f32;
-            let (orig_w, orig_h) = img.dimensions();
-            
-            loop {
-                let mut cursor = Cursor::new(Vec::new());
-                match format {
-                    "png" => {
-                        processed.write_to(&mut cursor, ImageOutputFormat::Png).unwrap();
-                    }
-                    "webp" => {
-                        processed.write_to(&mut cursor, ImageOutputFormat::WebP).unwrap();
-                    }
-                    _ => {
-                        processed.write_to(&mut cursor, ImageOutputFormat::Jpeg(quality)).unwrap();
-                    }
+            // リサイズ1回
+            let img = if let Some(w) = width {
+                let (orig_w, orig_h) = img.dimensions();
+                if orig_w <= w {
+                    img
+                } else {
+                    let scale = w as f32 / orig_w as f32;
+                    let new_h = (orig_h as f32 * scale).round() as u32;
+                    img.resize_exact(w, new_h, image::imageops::FilterType::Nearest)
                 }
-                
-                let current_size = cursor.get_ref().len();
-                
-                // 200KB以下になったら終了
-                if current_size <= MAX_SIZE_BYTES {
-                    break;
-                }
-                
-                // スケールファクターを0.9倍にして再リサイズ
-                scale_factor *= 0.9;
-                let new_w = (orig_w as f32 * scale_factor).round() as u32;
-                let new_h = (orig_h as f32 * scale_factor).round() as u32;
-                
-                // 最小サイズ制限（100x100以下にはしない）
-                if new_w < 100 || new_h < 100 {
-                    info!("Reached minimum size limit, using current image");
-                    break;
-                }
-                
-                processed = img.resize_exact(new_w, new_h, image::imageops::FilterType::Lanczos3);
-            }
-
-            let mut cursor = Cursor::new(Vec::new());
-            match format {
-                "png" => {
-                    processed.write_to(&mut cursor, ImageOutputFormat::Png).unwrap();
-                }
-                "webp" => {
-                    processed.write_to(&mut cursor, ImageOutputFormat::WebP).unwrap();
-                }
-                _ => {
-                    processed.write_to(&mut cursor, ImageOutputFormat::Jpeg(quality)).unwrap();
-                }
-            }
-
-            let out_buf = cursor.into_inner();
-            let content_type = match format {
-                "png" => "image/png",
-                "webp" => "image/webp",
-                _ => "image/jpeg",
+            } else {
+                img
             };
 
+            // エンコード1回
+            let mut cursor = Cursor::new(Vec::new());
+            let content_type = match format {
+                "png" => {
+                    img.write_to(&mut cursor, ImageOutputFormat::Png).unwrap();
+                    "image/png"
+                }
+                "webp" => {
+                    img.write_to(&mut cursor, ImageOutputFormat::WebP).unwrap();
+                    "image/webp"
+                }
+                _ => {
+                    img.write_to(&mut cursor, ImageOutputFormat::Jpeg(quality)).unwrap();
+                    "image/jpeg"
+                }
+            };
+
+            let out_buf = cursor.into_inner();
             let resp = Response::builder()
                 .status(200)
                 .header("Content-Type", content_type)
@@ -195,4 +139,59 @@ async fn main() -> Result<()> {
         .await
         .map_err(|e| anyhow::anyhow!(e.to_string()))?;
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::fs;
+
+    #[tokio::test]
+    async fn test_image_resize() {
+        // sample.jpgを読み込み
+        let sample_bytes = fs::read("sample.jpg").expect("sample.jpg not found");
+        println!("Original sample.jpg size: {} bytes", sample_bytes.len());
+
+        // width指定でリサイズテスト
+        let req = lambda_http::http::Request::builder()
+            .method("POST")
+            .uri("https://example.com/?width=300&quality=80&format=jpeg")
+            .body(Body::Binary(sample_bytes.clone()))
+            .unwrap();
+
+        let resp = func(req).await.unwrap();
+        println!("Response status: {}", resp.status());
+        println!("Response content-type: {:?}", resp.headers().get("Content-Type"));
+
+        let output_bytes = match resp.body() {
+            Body::Binary(b) => b.clone(),
+            Body::Text(s) => s.as_bytes().to_vec(),
+            Body::Empty => Vec::new(),
+        };
+
+        println!("Output size: {} bytes", output_bytes.len());
+        
+        // 結果を保存
+        fs::write("test_output_300w.jpg", &output_bytes).unwrap();
+        println!("Saved output to test_output_300w.jpg");
+
+        // 元サイズより小さくなっていることを確認
+        assert!(output_bytes.len() < sample_bytes.len());
+        assert_eq!(resp.status(), 200);
+    }
+
+
+    #[tokio::test]
+    async fn test_options_method() {
+        let req = lambda_http::http::Request::builder()
+            .method("OPTIONS")
+            .uri("https://example.com/")
+            .body(Body::Empty)
+            .unwrap();
+
+        let resp = func(req).await.unwrap();
+        
+        assert_eq!(resp.status(), 204);
+        assert_eq!(resp.headers().get("Access-Control-Allow-Origin").unwrap(), "*");
+    }
 }
