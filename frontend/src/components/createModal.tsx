@@ -110,8 +110,20 @@ export function CreateModal({
         try {
           const uploadResponse = await uploadImage(imageFile);
           const imageBlob = await uploadResponse.blob();
+          
+          // Lambdaからのレスポンスヘッダーから正しいContent-Typeを取得
+          const contentType = uploadResponse.headers.get('Content-Type') || imageBlob.type || imageFile.type;
+          
           processedImageFile = new File([imageBlob], imageFile.name, {
-            type: imageBlob.type || imageFile.type,
+            type: contentType,
+            lastModified: Date.now()
+          });
+          
+          console.log("Processed image:", {
+            originalSize: imageFile.size,
+            compressedSize: processedImageFile.size,
+            originalType: imageFile.type,
+            compressedType: processedImageFile.type
           });
         } catch (uploadError) {
           console.error("Image upload failed:", uploadError);
@@ -126,16 +138,13 @@ export function CreateModal({
       console.log("Obtained upload URL:", upLoadUrl);
 
       if (processedImageFile) {
-        const Data = new FormData();
-        Data.append("file", processedImageFile);
-
         if (typeof upLoadUrl.imageUrl === "string" && upLoadUrl.imageUrl) {
           const uploadResponse = await fetch(upLoadUrl.imageUrl, {
             method: "PUT",
             headers: {
-              "Content-Type": imageFile && imageFile.type ? imageFile.type : "image/jpeg",
+              "Content-Type": processedImageFile.type || "image/jpeg",
             },
-            body: Data,
+            body: processedImageFile, // FormDataではなく、Fileを直接送る
           });
           if (!uploadResponse.ok) {
             throw new Error(
