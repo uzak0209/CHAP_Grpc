@@ -24,6 +24,7 @@ const (
 
 type UploadImageRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
+	Filename      string                 `protobuf:"bytes,1,opt,name=filename,proto3" json:"filename,omitempty"` // Name of the image file
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -56,6 +57,13 @@ func (x *UploadImageRequest) ProtoReflect() protoreflect.Message {
 // Deprecated: Use UploadImageRequest.ProtoReflect.Descriptor instead.
 func (*UploadImageRequest) Descriptor() ([]byte, []int) {
 	return file_image_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *UploadImageRequest) GetFilename() string {
+	if x != nil {
+		return x.Filename
+	}
+	return ""
 }
 
 type UploadImageResponse struct {
@@ -106,8 +114,9 @@ var File_image_proto protoreflect.FileDescriptor
 
 const file_image_proto_rawDesc = "" +
 	"\n" +
-	"\vimage.proto\x12\rchap.image.v1\x1a\x1cgoogle/api/annotations.proto\"\x14\n" +
-	"\x12UploadImageRequest\"2\n" +
+	"\vimage.proto\x12\rchap.image.v1\x1a\x1cgoogle/api/annotations.proto\"0\n" +
+	"\x12UploadImageRequest\x12\x1a\n" +
+	"\bfilename\x18\x01 \x01(\tR\bfilename\"2\n" +
 	"\x13UploadImageResponse\x12\x1b\n" +
 	"\timage_url\x18\x01 \x01(\tR\bimageUrl2\x86\x01\n" +
 	"\fImageService\x12v\n" +

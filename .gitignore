@@ -2,3 +2,9 @@
 terraform/generated_chap_key.pem
 /lambda/target/
 /terraform/.terraform/
+/terraform/terraform.tfstate
+/terraform/terraform.tfstate.backup
+/terraform/.terraform.lock.hcl
+/terraform/variable.tf
+# Do not commit backend env
+backend/.env

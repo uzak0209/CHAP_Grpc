@@ -38,8 +38,8 @@ export async function updateMe(): Promise<Result<void, string>> {
     const res = await userServiceGetMe();
     const data = res.data;
     // If API indicates success, set store. Adjust according to actual response shape.
-    if (data?.success) {
-      const me: Me = { name: data.name , image: data.image  };
+    if (data?.user) {
+      const me: Me = { name: data.user.name??"" , image: data.user.image??"" }; ;
       setMe(Some(me));
       return Ok(undefined);
     }

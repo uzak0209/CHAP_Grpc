@@ -13,6 +13,7 @@ import (
 var DB *gorm.DB
 
 func InitDB() {
+
 	dsn := os.Getenv("DB_DSN")
 	if dsn == "" {
 		log.Fatal("DB_DSN environment variable is not set")

@@ -1,10 +1,10 @@
 import { postServiceCreatePost, postServiceGetPosts } from "@/api/post";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import type { PostServiceGetPostsParams } from "@/api/post.schemas.ts/postServiceGetPostsParams";
+import type { V1GetPostsRequest } from "@/api/post.schemas.ts";
 import type { V1GetPostsResponse } from "@/api/post.schemas.ts/v1GetPostsResponse";
 import type { V1CreatePostRequest } from "@/api/post.schemas.ts/v1CreatePostRequest";
 
-export function useGetPosts(params?: PostServiceGetPostsParams) {
+export function useGetPosts(params:V1GetPostsRequest)  {
   return useQuery<V1GetPostsResponse | undefined>({
     queryKey: ["posts", params ?? null],
     queryFn: async () => {

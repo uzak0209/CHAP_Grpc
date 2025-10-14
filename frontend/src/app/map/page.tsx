@@ -5,7 +5,6 @@ import dynamic from 'next/dynamic';
 import React from 'react';
 import { useUIState } from '@/store/useUIState';
 import { MultiModalFAB } from '@/components/multi-modal-fab';
-import "../../api/axios";
 const MapClient = dynamic(() => import('@/app/map/MapClient'), { ssr: false });
 
 export default function MapPage() {

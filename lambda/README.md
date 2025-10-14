@@ -20,7 +20,14 @@ cargo build --release
 
 Packaging for AWS Lambda
 
-Use `cargo lambda` or a tool like `cargo-lambda` or `aws sam` to build the binary for AWS Lambda. Alternatively, compile for x86_64-unknown-linux-gnu and zip the binary as `bootstrap`.
+Recommended (static musl build - avoids GLIBC errors on provided.al2):
+
+```bash
+cd lambda
+./build.sh  # produces chap_image_lambda.zip in this folder
+```
+
+Alternatively, you can use `cargo-lambda` or `aws sam`. If you build for glibc (x86_64-unknown-linux-gnu), you must ensure compatibility with the Lambda runtime. Using musl is safer.
 
 Usage (HTTP invocation)
 

@@ -8,9 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
-import type { PostServiceGetPostsParams } from "@/api/post.schemas.ts/postServiceGetPostsParams";
+
 import { useAuthServiceSignIn, useAuthServiceSignUp } from "@/api/auth";
-import "../../api/axios";
 import { updateMe } from "@/store/useMe";
 import { useGetPosts } from "@/hooks/use-post";
 import {
@@ -50,23 +49,8 @@ export default function LoginPage() {
       console.log("captureCurrentLocation result", res);
     })();
   }, []);
-  // compute params for hooks (hooks must be called at top level)
-  const locationParams = currentLocation.isSome()
-    ? ({ lat: currentLocation.unwrap().lat, lng: currentLocation.unwrap().lng } as PostServiceGetPostsParams)
-    : undefined;
 
-  // call hooks at top-level; they internally use `enabled` so they don't run until params exist
-  const postsQuery = useGetPosts(locationParams);
-  const eventsQuery = useGetEvents(locationParams);
-  const threadsQuery = useGetThreads(locationParams);
 
-  useEffect(() => {
-    console.log("Current Location in LoginPage:", currentLocation);
-    // you can inspect query states for debugging
-    console.log("postsQuery status:", postsQuery.status, postsQuery.data);
-    console.log("eventsQuery status:", eventsQuery.status, eventsQuery.data);
-    console.log("threadsQuery status:", threadsQuery.status, threadsQuery.data);
-  }, [currentLocation, postsQuery.status, eventsQuery.status, threadsQuery.status]);
 
   // ログイン成功時のリダイレクト処理
   useEffect(() => {

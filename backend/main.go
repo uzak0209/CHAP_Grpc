@@ -4,6 +4,7 @@ import (
 	"log"
 	"sync"
 
+	"github.com/joho/godotenv"
 	"github.com/uzak0209/CHAP_Grpc/backend/handler"
 	"github.com/uzak0209/CHAP_Grpc/backend/infra/db"
 	"github.com/uzak0209/CHAP_Grpc/backend/middleware"
@@ -12,6 +13,10 @@ import (
 func main() {
 	log.Print("Starting application.")
 	log.Println("Initializing database...")
+	if err := godotenv.Load(".env"); err != nil {
+		log.Printf("could not load .env from current dir: %v", err)
+		_ = godotenv.Load("/opt/app/.env")
+	}
 	db.InitDB()
 	log.Println("Database initialized successfully")
 
@@ -27,7 +32,7 @@ func main() {
 		}
 	}()
 
-	// gRPC-Gatewayサーバーを起動 (8081)
+	// gRPC-Gatewayサーバーを起動 (443)
 	go func() {
 		defer wg.Done()
 		log.Println("Starting gRPC-Gateway server on :8081...")

@@ -21,14 +21,10 @@ import {
 import { X, Hash, Calendar } from "lucide-react";
 import { Category, CATEGORY_OPTIONS, ContentType } from "@/types/types";
 import type { Coordinate } from "@/types/types";
-import {
-  useLocation,
-  useLocationStore,
-} from "@/store/useLocation";
+import { useLocation, useLocationStore } from "@/store/useLocation";
 import { useCreateSpot } from "@/hooks/use-spot";
 import { useCreateEvent } from "@/hooks/use-event";
 import { useCreateThreads } from "@/hooks/use-thread";
-import { useImageServiceUploadImage } from "@/api/image";
 import { postServiceCreatePost } from "@/api/post";
 import { eventServiceCreateEvent } from "@/api/event";
 import { threadServiceCreateThread } from "@/api/thread";
@@ -37,6 +33,7 @@ import type { V1CreatePostRequest } from "@/api/post.schemas.ts";
 import type { V1CreateEventRequest } from "@/api/event.schemas.ts";
 import type { V1CreateThreadRequest } from "@/api/thread.schemas.ts";
 import { useCreatePost } from "@/hooks/use-post";
+import { uploadImage, useGetUploadUrl } from "@/hooks/use-image";
 interface CreateModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -54,15 +51,15 @@ export function CreateModal({
   const [tagInput, setTagInput] = useState("");
   const [eventDate, setEventDate] = useState(""); // イベント開始日の状態
   const [loading, setLoading] = useState(false);
-    const [imageFile, setImageFile] = useState<File | null>(null);
-    const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const currentLocation = useLocationStore((s) => s.currentLocation);
   // React Query mutations (call hooks at top level)
   const createPostMutation = useCreatePost();
   const createEventMutation = useCreateEvent();
   const createThreadMutation = useCreateThreads();
   const createSpotMutation = useCreateSpot();
-  const uploadImageMutation = useImageServiceUploadImage();
+  const getUploadURLMutation = useGetUploadUrl();
 
   // モーダルが開くたびにフォームをリセットする
   useEffect(() => {
@@ -97,7 +94,7 @@ export function CreateModal({
       alert("イベント開始日を入力してください");
       return;
     }
-
+    let uploadedImageUrl: string | null|undefined = null; // アップロードされた画像のURLを格納する変数
     setLoading(true);
     try {
       const effectiveCategory: Category =
@@ -108,36 +105,56 @@ export function CreateModal({
       ];
 
       // 画像が選択されていればCloudflare Workers経由でR2にアップロードする
-      let uploadedImageUrl = "";
+      let processedImageFile: File | null = null;
       if (imageFile) {
         try {
-          const result = await uploadImageMutation.mutateAsync({ data: {} as any });
-
-          const uploadUrl = result?.data?.imageUrl;
-          if (!uploadUrl) {
-            throw new Error("アップロード先のURLが取得できませんでした");
-          }
-
-          // 取得した URL に対してファイルを PUT でアップロードする
-          const putResponse = await fetch(uploadUrl, {
-            method: "POST",
-            headers: {
-              "Content-Type":  "multipart/form-data",
-            },
-            body: imageFile,
+          const uploadResponse = await uploadImage(imageFile);
+          const imageBlob = await uploadResponse.blob();
+          processedImageFile = new File([imageBlob], imageFile.name, {
+            type: imageBlob.type || imageFile.type,
           });
-
-          if (!putResponse.ok) {
-            const text = await putResponse.text().catch(() => "");
-            console.error("Image PUT failed", putResponse.status, text);
-            throw new Error("画像のアップロードに失敗しました (PUT)");
-          }
-          uploadedImageUrl = uploadUrl;
-        } catch (error) {
-          console.error("Image upload error:", error);
-          throw new Error("画像のアップロードに失敗しました");
+        } catch (uploadError) {
+          console.error("Image upload failed:", uploadError);
+          alert("画像のアップロードに失敗しました。もう一度お試しください。");
+          setLoading(false);
+          return;
         }
       }
+      const upLoadUrl = await getUploadURLMutation.mutateAsync({
+        filename: imageFile?.name,
+      });
+      console.log("Obtained upload URL:", upLoadUrl);
+
+      if (processedImageFile) {
+        const Data = new FormData();
+        Data.append("file", processedImageFile);
+
+        if (typeof upLoadUrl.imageUrl === "string" && upLoadUrl.imageUrl) {
+          const uploadResponse = await fetch(upLoadUrl.imageUrl, {
+            method: "PUT",
+            headers: {
+              "Content-Type": imageFile && imageFile.type ? imageFile.type : "image/jpeg",
+            },
+            body: Data,
+          });
+          if (!uploadResponse.ok) {
+            throw new Error(
+              `Image upload failed with status ${uploadResponse.status}`
+            );
+          }
+          // R2への PUT は成功時に空のレスポンスを返すので、JSONパースは不要
+          // アップロードされた画像のURLはプリサインURLからクエリパラメータを除いたもの
+          const imageUrl = upLoadUrl.imageUrl ? upLoadUrl.imageUrl.split('?')[0] : null;
+          console.log("Image successfully uploaded to:", imageUrl);
+          
+          // uploadedImageUrl にセット
+          uploadedImageUrl = imageUrl;
+        } else {
+          throw new Error("Upload URL is invalid or undefined.");
+        }
+      }
+      
+      // uploadedImageUrl は上で設定される
 
       interface BaseData {
         content: string;
@@ -217,7 +234,6 @@ export function CreateModal({
           break;
         }
         case "spot": {
-
           // For spot, use the viewCenter (always-updated map center) if available, otherwise fall back to currentLocation
           const viewCenter = useLocationStore.getState().viewCenter;
           const coord =
@@ -405,7 +421,7 @@ export function CreateModal({
                 !content.trim() ||
                 loading ||
                 (contentType === "event" && !eventDate) ||
-                (category == ""&& contentType !== "spot") 
+                (category == "" && contentType !== "spot")
               }
               className="flex-1"
             >

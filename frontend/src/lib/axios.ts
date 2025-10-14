@@ -1,5 +1,6 @@
 import axios from 'axios';
 
+axios.defaults.baseURL = process.env.NEXT_PUBLIC_API_ENDPOINT;
 
 // Attach Authorization header from localStorage if token exists
 axios.interceptors.request.use((config) => {

@@ -1,7 +1,7 @@
 name: Deploy via SSM
 on:
   push:
-    branches: [ main ]
+    branches: [ master ]
 
 jobs:
   deploy:
@@ -16,20 +16,64 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-northeast-1
 
-      - name: Build binary
-        run: cd backend && GOOS=linux GOARCH=amd64 go build -o app main.go
+      - name: Cache Go modules
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/go/pkg/mod
+            ~/.cache/go-build
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+
+      - name: Cache Docker layers
+        uses: actions/cache@v4
+        with:
+          path: /tmp/.docker-cache
+          key: ${{ runner.os }}-docker-amazonlinux2
+
+      - name: Load Docker cache
+        run: |
+          mkdir -p /tmp/.docker-cache
+          docker load -i /tmp/.docker-cache/image.tar || true
+
+      - name: Build binary for Amazon Linux 2
+        run: |
+          docker pull amazonlinux:2
+          docker save amazonlinux:2 -o /tmp/.docker-cache/image.tar
+          docker run --rm -v $PWD:/app -w /app/backend amazonlinux:2 bash -c "
+            yum install -y golang && \
+            go version && \
+            export GOPROXY=https://proxy.golang.org,direct && \
+            go mod tidy && \
+            GOOS=linux GOARCH=amd64 go build -o app main.go
+          "
+          ls -lh backend/app
+
+      - name: Upload app to S3
+        run: |
+          aws s3 cp ./backend/app s3://chapexec/app
 
       - name: Deploy to EC2 via SSM
         run: |
           aws ssm send-command \
+            --region ap-northeast-1 \
             --instance-ids i-0852a3729fc7699a4 \
             --document-name "AWS-RunShellScript" \
-            --comment "Deploy new binary" \
-            --parameters 'commands=[
+            --comment "Update app and restart service" \
+            --parameters commands='[
+              "set -e",
               "mkdir -p /opt/app",
               "cd /opt/app",
-              "rm -f app",
-              "echo \"$(base64 < ./app)\" | base64 -d > app",
-              "chmod +x app",
-              "nohup ./app > app.log 2>&1 &"
+              "aws s3 cp s3://chapexec/app ./app.new",
+              "if [ -s app.new ]; then",
+              "  echo \"Updating app binary...\";",
+              "  mv -f app.new app;",
+              "  chmod +x app;",
+              "  echo \"Restarting systemd service...\";",
+              "  sudo systemctl restart chap.service;",
+              "  sudo systemctl status chap.service --no-pager -l || true;",
+              "else",
+              "  echo \"Download failed\" > /opt/app/error.log;",
+              "fi"
             ]'

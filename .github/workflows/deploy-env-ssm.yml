@@ -1,0 +1,43 @@
+name: Deploy .env to EC2 via SSM
+
+on:
+    push:
+        branches: [ master ]
+
+jobs:
+  deploy-env:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-1
+
+      - name: Generate .env from secrets
+        run: |
+          echo "DB_DSN=\"${{ secrets.DB_DSN }}\"" > .env
+          echo "JWT_SECRET=\"${{ secrets.JWT_SECRET }}\"" >> .env
+          echo "CLOUDFLARE_API_TOKEN=\"${{ secrets.CLOUDFLARE_API_TOKEN }}\"" >> .env
+          echo "CLOUDFLARE_ACCOUNT_ID=\"${{ secrets.CLOUDFLARE_ACCOUNT_ID }}\"" >> .env
+          echo "R2_BUCKET_NAME=\"${{ secrets.R2_BUCKET_NAME }}\"" >> .env
+          echo "R2_ACCESS_KEY=\"${{ secrets.R2_ACCESS_KEY }}\"" >> .env
+          echo "R2_SECRET_KEY=\"${{ secrets.R2_SECRET_KEY }}\"" >> .env
+          chmod 600 .env
+
+      - name: Send .env to EC2 via SSM
+        run: |
+          ENV_B64=$(base64 -w0 .env)
+          aws ssm send-command \
+            --region ap-northeast-1 \
+            --instance-ids "i-0852a3729fc7699a4" \
+            --document-name "AWS-RunShellScript" \
+            --comment "Deploy .env file" \
+            --parameters commands='[
+              "cd /opt/app",
+              "rm -f .env",
+              "echo '"$ENV_B64"' | base64 --decode > .env",
+              "chmod 600 .env"
+            ]' \
+            --output json

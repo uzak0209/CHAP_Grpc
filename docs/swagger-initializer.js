@@ -6,7 +6,8 @@ window.onload = function() {
       { url: "/docs/user.swagger.json", name: "User" },
       { url: "/docs/comment.swagger.json", name: "Comment" },
       { url: "/docs/post.swagger.json", name: "Post" },
-      { url: "/docs/thread.swagger.json", name: "Thread" }
+      { url: "/docs/thread.swagger.json", name: "Thread" },
+      { url: "/docs/event.swagger.json", name: "Event" }
     ],
     dom_id: '#swagger-ui',
     presets: [

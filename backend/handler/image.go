@@ -2,76 +2,73 @@ package handler
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
-	"net/http"
 	"os"
+	"time"
 
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/credentials"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 	pd "github.com/uzak0209/CHAP_Grpc/backend/api/pd"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
-type directUploadResponse struct {
-	Result struct {
-		UploadURL string `json:"uploadURL"`
-		ID        string `json:"id"`
-	} `json:"result"`
-	Success bool `json:"success"`
+type ImageServer struct {
+	pd.UnimplementedImageServiceServer
 }
 
 func NewImageServer() *ImageServer {
 	return &ImageServer{}
 }
 
-type ImageServer struct {
-	pd.UnimplementedImageServiceServer
-}
-
-// UploadImageはCloudflare ImagesのアップロードURLを取得するハンドラーです
+// UploadImage: R2 にアップロードする署名付き URL を返す
 func (s *ImageServer) UploadImage(ctx context.Context, req *pd.UploadImageRequest) (*pd.UploadImageResponse, error) {
+	bucket := os.Getenv("R2_BUCKET_NAME")
+	r2AccessKey := os.Getenv("R2_ACCESS_KEY")
+	r2SecretKey := os.Getenv("R2_SECRET_KEY")
 	accountID := os.Getenv("CLOUDFLARE_ACCOUNT_ID")
-	apiToken := os.Getenv("CLOUDFLARE_API_TOKEN")
 
-	if accountID == "" || apiToken == "" {
-		return nil, status.Error(codes.Internal, "cloudflare credentials not configured")
+	if bucket == "" || r2AccessKey == "" || r2SecretKey == "" || accountID == "" {
+		return nil, status.Error(codes.Internal, "R2 credentials not configured")
 	}
 
-	url := fmt.Sprintf("https://api.cloudflare.com/client/v4/accounts/%s/images/v2/direct_upload", accountID)
+	key := fmt.Sprintf("uploads/%d_%s", time.Now().Unix(), req.Filename)
+	endpoint := fmt.Sprintf("https://%s.r2.cloudflarestorage.com", accountID)
 
-	// create request with context so it respects deadlines/cancellations
-	httpReq, err := http.NewRequestWithContext(ctx, "POST", url, nil)
+	// AWS SDK 設定 (R2 は S3 互換)
+	cfg, err := config.LoadDefaultConfig(ctx,
+		config.WithRegion("auto"),
+		config.WithCredentialsProvider(credentials.NewStaticCredentialsProvider(r2AccessKey, r2SecretKey, "")),
+		config.WithEndpointResolver(aws.EndpointResolverFunc(
+			func(service, region string) (aws.Endpoint, error) {
+				return aws.Endpoint{
+					URL:           endpoint,
+					SigningRegion: "auto",
+				}, nil
+			},
+		)),
+	)
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "failed to create request: %v", err)
+		return nil, status.Errorf(codes.Internal, "failed to load aws config: %v", err)
 	}
-	httpReq.Header.Set("Authorization", "Bearer "+apiToken)
-	httpReq.Header.Set("Content-Type", "application/json")
 
-	client := &http.Client{}
-	resp, err := client.Do(httpReq)
+	client := s3.NewFromConfig(cfg)
+	presigner := s3.NewPresignClient(client)
+
+	// 署名付き URL 発行 (PUT)
+	presigned, err := presigner.PresignPutObject(ctx, &s3.PutObjectInput{
+		Bucket: aws.String(bucket),
+		Key:    aws.String(key),
+	}, func(po *s3.PresignOptions) {
+		po.Expires = 15 * time.Minute
+	})
 	if err != nil {
-		return nil, status.Errorf(codes.Unavailable, "failed to call cloudflare: %v", err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		// try to read body for debugging
-		var bodyBuf map[string]any
-		_ = json.NewDecoder(resp.Body).Decode(&bodyBuf)
-		return nil, status.Errorf(codes.Unavailable, "cloudflare returned status %d: %v", resp.StatusCode, bodyBuf)
+		return nil, status.Errorf(codes.Internal, "failed to presign URL: %v", err)
 	}
 
-	var data directUploadResponse
-	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
-		return nil, status.Errorf(codes.Internal, "failed to decode cloudflare response: %v", err)
-	}
-
-	if !data.Success {
-		return nil, status.Error(codes.Internal, "cloudflare did not succeed")
-	}
-
-	// Return the upload URL in the proto response
 	return &pd.UploadImageResponse{
-		ImageUrl: data.Result.UploadURL,
+		ImageUrl: presigned.URL, // ← フロントはこの URL に直接 PUT する
 	}, nil
 }
