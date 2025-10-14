@@ -39,6 +39,30 @@ async fn func(event: Request) -> std::result::Result<Response<Body>, Infallible>
                 }
             };
 
+            // 200KB以下の場合はそのまま返す
+            const MAX_SIZE_BYTES: usize = 200 * 1024; // 200KB
+            if body_bytes.len() <= MAX_SIZE_BYTES {
+                let content_type = match ImageReader::new(std::io::Cursor::new(&body_bytes))
+                    .with_guessed_format()
+                    .ok()
+                    .and_then(|reader| reader.format())
+                {
+                    Some(image::ImageFormat::Png) => "image/png",
+                    Some(image::ImageFormat::WebP) => "image/webp", 
+                    _ => "image/jpeg",
+                };
+
+                let resp = Response::builder()
+                    .status(200)
+                    .header("Content-Type", content_type)
+                    .header("Access-Control-Allow-Origin", "*")
+                    .header("Access-Control-Allow-Methods", "GET,POST,OPTIONS")
+                    .header("Access-Control-Allow-Headers", "Content-Type")
+                    .body(Body::from(body_bytes))
+                    .unwrap();
+                return Ok(resp);
+            }
+
             let img = match ImageReader::new(std::io::Cursor::new(&body_bytes)).with_guessed_format() {
                 Ok(reader) => match reader.decode() {
                     Ok(i) => i,
@@ -67,18 +91,45 @@ async fn func(event: Request) -> std::result::Result<Response<Body>, Infallible>
                 }
             };
 
-            let processed: DynamicImage = if let Some(w) = width {
-                let (orig_w, orig_h) = img.dimensions();
-                if orig_w <= w {
-                    img
-                } else {
-                    let scale = w as f32 / orig_w as f32;
-                    let new_h = (orig_h as f32 * scale).round() as u32;
-                    img.resize_exact(w, new_h, image::imageops::FilterType::Lanczos3)
+            // 200KB以下になるまでアスペクト比を保ったまま段階的にリサイズ
+            let mut processed = img.clone();
+            let mut scale_factor = 1.0f32;
+            let (orig_w, orig_h) = img.dimensions();
+            
+            loop {
+                let mut cursor = Cursor::new(Vec::new());
+                match format {
+                    "png" => {
+                        processed.write_to(&mut cursor, ImageOutputFormat::Png).unwrap();
+                    }
+                    "webp" => {
+                        processed.write_to(&mut cursor, ImageOutputFormat::WebP).unwrap();
+                    }
+                    _ => {
+                        processed.write_to(&mut cursor, ImageOutputFormat::Jpeg(quality)).unwrap();
+                    }
                 }
-            } else {
-                img
-            };
+                
+                let current_size = cursor.get_ref().len();
+                
+                // 200KB以下になったら終了
+                if current_size <= MAX_SIZE_BYTES {
+                    break;
+                }
+                
+                // スケールファクターを0.9倍にして再リサイズ
+                scale_factor *= 0.9;
+                let new_w = (orig_w as f32 * scale_factor).round() as u32;
+                let new_h = (orig_h as f32 * scale_factor).round() as u32;
+                
+                // 最小サイズ制限（100x100以下にはしない）
+                if new_w < 100 || new_h < 100 {
+                    info!("Reached minimum size limit, using current image");
+                    break;
+                }
+                
+                processed = img.resize_exact(new_w, new_h, image::imageops::FilterType::Lanczos3);
+            }
 
             let mut cursor = Cursor::new(Vec::new());
             match format {
@@ -89,7 +140,7 @@ async fn func(event: Request) -> std::result::Result<Response<Body>, Infallible>
                     processed.write_to(&mut cursor, ImageOutputFormat::WebP).unwrap();
                 }
                 _ => {
-                    processed.write_to(&mut cursor, ImageOutputFormat::Jpeg(quality as u8)).unwrap();
+                    processed.write_to(&mut cursor, ImageOutputFormat::Jpeg(quality)).unwrap();
                 }
             }
 

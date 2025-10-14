@@ -94,7 +94,7 @@ export function CreateModal({
       alert("イベント開始日を入力してください");
       return;
     }
-
+    let uploadedImageUrl: string | null|undefined = null; // アップロードされた画像のURLを格納する変数
     setLoading(true);
     try {
       const effectiveCategory: Category =
@@ -104,39 +104,15 @@ export function CreateModal({
         ...tags.filter((t) => t !== effectiveCategory),
       ];
 
-      // 画像が選択されていればR2にアップロードする
-      let uploadedImageUrl: string | null = null;
+      // 画像が選択されていればCloudflare Workers経由でR2にアップロードする
+      let processedImageFile: File | null = null;
       if (imageFile) {
         try {
-          // プレサインドURL取得
-          const upLoadUrl = await getUploadURLMutation.mutateAsync({
-            filename: imageFile.name,
+          const uploadResponse = await uploadImage(imageFile);
+          const imageBlob = await uploadResponse.blob();
+          processedImageFile = new File([imageBlob], imageFile.name, {
+            type: imageBlob.type || imageFile.type,
           });
-          console.log("Obtained upload URL:", upLoadUrl);
-
-          if (typeof upLoadUrl.imageUrl === "string" && upLoadUrl.imageUrl) {
-            // 画像を直接PUT（FormDataは使わない）
-            const uploadResponse = await fetch(upLoadUrl.imageUrl, {
-              method: "PUT",
-              headers: {
-                "Content-Type": imageFile.type || "image/jpeg",
-              },
-              body: imageFile, // ファイル直接、FormDataではない
-            });
-
-            if (!uploadResponse.ok) {
-              throw new Error(
-                `Image upload failed with status ${uploadResponse.status}`
-              );
-            }
-
-            console.log("Image successfully uploaded");
-            // アップロード後の画像URLを構築（通常はプレサインドURLからクエリパラメータを除いたもの）
-            const uploadedUrl = new URL(upLoadUrl.imageUrl);
-            uploadedImageUrl = `${uploadedUrl.protocol}//${uploadedUrl.host}${uploadedUrl.pathname}`;
-          } else {
-            throw new Error("Upload URL is invalid or undefined.");
-          }
         } catch (uploadError) {
           console.error("Image upload failed:", uploadError);
           alert("画像のアップロードに失敗しました。もう一度お試しください。");
@@ -144,6 +120,41 @@ export function CreateModal({
           return;
         }
       }
+      const upLoadUrl = await getUploadURLMutation.mutateAsync({
+        filename: imageFile?.name,
+      });
+      console.log("Obtained upload URL:", upLoadUrl);
+
+      if (processedImageFile) {
+        const Data = new FormData();
+        Data.append("file", processedImageFile);
+
+        if (typeof upLoadUrl.imageUrl === "string" && upLoadUrl.imageUrl) {
+          const uploadResponse = await fetch(upLoadUrl.imageUrl, {
+            method: "PUT",
+            headers: {
+              "Content-Type": imageFile && imageFile.type ? imageFile.type : "image/jpeg",
+            },
+            body: Data,
+          });
+          if (!uploadResponse.ok) {
+            throw new Error(
+              `Image upload failed with status ${uploadResponse.status}`
+            );
+          }
+          // R2への PUT は成功時に空のレスポンスを返すので、JSONパースは不要
+          // アップロードされた画像のURLはプリサインURLからクエリパラメータを除いたもの
+          const imageUrl = upLoadUrl.imageUrl ? upLoadUrl.imageUrl.split('?')[0] : null;
+          console.log("Image successfully uploaded to:", imageUrl);
+          
+          // uploadedImageUrl にセット
+          uploadedImageUrl = imageUrl;
+        } else {
+          throw new Error("Upload URL is invalid or undefined.");
+        }
+      }
+      
+      // uploadedImageUrl は上で設定される
 
       interface BaseData {
         content: string;
