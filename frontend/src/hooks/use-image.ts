@@ -4,7 +4,7 @@ import { imageServiceUploadImage } from "@/api/image";
 import type { V1UploadImageRequest } from "@/api/image.schemas.ts";
 
 export async function uploadImage(file: File) {
-  const workersEndpoint = process.env.NEXT_PUBLIC_WORKERS_UPLOAD_ENDPOINT;
+  const workersEndpoint = process.env.NEXT_PUBLIC_LAMBDA_ENDPOINT;
   if (!workersEndpoint) throw new Error("Workers upload endpoint is not configured");
 
   const response = await fetch(workersEndpoint, {
