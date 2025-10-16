@@ -1,41 +1,51 @@
-use tokenizers::Tokenizer;
-use vibrato::{Dictionary, Tokenizer as VibratoTokenizer};
-use std::fs::File;
+mod tokenizer;
+mod wordtovec;
+
+use wordtovec::Word2VecModel;
 
 fn main() -> anyhow::Result<()> {
-    // Vibrato 辞書を読み込み（zstd圧縮ファイル）
-    let dict_path = "dict/ipadic-mecab-2_7_0/system.dic.zst";
-    let file = File::open(dict_path)?;
-    let decoder = zstd::Decoder::new(file)?;
-    let dict = Dictionary::read(decoder)?;
-    let morpheme_tokenizer = VibratoTokenizer::new(dict);
-    
-    // WordPiece トークナイザーを読み込み
-    let wordpiece_tokenizer = Tokenizer::from_file("cl-tohoku/bert-base-japanese-v3/tokenizer.json")
-        .map_err(|e| anyhow::anyhow!("Failed to load tokenizer: {:?}", e))?;
-    
-    let text = "災害が起きて全ての建物は崩れ落ちた。";
-    
-    // ステップ1: 形態素解析
-    let mut worker = morpheme_tokenizer.new_worker();
-    worker.reset_sentence(text);
-    worker.tokenize();
-    
-    let morphemes: Vec<String> = worker
-        .token_iter()
-        .map(|token| token.surface().to_string())
-        .collect();
-    
-    println!("形態素解析結果: {:?}", morphemes);
-    
-    // ステップ2: WordPiece トークナイズ
-    // 形態素間にスペースを入れて結合
-    let joined_text = morphemes.join(" ");
-    let output = wordpiece_tokenizer.encode(joined_text.as_str(), true)
-        .map_err(|e| anyhow::anyhow!("Failed to encode: {:?}", e))?;
-    
-    println!("WordPiece トークン: {:?}", output.get_tokens());
-    println!("トークンID: {:?}", output.get_ids());
-    
+    // Word2Vec モデルを読み込む
+    println!("chiVe モデルを読み込み中...");
+    let model = Word2VecModel::load("chive-1.3-mc90.fifu")?;
+    println!("モデル読み込み完了！");
+    println!("ベクトル次元数: {}", model.dims());
+    println!();
+
+    // テキストをトークナイズ
+    let text = "ナリタブライアン（Narita Brian、1991年5月3日 - 1998年9月27日）は日本の競走馬・種牡馬。中央競馬史上5頭目のクラシック三冠馬。「シャドーロールの怪物」と呼ばれた。
+
+1993年8月にデビュー。同年11月から1995年3月にかけてクラシック三冠を含むGI5連勝、10連続連対を達成し、1993年JRA賞最優秀3歳牡馬、1994年JRA賞年度代表馬及び最優秀4歳牡馬に選出された。1995年春に故障（股関節炎）を発症した後はその後遺症から低迷し、6戦して重賞を1勝するにとどまった（GI は5戦して未勝利）が、第44回阪神大賞典におけるマヤノトップガンとのマッチレースや短距離戦である第26回高松宮杯への出走によってファンの話題を集めた。…… 
+
+".to_string();
+    let tokens = tokenizer::tokenizer(text.clone())?;
+    println!("入力テキスト: {}", text);
+    println!("トークン: {}", tokens.join(" "));
+    println!();
+
+    // トークン間の類似度行列を計算
+    println!("=== トークン間のコサイン類似度行列 ===");
+    let similarity_matrix = model.similarity_matrix(&tokens);
+    for row in &similarity_matrix {
+        for (word1, word2, similarity) in row {
+            println!("'{}' と '{}': {:.4}", word1, word2, similarity);
+        }
+    }
+    println!();
+
+    // 階層的クラスタリング
+    println!("=== 階層的クラスタリング（しきい値: 0.5）===");
+    let clusters = model.hierarchical_clustering(&tokens, 0.5);
+    for (i, cluster) in clusters.iter().enumerate() {
+        println!("クラスタ {}: [{}]", i + 1, cluster.join(", "));
+    }
+    println!();
+
+    // より低いしきい値でクラスタリング
+    println!("=== 階層的クラスタリング（しきい値: 0.3）===");
+    let clusters_strict = model.hierarchical_clustering(&tokens, 0.3);
+    for (i, cluster) in clusters_strict.iter().enumerate() {
+        println!("クラスタ {}: [{}]", i + 1, cluster.join(", "));
+    }
+
     Ok(())
 }

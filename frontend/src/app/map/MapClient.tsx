@@ -249,6 +249,16 @@ export default function MapClient() {
                   <Marker key={ev.id} position={[ev.lat, ev.lng]} icon={redIcon}>
                     <Popup>
                       <div className="min-w-[160px]">
+                        {ev.image && (
+                          <img 
+                            src={ev.image} 
+                            alt={ev.content} 
+                            className="w-full h-32 object-cover rounded mb-2"
+                            onError={(e) => {
+                              e.currentTarget.style.display = 'none';
+                            }}
+                          />
+                        )}
                         <div className="text-base text-gray-800 mb-1">{ev.content}</div>
                         <div className="text-sm text-gray-600 mb-2">by {ev.userName}</div>
                         <div className="flex items-center gap-2 text-sm text-gray-600">
@@ -273,6 +283,16 @@ export default function MapClient() {
                         role="button"
                         onClick={() => router.push(`/thread/${th.id}`)}
                       >
+                        {th.image && (
+                          <img 
+                            src={th.image} 
+                            alt={th.content} 
+                            className="w-full h-32 object-cover rounded mb-2"
+                            onError={(e) => {
+                              e.currentTarget.style.display = 'none';
+                            }}
+                          />
+                        )}
                         <div className="text-base text-gray-800 mb-1">{th.content}</div>
                         <div className="text-sm text-gray-600 mb-2">by {th.userName}</div>
                         <div className="flex items-center gap-2 text-sm text-gray-600">
@@ -289,6 +309,16 @@ export default function MapClient() {
                   <Marker key={po.id} position={[po.lat, po.lng]} icon={blueIcon}>
                     <Popup>
                       <div className="min-w-[160px]">
+                        {po.image && (
+                          <img 
+                            src={po.image} 
+                            alt={po.content} 
+                            className="w-full h-32 object-cover rounded mb-2"
+                            onError={(e) => {
+                              e.currentTarget.style.display = 'none';
+                            }}
+                          />
+                        )}
                         <div className="text-base text-gray-800 mb-1">{po.content}</div>
                         <div className="text-sm text-gray-600 mb-2">by {po.userName}</div>
                         <div className="flex items-center gap-2 text-sm text-gray-600">
@@ -305,6 +335,14 @@ export default function MapClient() {
                   <Marker key={sp.id} position={[sp.lat, sp.lng]} icon={pin}>
                     <Popup>
                       <div className="min-w-[160px]">
+                        {sp&& (
+                          <div
+                            className="w-full h-32 object-cover rounded mb-2"
+                            onError={(e) => {
+                              e.currentTarget.style.display = 'none';
+                            }}
+                          />
+                        )}
                         <div className="text-base text-gray-800 mb-1">{sp.title}</div>
                         <div className="text-sm text-gray-600 mb-2">{sp.description}</div>
                       </div>
