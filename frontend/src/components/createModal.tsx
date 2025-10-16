@@ -34,6 +34,7 @@ import type { V1CreateEventRequest } from "@/api/event.schemas.ts";
 import type { V1CreateThreadRequest } from "@/api/thread.schemas.ts";
 import { useCreatePost } from "@/hooks/use-post";
 import { uploadImage, useGetUploadUrl } from "@/hooks/use-image";
+
 interface CreateModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -146,14 +147,19 @@ export function CreateModal({
             },
             body: processedImageFile, // FormDataではなく、Fileを直接送る
           });
+          
           if (!uploadResponse.ok) {
             throw new Error(
               `Image upload failed with status ${uploadResponse.status}`
             );
           }
-          // R2への PUT は成功時に空のレスポンスを返すので、JSONパースは不要
-          // アップロードされた画像のURLはプリサインURLからクエリパラメータを除いたもの
-          const imageUrl = upLoadUrl.imageUrl ? upLoadUrl.imageUrl.split('?')[0] : null;
+          
+
+          const url = new URL(upLoadUrl.imageUrl);
+          const pathname = url.pathname; // "/uploads/1760619864_CHAP%20%281%29.png"
+          
+          // 実際の公開URLを構築
+          const imageUrl = `https://r2.chap-app.jp${pathname}`;
           console.log("Image successfully uploaded to:", imageUrl);
           
           // uploadedImageUrl にセット
