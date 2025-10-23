@@ -1,11 +1,23 @@
 use anyhow::{Context, Result};
 use finalfusion::prelude::*;
 use finalfusion::vocab::Vocab;
+use linfa::traits::Fit;
+use linfa::prelude::Predict;
+use linfa::dataset::DatasetBase;
+use linfa_clustering::KMeans;
+use ndarray::Array2;
 use std::fs::File;
 use std::io::BufReader;
 
 pub struct Word2VecModel {
     embeddings: Embeddings<VocabWrap, StorageWrap>,
+}
+
+pub struct SphericalKMeansResult {
+    pub words: Vec<String>,
+    pub labels: Vec<usize>,
+    pub centroids: Array2<f32>,
+    pub samples: Array2<f32>, // L2 正規化済み
 }
 
 impl Word2VecModel {
@@ -57,7 +69,7 @@ impl Word2VecModel {
 
     /// 類似単語を検索
     pub fn similar_words(&self, word: &str, limit: usize) -> Option<Vec<(String, f32)>> {
-        // クエリ単語の埋め込みを取得
+        // クエリ単語の埋め込みを取得s
         let query_embedding = self.embeddings.embedding(word)?;
         
         // 全単語に対してコサイン類似度を計算
@@ -87,6 +99,74 @@ impl Word2VecModel {
     /// ベクトルの次元数を取得
     pub fn dims(&self) -> usize {
         self.embeddings.dims()
+    }
+
+    /// 高速クラスタリング: Spherical K-Means (コサイン類似度)
+    /// - k: クラスタ数
+    /// - max_niter: 反復回数（例: 50-200）
+    /// - batch_size: ミニバッチサイズ（例: 512-4096）
+    /// - words: 対象語彙（存在しない語は除外）
+    pub fn spherical_kmeans(
+        &self,
+        words: &[String],
+        k: usize,
+        max_niter: usize,
+    ) -> anyhow::Result<(Vec<String>, Vec<usize>)> {
+        let res = self.spherical_kmeans_full(words, k, max_niter)?;
+        Ok((res.words, res.labels))
+    }
+
+    /// 重心と正規化済みサンプルを含む完全版
+    pub fn spherical_kmeans_full(
+        &self,
+        words: &[String],
+        k: usize,
+        max_niter: usize,
+    ) -> anyhow::Result<SphericalKMeansResult> {
+        // 単語→ベクトル（存在しない語は除外）
+        let mut kept_words = Vec::new();
+        let mut vectors: Vec<Vec<f32>> = Vec::new();
+        for w in words {
+            if let Some(v) = self.word_to_vec(w) {
+                kept_words.push(w.clone());
+                vectors.push(v);
+            }
+        }
+
+        // 行列化 & L2正規化
+        let n = vectors.len();
+        if n == 0 {
+            return Ok(SphericalKMeansResult { words: Vec::new(), labels: Vec::new(), centroids: Array2::zeros((0, 0)), samples: Array2::zeros((0, 0)) });
+        }
+        let d = vectors[0].len();
+        let mut samples = Array2::<f32>::zeros((n, d));
+        for (i, v) in vectors.iter().enumerate() {
+            let mut norm = 0f32;
+            for x in v { norm += x * x; }
+            let norm = norm.sqrt().max(1e-12);
+            for j in 0..d { samples[(i, j)] = v[j] / norm; }
+        }
+
+        let dataset = DatasetBase::from(samples.clone());
+        let model = KMeans::params(k)
+            .max_n_iterations(max_niter as u64)
+            .fit(&dataset)?;
+        let labels = model.predict(&dataset).to_vec();
+        let mut centroids = model.centroids().to_owned();
+        // 重心も L2 正規化してコサイン類似度の閾値と整合を取る
+        for i in 0..centroids.nrows() {
+            let mut norm = 0f32;
+            for j in 0..centroids.ncols() {
+                let v = centroids[(i, j)];
+                norm += v * v;
+            }
+            let norm = norm.sqrt().max(1e-12);
+            for j in 0..centroids.ncols() {
+                centroids[(i, j)] /= norm;
+            }
+        }
+
+        Ok(SphericalKMeansResult { words: kept_words, labels, centroids, samples })
     }
 
     /// 単語リスト間のコサイン類似度行列を計算

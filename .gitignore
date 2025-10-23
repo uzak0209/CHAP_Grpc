@@ -8,3 +8,4 @@ terraform/generated_chap_key.pem
 /terraform/variable.tf
 # Do not commit backend env
 backend/.env
+social_sensor/target

@@ -61,6 +61,7 @@ func (s *ThreadServer) CreateThread(ctx context.Context, req *pd.CreateThreadReq
 		ContentType: req.GetContentType(),
 		Lat:         req.GetLat(),
 		Lng:         req.GetLng(),
+		Image:       req.GetImage(),
 	}
 
 	if err := s.threadRepo.Create(ctx, thread); err != nil {
@@ -95,6 +96,7 @@ func (s *ThreadServer) GetThreads(ctx context.Context, req *pd.GetThreadsRequest
 			Lat:         thread.Lat,
 			Lng:         thread.Lng,
 			ContentType: thread.ContentType,
+			Image:       thread.Image,
 		}
 	}
 
@@ -141,6 +143,7 @@ func (s *ThreadServer) GetThreadsByID(ctx context.Context, req *pd.GetThreadByID
 			Content:   thread.Content,
 			CreatedAt: thread.CreatedAt.Format(time.RFC3339),
 			UpdatedAt: thread.UpdatedAt.Format(time.RFC3339),
+			Image:     thread.Image,
 		},
 		Comment: responseComments,
 	}, nil
