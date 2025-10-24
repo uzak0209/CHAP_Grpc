@@ -1,10 +1,14 @@
 use crate::domain::validate::{Validate, ValidationError};
 
+#[derive(Debug, Clone)]
 pub struct Title(String);
 impl Title {
-    pub fn new(title: String) -> Self {
+    pub fn new(value: String) -> Result<Self, ValidationError> {
         // You can add validation logic here if needed
-        Title(title)
+
+        let title = Title(value);
+        title.validate()?;
+        Ok(title)
     }
 
     pub fn value(&self) -> &str {
