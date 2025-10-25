@@ -1,8 +1,8 @@
-use sqlx::postgres::PgPoolOptions;
-use sqlx::PgPool;
-use anyhow::Result;
+use sea_orm::Database;
+use sea_orm::DatabaseConnection;
 
-pub async fn get_db_pool(dsn: &str) -> Result<PgPool> {
-    let pool = PgPoolOptions::new().max_connections(5).connect(dsn).await?;
-    Ok(pool)
+pub async fn connect() -> DatabaseConnection {
+    Database::connect("postgres://user:pass@localhost:5432/social_sensor")
+        .await
+        .expect("Failed to connect to database")
 }
