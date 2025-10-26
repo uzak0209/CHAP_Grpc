@@ -1,4 +1,3 @@
-pub mod coordinate;
 pub mod lat;
 pub mod lng;
 pub mod title;

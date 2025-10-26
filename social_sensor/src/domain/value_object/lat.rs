@@ -1,5 +1,5 @@
 use crate::domain::validate::{Validate, ValidationError};
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Lat {
     value: f64,
 }
