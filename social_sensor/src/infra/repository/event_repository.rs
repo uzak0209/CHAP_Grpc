@@ -22,16 +22,11 @@ impl EventRepository {
             .all(&self.db)
             .await
             .map_err(|e: sea_orm::DbErr| anyhow::anyhow!(e.to_string()))?;
+        let out: Vec<crate::domain::entity::event::Event> = models
+            .into_iter()
+            .map(|m| m.try_into())
+            .collect::<Result<_, _>>()?;
 
-        let mut out = Vec::with_capacity(models.len());
-        for m in models {
-            let ent: crate::domain::entity::event::Event =
-                m.try_into()
-                    .map_err(|e: crate::domain::validate::ValidationError| {
-                        anyhow::anyhow!(e.to_string())
-                    })?;
-            out.push(ent);
-        }
         Ok(out)
     }
 }

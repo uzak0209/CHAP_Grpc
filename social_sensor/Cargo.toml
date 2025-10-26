@@ -18,3 +18,4 @@ axum = "0.7"
 hyper = { version = "0.14", features = ["server"] }
 tower = "0.4"
 actix-web = "4"
+dotenvy = "0.15.7"

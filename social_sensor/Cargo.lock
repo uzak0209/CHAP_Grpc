@@ -2467,6 +2467,7 @@ dependencies = [
  "chrono",
  "clap",
  "convert_case",
+ "dotenvy",
  "hyper 0.14.32",
  "rust_decimal",
  "sea-orm",
