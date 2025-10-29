@@ -1,8 +1,9 @@
 use std::collections::HashSet;
 
-use aiserver::Word2VecModel;
+use crate::domain::domain_service::tokenizer::tokenizer;
+use crate::domain::domain_service::word2vec::Word2VecModel;
 
-fn main() -> () {
+fn main() -> Result<(), anyhow::Error> {
     // Word2Vec モデルを読み込む
     let model = Word2VecModel::load("chive-1.3-mc100-dim50.fifu")?;
     println!("モデル読み込み完了！");
@@ -21,7 +22,7 @@ fn main() -> () {
 数学は文化の一部としても重要な位置を占めている芸術においては対称性比例フラクタル幾何など数学的概念が美的表現に応用されている音楽ではリズムや音階に数学的構造が見出され建築やデザインでも幾何学的調和が重視されるさらに文学や哲学でも数学的比喩や構造が用いられることがあるこのように数学は人類の知的文化的活動の根幹を成す学問の一つであり論理と創造の融合として普遍的価値を持つ
 
 ".to_string();
-    let tokens = aiserver::tokenizer::tokenizer(text.clone())?;
+    let tokens = tokenizer(text.clone()).unwrap_or_default();
     println!("入力テキスト: {}", text);
     println!("トークン: {}", tokens.join(" "));
     println!();
@@ -57,7 +58,7 @@ fn main() -> () {
     // クラスタごとに出力（しきい値 + マージンを満たさないものは除外）。重複語もそのまま保持。
     let mut clusters: Vec<Vec<String>> = vec![Vec::new(); k];
     let mut assigned_cnt = 0usize;
-    let mut below_thr_cnt = 0usize;
+    let mut _below_thr_cnt = 0usize;
     let mut ambiguous_cnt = 0usize;
     let mut relaxed_cnt = 0usize;
     let mut fallback_cnt = 0usize;
@@ -92,7 +93,7 @@ fn main() -> () {
             assigned_cnt += 1;
             assigned_mask[idx] = true;
         } else if best < sim_threshold {
-            below_thr_cnt += 1;
+            _below_thr_cnt += 1;
             if below_thr_samples.len() < 30 {
                 below_thr_samples.push(w.clone());
             }
@@ -157,7 +158,7 @@ fn main() -> () {
             }
         }
     }
-    
+
     // 4段目: 強制割当（全件を最も近い重心へ割当）。品質表示のため別カウント。
     for (idx, w) in res.words.iter().enumerate() {
         if assigned_mask[idx] {
@@ -223,4 +224,46 @@ fn main() -> () {
     }
 
     Ok(())
+}
+
+use linfa_clustering::KMeans;
+use linfa::traits::Fit;
+use linfa::prelude::Predict;
+use anyhow::Result;
+
+pub fn process_and_cluster(texts: Vec<String>, model_path: &str, n_clusters: usize) -> Result<Vec<usize>> {
+    // 1. トークナイズ
+    let tokenized: Vec<Vec<String>> = texts.into_iter().map(|text| tokenizer(text).unwrap_or_default()).collect();
+
+    // 2. Word2Vec モデルのロード
+    let model = Word2VecModel::load(model_path)?;
+
+    // 3. ベクトル化
+    let words: Vec<String> = tokenized.into_iter().flatten().collect();
+    let dataset = model.create_dataset(&words).ok_or_else(|| anyhow::anyhow!("No valid vectors for clustering"))?;
+
+    // 4. クラスタリング
+    let kmeans = KMeans::params(n_clusters).fit(&dataset)?;
+    Ok(kmeans.predict(&dataset).to_vec())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_process_and_cluster() {
+        let texts = vec![
+            "Rust is a systems programming language".to_string(),
+            "Machine learning is fascinating".to_string(),
+            "Clustering algorithms group data".to_string(),
+        ];
+        let model_path = "models/word2vec.bin";
+        let n_clusters = 2;
+
+        let result = process_and_cluster(texts, model_path, n_clusters);
+        assert!(result.is_ok());
+        let labels = result.unwrap();
+        assert_eq!(labels.len(), 3); // 3 texts should result in 3 labels
+    }
 }

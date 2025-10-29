@@ -1,7 +1,7 @@
 use crate::domain::validate::ValidationError;
 use crate::{
     domain::{
-        composite::coordinate::{self, Coordinate},
+        composite::coordinate::Coordinate,
         entity::post::{self, Post},
         value_object::uuid_v0,
         value_object::{lat, lng},

@@ -19,3 +19,14 @@ hyper = { version = "0.14", features = ["server"] }
 tower = "0.4"
 actix-web = "4"
 dotenvy = "0.15.7"
+finalfusion = { version = "0.14", features = ["memmap"] }
+vibrato = "0.5"
+zstd = "0.13"
+linfa = "0.8.0"
+linfa-clustering = "0.8.0"
+ndarray = "0.16.1"
+word2vec = "0.3.3"
+rstest = "0.26.1"
+
+[features]
+with-embeddings = []
