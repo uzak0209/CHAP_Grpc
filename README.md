@@ -16,12 +16,6 @@ make dev-logs
 make dev-down
 ```
 
-### 利用可能なエンドポイント
-
-- **gRPCサーバー**: `localhost:50051`
-- **HTTP API (Envoy)**: `http://localhost:8080`
-- **Swagger UI**: `http://localhost:3000`
-
 ### 開発時の機能
 
 - **ホットリロード**: Goファイルを変更すると自動で再ビルド・再起動
@@ -34,22 +28,8 @@ make dev-down
 - Protocol Buffers
 - Docker & Docker Compose
 - PostgreSQL
+- Rust
 
-
-## プロジェクト構成
-
-```
-CHAP_Grpc/
-├── backend/           # Goサーバー
-│   ├── api/          # Protocol Buffers定義と生成コード
-│   ├── handler/      # gRPCハンドラー
-│   ├── infra/        # インフラ層（DB、リポジトリ）
-│   ├── middleware/   # ミドルウェア
-│   └── utils/        # ユーティリティ
-├── envoy/            # Envoyプロキシ設定
-├── docs/             # Swagger UI
-└── scripts/          # 開発用スクリプト
-```
 
 ## 開発コマンド
 
