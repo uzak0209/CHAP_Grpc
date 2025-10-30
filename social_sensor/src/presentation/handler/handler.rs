@@ -2,6 +2,7 @@ use crate::infra::repository::{
     event_repository::EventRepository, post_repository::PostRepository,
     thread_repository::ThreadRepository,
 };
+use crate::presentation::dto::coordinate::SimpleCoordinate;
 use actix_web::{App, HttpResponse, HttpServer, web};
 use serde_json::json;
 use std::net::SocketAddr;
@@ -20,9 +21,16 @@ async fn lang_process_actix(state: web::Data<AppState>) -> HttpResponse {
     let usecase =
         crate::usecase::lang_analyzer::LangAnalyzerUsecase::new(postrepo, threadrepo, eventrepo);
     match usecase.get_clustering_result().await {
-        Ok(result) => HttpResponse::Ok().json(json!({"ok": true, "data": result}) ),
-        Err(e) => HttpResponse::InternalServerError()
-            .json(json!({"ok": false, "error": format!("{}", e)})),
+        Ok(result) => {
+            let data: Vec<SimpleCoordinate> =
+                result.into_iter().map(SimpleCoordinate::from).collect();
+            let resp = { data };
+            HttpResponse::Ok().json(resp)
+        }
+        Err(e) => HttpResponse::InternalServerError().json(json!({
+            "data": [],
+            "ok": false
+        }))
     }
 }
 

@@ -86,6 +86,7 @@ impl LangAnalyzerUsecase {
             clustering_result,
         )
         .await?;
+        println!("Clustering and mapping completed. Result: {:?}", result);
         Ok(result)
     }
 }

@@ -4,7 +4,7 @@ use crate::{
         entity::{event::Event, post::Post, thread::Thread},
     },
     infra::repository::{
-        self, event_repository::EventRepository, post_repository::PostRepository,
+        event_repository::EventRepository, post_repository::PostRepository,
         thread_repository::ThreadRepository,
     },
 };
@@ -20,22 +20,36 @@ pub async fn map_clustering_result(
     let set: HashSet<_> = clustering_result.into_iter().collect();
     let posts_entities: Vec<Post> = post_repository.find_valid_post_entities().await?;
 
-    let posts = posts_entities
+    let posts: Vec<_> = posts_entities
         .into_iter()
-        .filter(|p| set.contains(p.content()))
-        .map(|p| p.coordinate().unwrap().clone());
+        .filter(|p| {
+            set.iter().any(|s| p.content().contains(s))
+        })
+        .filter_map(|p| p.coordinate().cloned())
+        .collect();
 
     let threads_entities: Vec<Thread> = thread_repository.find_valid_thread_entities().await?;
-    let threads = threads_entities
+    let threads: Vec<_> = threads_entities
         .into_iter()
-        .filter(|t| set.contains(t.title().value()))
-        .map(|t| t.coordinate().unwrap().clone());
+        .filter(|t| {
+            set.iter().any(|s| t.title().value().contains(s))
+        })
+        .filter_map(|t| t.coordinate().cloned())
+        .collect();
 
     let events_entities: Vec<Event> = event_repository.find_valid_event_entities().await?;
-    let events = events_entities
+    let events: Vec<_> = events_entities
         .into_iter()
-        .filter(|e| set.contains(e.title().value()))
-        .map(|e| e.coordinate().unwrap().clone());
+        .filter(|e| {
+            set.iter().any(|s| e.title().value().contains(s))
+        })
+        .filter_map(|e| e.coordinate().cloned())
+        .collect();
 
-    Ok(posts.chain(threads).chain(events).collect())
+    println!(
+        "Mapped clustering result:\n  posts: {:?}\n  threads: {:?}\n  events: {:?}",
+        posts, threads, events
+    );
+
+    Ok(posts.into_iter().chain(threads).chain(events).collect())
 }
