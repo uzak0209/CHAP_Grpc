@@ -3155,6 +3155,7 @@ dependencies = [
  "linfa",
  "linfa-clustering",
  "ndarray 0.16.1",
+ "once_cell",
  "rstest",
  "rust_decimal",
  "sea-orm",

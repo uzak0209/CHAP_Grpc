@@ -1,5 +1,6 @@
 use crate::domain::validate::{Validate, ValidationError};
-#[derive(Debug, Clone)]
+use serde::{Deserialize, Serialize};
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Lng {
     value: f64,
 }

@@ -1,5 +1,7 @@
+use serde::{Deserialize, Serialize};
+
 use crate::domain::validate::{Validate, ValidationError};
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Lat {
     value: f64,
 }

@@ -1,3 +1,4 @@
+use crate::domain::domain_service::heatmap;
 use crate::domain::domain_service::tokenizer::tokenizer;
 use crate::domain::domain_service::word2vec::Word2VecModel;
 use anyhow::Result;

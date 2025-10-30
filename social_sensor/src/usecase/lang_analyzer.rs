@@ -1,8 +1,14 @@
+use crate::domain::composite::coordinate::Coordinate;
+use crate::domain::domain_service::heatmap;
+use crate::domain::domain_service::{clustering, get_trend::get_trend};
+use crate::{
+    domain::domain_service::tokenizer::tokenizer,
+    infra::repository::{
+        event_repository::EventRepository, post_repository::PostRepository,
+        thread_repository::ThreadRepository,
+    },
+};
 use anyhow::Result as AnyResult;
-use std::collections::BTreeMap;
-
-use crate::infra::repository::{event_repository::EventRepository, post_repository::PostRepository, thread_repository::ThreadRepository};
-
 /// LangAnalyzerUsecase: gathers text from repositories, tokenizes, builds frequency map,
 /// optionally runs clustering via an embeddings model, and writes a cache file.
 pub struct LangAnalyzerUsecase {
@@ -12,12 +18,20 @@ pub struct LangAnalyzerUsecase {
 }
 
 impl LangAnalyzerUsecase {
-    pub fn new(postrepo: PostRepository, threadrepo: ThreadRepository, eventrepo: EventRepository) -> Self {
-        Self { postrepo, threadrepo, eventrepo }
+    pub fn new(
+        postrepo: PostRepository,
+        threadrepo: ThreadRepository,
+        eventrepo: EventRepository,
+    ) -> Self {
+        Self {
+            postrepo,
+            threadrepo,
+            eventrepo,
+        }
     }
 
     /// Collect content from DB, tokenize, and write frequency JSON to /tmp/lang_cache.json
-    pub async fn process_and_cache(&self) -> AnyResult<String> {
+    pub async fn get_contents(&self) -> AnyResult<Vec<String>> {
         let mut contents: Vec<String> = Vec::new();
 
         let posts = self.postrepo.find_valid_post_entities().await?;
@@ -36,24 +50,42 @@ impl LangAnalyzerUsecase {
             contents.push(e.title().to_string());
         }
 
-        // Tokenize using domain tokenizer
-        let mut freq: BTreeMap<String, u64> = BTreeMap::new();
-        for c in contents {
-            match crate::domain::domain_service::tokenizer::tokenizer(c.clone()) {
-                Ok(tokens) => {
-                    for t in tokens {
-                        let w = t.to_lowercase();
-                        *freq.entry(w).or_insert(0) += 1;
-                    }
-                }
-                Err(_) => continue,
-            }
-        }
+        Ok(contents)
+    }
 
-        // Serialize and write to /tmp/lang_cache.json (same path used in aiserver)
-        let json = serde_json::to_string(&freq)?;
-        let _ = std::fs::write("/tmp/lang_cache.json", &json);
+    fn tokenize(contents: Vec<String>) -> anyhow::Result<Vec<String>> {
+        // Tokenize each input string and flatten into a single vector of tokens.
+        let joined = contents.join(" ");
+        let tokenized = tokenizer(joined)?;
+        Ok(tokenized)
+    }
 
-        Ok("processed".to_string())
+    /// Use case for clustering data
+    fn execute_clustering(
+        tokenized_data: Vec<String>,
+        model_path: &str,
+        n_clusters: usize,
+    ) -> anyhow::Result<Vec<String>> {
+        let clustering_result =
+            clustering::process_and_cluster(tokenized_data, model_path, n_clusters)?;
+        let trend = get_trend(clustering_result);
+        return Ok(trend);
+    }
+
+    pub async fn get_clustering_result(&self) -> anyhow::Result<Vec<Coordinate>> {
+        let contents = self.get_contents().await?;
+        println!("Fetched {:?} contents from repositories.", contents);
+        let tokenized_data = Self::tokenize(contents)?;
+        let model_path = "chive-1.3-mc100-dim50.fifu"; // specify your model path
+        let n_clusters = std::cmp::max(1, tokenized_data.len() / 100); // ensure at least 1 cluster
+        let clustering_result = Self::execute_clustering(tokenized_data, model_path, n_clusters)?;
+        let result = heatmap::map_clustering_result(
+            &self.postrepo,
+            &self.eventrepo,
+            &self.threadrepo,
+            clustering_result,
+        )
+        .await?;
+        Ok(result)
     }
 }

@@ -1,38 +1,41 @@
-use crate::domain::{
-    composite::coordinate::Coordinate,
-    entity::{event::Event, post::Post, thread::Thread},
-    value_object::uuid_v0::UUID,
+use crate::{
+    domain::{
+        composite::coordinate::Coordinate,
+        entity::{event::Event, post::Post, thread::Thread},
+    },
+    infra::repository::{
+        self, event_repository::EventRepository, post_repository::PostRepository,
+        thread_repository::ThreadRepository,
+    },
 };
-#[derive(Debug, Clone)]
-enum ClusteringResult {
-    Post(Coordinate),
-    Thread(Coordinate),
-    Event(Coordinate),
-}
+use anyhow::Result;
 use std::collections::HashSet;
 
-fn map_clustering_result(
-    posts: Vec<Post>,
-    threads: Vec<Thread>,
-    events: Vec<Event>,
+pub async fn map_clustering_result(
+    post_repository: &PostRepository,
+    event_repository: &EventRepository,
+    thread_repository: &ThreadRepository,
     clustering_result: Vec<String>,
-) -> Vec<ClusteringResult> {
+) -> Result<Vec<Coordinate>> {
     let set: HashSet<_> = clustering_result.into_iter().collect();
+    let posts_entities: Vec<Post> = post_repository.find_valid_post_entities().await?;
 
-    let posts = posts
+    let posts = posts_entities
         .into_iter()
         .filter(|p| set.contains(p.content()))
-        .map(|p| ClusteringResult::Post(p.coordinate().unwrap().clone()));
+        .map(|p| p.coordinate().unwrap().clone());
 
-    let threads = threads
+    let threads_entities: Vec<Thread> = thread_repository.find_valid_thread_entities().await?;
+    let threads = threads_entities
         .into_iter()
         .filter(|t| set.contains(t.title().value()))
-        .map(|t| ClusteringResult::Thread(t.coordinate().unwrap().clone()));
+        .map(|t| t.coordinate().unwrap().clone());
 
-    let events = events
+    let events_entities: Vec<Event> = event_repository.find_valid_event_entities().await?;
+    let events = events_entities
         .into_iter()
         .filter(|e| set.contains(e.title().value()))
-        .map(|e| ClusteringResult::Event(e.coordinate().unwrap().clone()));
+        .map(|e| e.coordinate().unwrap().clone());
 
-    posts.chain(threads).chain(events).collect()
+    Ok(posts.chain(threads).chain(events).collect())
 }

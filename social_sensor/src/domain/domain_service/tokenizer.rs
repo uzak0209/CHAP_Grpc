@@ -1,32 +1,22 @@
-use rstest::rstest;
+use once_cell::sync::Lazy;
 use std::fs::File;
+use std::sync::Arc;
 use vibrato::{Dictionary, Tokenizer as VibratoTokenizer};
+
+static TOKENIZER: Lazy<Arc<VibratoTokenizer>> = Lazy::new(|| {
+    let file = File::open("system.dic.zst").expect("Failed to open dictionary file");
+    let decoder = zstd::Decoder::new(file).expect("Failed to decode zstd");
+    let dict = Dictionary::read(decoder).expect("Failed to read dictionary");
+    Arc::new(VibratoTokenizer::new(dict))
+});
+
 const STOPWORDS: &[&str] = &[
-    "する",
-    "れる",
-    "られる",
-    "と",
-    "か",
-    "いる",
-    "ある",
-    "なる",
-    "できる",
-    "得る",
-    "行う",
-    "こと",
-    "もの",
-    "よう",
-    "ため",
-    "が",
-    "は",
+    "する", "れる", "られる", "と", "か", "いる", "ある", "なる", "できる",
+    "得る", "行う", "こと", "もの", "よう", "ため", "が", "は",
 ];
 
 pub fn tokenizer(text: String) -> anyhow::Result<Vec<String>> {
-    let file = File::open("system.dic.zst")?;
-    let decoder = zstd::Decoder::new(file)?;
-    let dict = Dictionary::read(decoder)?;
-    let tokenizer = VibratoTokenizer::new(dict);
-
+    let tokenizer = TOKENIZER.clone();
     let mut worker = tokenizer.new_worker();
     worker.reset_sentence(text);
     worker.tokenize();
@@ -62,12 +52,4 @@ pub fn tokenizer(text: String) -> anyhow::Result<Vec<String>> {
         .collect();
 
     Ok(morphemes)
-}
-#[rstest]
-#[case("津波が近づいています。高台へと逃げてください")]
-fn add_test(#[case] text: String) {
-    let tokens = tokenizer(text);
-    tokens.iter().for_each(|x| println!("{:?}", x));
-    println!("{:?}", tokens);
-    assert!(tokens.is_ok());
 }

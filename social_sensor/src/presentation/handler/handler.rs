@@ -11,20 +11,6 @@ pub struct AppState {
     pub db: Arc<sea_orm::DatabaseConnection>,
 }
 
-async fn called_ai_actix(state: web::Data<AppState>) -> HttpResponse {
-    // construct repositories from sea_orm connection
-    let postrepo = PostRepository::new(state.db.as_ref().clone());
-    let threadrepo = ThreadRepository::new(state.db.as_ref().clone());
-    let eventrepo = EventRepository::new(state.db.as_ref().clone());
-
-    let usecase = crate::usecase::called_ai::CalledAIUsecase::new(postrepo, threadrepo, eventrepo);
-    match usecase.called_ai().await {
-        Ok(s) => HttpResponse::Ok().json(json!({"ok": true, "message": s})),
-        Err(e) => HttpResponse::InternalServerError()
-            .json(json!({"ok": false, "error": format!("{}", e)})),
-    }
-}
-
 async fn lang_process_actix(state: web::Data<AppState>) -> HttpResponse {
     // construct repositories from sea_orm connection
     let postrepo = PostRepository::new(state.db.as_ref().clone());
@@ -33,8 +19,8 @@ async fn lang_process_actix(state: web::Data<AppState>) -> HttpResponse {
 
     let usecase =
         crate::usecase::lang_analyzer::LangAnalyzerUsecase::new(postrepo, threadrepo, eventrepo);
-    match usecase.process_and_cache().await {
-        Ok(_) => HttpResponse::Ok().body("processed"),
+    match usecase.get_clustering_result().await {
+        Ok(result) => HttpResponse::Ok().json(json!({"ok": true, "data": result}) ),
         Err(e) => HttpResponse::InternalServerError()
             .json(json!({"ok": false, "error": format!("{}", e)})),
     }
@@ -53,8 +39,7 @@ pub async fn serve(addr: SocketAddr, state: AppState) -> anyhow::Result<()> {
     HttpServer::new(move || {
         App::new()
             .app_data(state_data.clone())
-            .route("/called_ai", web::get().to(called_ai_actix))
-            .route("/lang/process", web::post().to(lang_process_actix))
+            .route("/lang/process", web::get().to(lang_process_actix))
             .route("/lang/cache", web::get().to(lang_cache_actix))
     })
     .bind(addr)?

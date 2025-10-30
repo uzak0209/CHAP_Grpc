@@ -1,23 +1,11 @@
 use anyhow::{Context, Result};
 use finalfusion::prelude::*;
-use linfa::dataset::DatasetBase;
-use linfa::prelude::Predict;
-use linfa::traits::Fit;
-use linfa_clustering::KMeans;
-use ndarray::Array1;
-use ndarray::Array2;
+use finalfusion::vocab::Vocab;
 use std::fs::File;
 use std::io::BufReader;
 
 pub struct Word2VecModel {
     embeddings: Embeddings<VocabWrap, StorageWrap>,
-}
-
-pub struct SphericalKMeansResult {
-    pub words: Vec<String>,
-    pub labels: Vec<usize>,
-    pub centroids: Array2<f32>,
-    pub samples: Array2<f32>, // L2 正規化済み
 }
 
 impl Word2VecModel {
@@ -34,166 +22,46 @@ impl Word2VecModel {
 
     /// 単語をベクトルに変換
     pub fn word_to_vec(&self, word: &str) -> Option<Vec<f32>> {
+        let word = word.trim();
+        if self.embeddings.vocab().idx(word).is_none() {
+            println!("Not found in vocab: {}", word);
+        }
         self.embeddings.embedding(word).map(|e| e.to_vec())
     }
-
-    /// 複数の単語の平均ベクトルを取得
-    pub fn words_to_vec(&self, words: &[String]) -> Option<Vec<f32>> {
-        let mut sum: Option<Vec<f32>> = None;
-        let mut count = 0;
-
-        for word in words {
-            if let Some(vec) = self.word_to_vec(word) {
-                if sum.is_none() {
-                    sum = Some(vec);
-                } else if let Some(ref mut s) = sum {
-                    for (i, val) in vec.iter().enumerate() {
-                        s[i] += val;
-                    }
-                }
-                count += 1;
-            }
-        }
-
-        if count > 0 {
-            sum.map(|mut s| {
-                for val in s.iter_mut() {
-                    *val /= count as f32;
-                }
-                s
-            })
-        } else {
-            None
-        }
-    }
-
     /// ベクトルの次元数を取得
     pub fn dims(&self) -> usize {
         self.embeddings.dims()
-    }
-
-    /// 高速クラスタリング: Spherical K-Means (コサイン類似度)
-    pub fn spherical_kmeans(
-        &self,
-        words: &[String],
-        k: usize,
-        max_niter: usize,
-    ) -> anyhow::Result<(Vec<String>, Vec<usize>)> {
-        let res = self.spherical_kmeans_full(words, k, max_niter)?;
-        Ok((res.words, res.labels))
-    }
-
-    /// 重心と正規化済みサンプルを含む完全版
-    pub fn spherical_kmeans_full(
-        &self,
-        words: &[String],
-        k: usize,
-        max_niter: usize,
-    ) -> anyhow::Result<SphericalKMeansResult> {
-        // 単語→ベクトル（存在しない語は除外）
-        let mut kept_words = Vec::new();
-        let mut vectors: Vec<Vec<f32>> = Vec::new();
-        for w in words {
-            if let Some(v) = self.word_to_vec(w) {
-                kept_words.push(w.clone());
-                vectors.push(v);
-            }
-        }
-
-        // 行列化 & L2正規化
-        let n = vectors.len();
-        if n == 0 {
-            return Ok(SphericalKMeansResult {
-                words: Vec::new(),
-                labels: Vec::new(),
-                centroids: Array2::zeros((0, 0)),
-                samples: Array2::zeros((0, 0)),
-            });
-        }
-        let d = vectors[0].len();
-        let mut samples = Array2::<f32>::zeros((n, d));
-        for (i, v) in vectors.iter().enumerate() {
-            let mut norm = 0f32;
-            for x in v {
-                norm += x * x;
-            }
-            let norm = norm.sqrt().max(1e-12);
-            for j in 0..d {
-                samples[(i, j)] = v[j] / norm;
-            }
-        }
-
-        let dataset = DatasetBase::from(samples.clone());
-        let model = KMeans::params(k)
-            .max_n_iterations(max_niter as u64)
-            .fit(&dataset)?;
-        let labels = model.predict(&dataset).to_vec();
-        let mut centroids = model.centroids().to_owned();
-        // 重心も L2 正規化してコサイン類似度の閾値と整合を取る
-        for i in 0..centroids.nrows() {
-            let mut norm = 0f32;
-            for j in 0..centroids.ncols() {
-                let v = centroids[(i, j)];
-                norm += v * v;
-            }
-            let norm = norm.sqrt().max(1e-12);
-            for j in 0..centroids.ncols() {
-                centroids[(i, j)] /= norm;
-            }
-        }
-
-        Ok(SphericalKMeansResult {
-            words: kept_words,
-            labels,
-            centroids,
-            samples,
-        })
-    }
-
-    /// ベクトルの正規化
-    fn normalize_vector(vector: &[f32]) -> Vec<f32> {
-        let norm = vector.iter().map(|x| x * x).sum::<f32>().sqrt().max(1e-12);
-        vector.iter().map(|x| x / norm).collect()
-    }
-
-    /// 単語リストをベクトルリストに変換
-    pub fn words_to_vectors(&self, words: &[String]) -> Vec<Vec<f32>> {
-        words
-            .iter()
-            .filter_map(|word| self.word_to_vec(word))
-            .map(|vec| Self::normalize_vector(&vec))
-            .collect()
-    }
-
-    /// クラスタリング用のデータセット作成
-    pub fn create_dataset(&self, words: &[String]) -> Option<DatasetBase<Array2<f32>, Array1<()>>> {
-        let vectors = self.words_to_vectors(words);
-        if vectors.is_empty() {
-            return None;
-        }
-        let n_samples = vectors.len();
-        let n_features = vectors[0].len();
-        let flat_vectors: Vec<f32> = vectors.into_iter().flatten().collect();
-        let array = Array2::from_shape_vec((n_samples, n_features), flat_vectors).ok()?;
-        // ラベルは不要（教師なし）なので unit ラベルの Dataset を作成
-        Some(DatasetBase::from(array))
     }
 }
 
 #[cfg(test)]
 mod tests {
+    use crate::domain::domain_service::tokenizer::tokenizer;
+
     use super::*;
 
     #[test]
-    #[ignore] // モデルファイルが必要なのでデフォルトではスキップ
-    fn test_word_to_vec() {
-        let model = Word2VecModel::load("models/word2vec.bin").unwrap();
 
-        let vec = model.word_to_vec("東京");
-        assert!(vec.is_some());
+    fn test_word_to_vec() -> Result<(), anyhow::Error> {
+        let model = Word2VecModel::load("chive-1.3-mc100-dim50.fifu").unwrap();
+        let message =
+            "東京は素晴らしい場所です。しかし、渋滞が多いです。しかし、食べ物は美味しい。競馬は、騎手が乗った馬により競われる競走競技であり、その着順を予想する賭博である。イギリスを発祥とする近代競馬は多くの国々で開催されており、その多くは勝馬投票券の販売とセットの興行として行われている。
 
-        if let Some(v) = vec {
-            println!("東京のベクトル次元数: {}", v.len());
-        }
+競馬は主に競馬場と呼ばれる専用の競技場で開催される。一つ一つの競い合いを競走と呼び、一日の競馬開催でいくつかの競走が行われる。競走の種類は、平坦なコースを走る平地競走、障害物の飛越を伴う障害競走、繋駕車を曳いて走る繋駕速歩競走の三つからなり、他に繋駕車を曳かない速歩競走やそりを曳くばんえい競走などがある。競走では一般には騎手が馬に騎乗して一定の距離を走り、最も早く決勝線に到達した馬を勝者とする。
+
+用いられる競走馬は平地や障害、速歩競走ではサラブレッド、サラブレッド系種、アラブ、アングロアラブ、アラブ系種の軽種馬もしくはクォーターホース、スタンダードブレッド等の中間種が用いられ、ばんえい競走では重種馬が用いられる。
+
+競馬の世界は優勝劣敗が大原則であり、強い馬は強い馬同士、弱い馬は弱い馬同士で競走するのが基本である。だが、競走の出走メンバーのみを変更するには限界がある。そこで考え出された方法として強い馬には重い負担重量を、弱い馬には軽い負担重量となるように負担重量を変更することである。負担重量の決定方法としては馬齢戦、別定戦、定量戦、ハンデキャップ競走などがある。
+
+競馬の競走には大多数の一般競走と、賞金が高額で特別登録料が必要な特別競走が存在する。特別競走の中でも特に賞金が高額で歴史と伝統・競走内容等を考慮し、重要な意義を持つ競走として重賞が行われる。各重賞競走の役割と重要性を広く認識してもらい生産界の指標としての重賞競走の位置づけを明確にするため、グループ制によってG1、G2、G3に分類される。G1は競走体系上もっとも重要な意義をもつ根幹競走、G2はG1に次ぐ主要な競走でG1の勝ち馬も比較的容易に出走できる内容をもった競走である。G3についてはG1、G2以外の競走である。
+
+G1競走の中でも、三歳馬に対して行われる伝統のある競走をクラシックと呼ぶ。世界各地でクラシックと呼ばれる競走が行われているが、多くの国がイギリスのクラシックレースを模範としている。イギリスのクラシックは全五競走で、うち二競走は牝馬限定戦であり、牡馬が出走可能な三競走すべてに優勝した競走馬を三冠馬という。ただし生産上の意味合いが薄れ、また距離別の路線が体系化されたこともあって三冠の概念は形骸化している。日本のクラシック競走はイギリスと同様に全五競走で、三歳牝馬路線の最終戦である秋華賞はクラシックには含まれていないが、三冠の概念は依然として重要視されている。";
+        let tokens = tokenizer(message.to_string())?;
+        let v: Vec<Vec<f32>> = tokens
+            .iter()
+            .filter_map(|word| model.word_to_vec(word))
+            .collect();
+
+        Ok(())
     }
 }
