@@ -1,6 +1,7 @@
 use crate::domain::composite::coordinate::Coordinate;
 use crate::domain::domain_service::heatmap;
 use crate::domain::domain_service::{clustering, get_trend::get_trend};
+use crate::infra::repository::gemini;
 use crate::{
     domain::domain_service::tokenizer::tokenizer,
     infra::repository::{
@@ -8,6 +9,10 @@ use crate::{
         thread_repository::ThreadRepository,
     },
 };
+pub struct ClusteringResponse{
+    pub trend: Vec<Coordinate>,
+    pub gemini_response: String,
+}
 use anyhow::Result as AnyResult;
 /// LangAnalyzerUsecase: gathers text from repositories, tokenizes, builds frequency map,
 /// optionally runs clustering via an embeddings model, and writes a cache file.
@@ -72,13 +77,15 @@ impl LangAnalyzerUsecase {
         return Ok(trend);
     }
 
-    pub async fn get_clustering_result(&self) -> anyhow::Result<Vec<Coordinate>> {
+    pub async fn get_clustering_result(&self) -> anyhow::Result<ClusteringResponse> {
         let contents = self.get_contents().await?;
         println!("Fetched {:?} contents from repositories.", contents);
         let tokenized_data = Self::tokenize(contents)?;
         let model_path = "chive-1.3-mc100-dim50.fifu"; // specify your model path
         let n_clusters = std::cmp::max(1, tokenized_data.len() / 100); // ensure at least 1 cluster
         let clustering_result = Self::execute_clustering(tokenized_data, model_path, n_clusters)?;
+        let gemini_response = gemini::ask_trend_gemini(clustering_result.clone())
+            .await.map_err(|e| anyhow::anyhow!(e.to_string()))?;
         let result = heatmap::map_clustering_result(
             &self.postrepo,
             &self.eventrepo,
@@ -87,6 +94,10 @@ impl LangAnalyzerUsecase {
         )
         .await?;
         println!("Clustering and mapping completed. Result: {:?}", result);
-        Ok(result)
+
+        Ok(ClusteringResponse {
+            trend: result,
+            gemini_response: gemini_response,
+        })
     }
 }

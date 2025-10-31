@@ -7,6 +7,7 @@ use actix_web::{App, HttpResponse, HttpServer, web};
 use serde_json::json;
 use std::net::SocketAddr;
 use std::sync::Arc;
+use actix_cors::Cors;
 #[derive(Clone)]
 pub struct AppState {
     pub db: Arc<sea_orm::DatabaseConnection>,
@@ -23,8 +24,8 @@ async fn lang_process_actix(state: web::Data<AppState>) -> HttpResponse {
     match usecase.get_clustering_result().await {
         Ok(result) => {
             let data: Vec<SimpleCoordinate> =
-                result.into_iter().map(SimpleCoordinate::from).collect();
-            let resp = { data };
+                result.trend.into_iter().map(SimpleCoordinate::from).collect();
+            let resp = json!({ "coordinate": data, "gemini_response": result.gemini_response });
             HttpResponse::Ok().json(resp)
         }
         Err(e) => HttpResponse::InternalServerError().json(json!({
@@ -41,18 +42,25 @@ async fn lang_cache_actix() -> HttpResponse {
     }
 }
 
-/// Start an actix-web server that supports GET /called_ai
 pub async fn serve(addr: SocketAddr, state: AppState) -> anyhow::Result<()> {
     let state_data = web::Data::new(state);
+
     HttpServer::new(move || {
+        let cors = Cors::default()
+            .allowed_origin("http://localhost:3001") // ← フロントのURL
+            .allowed_methods(vec!["GET", "POST"])
+            .allowed_headers(vec!["Content-Type"])
+            .supports_credentials();
+
         App::new()
+            .wrap(cors)
             .app_data(state_data.clone())
             .route("/lang/process", web::get().to(lang_process_actix))
             .route("/lang/cache", web::get().to(lang_cache_actix))
     })
     .bind(addr)?
     .run()
-    .await
-    .map_err(|e| anyhow::anyhow!(e.to_string()))?;
+    .await?;
+
     Ok(())
 }

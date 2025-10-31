@@ -28,6 +28,9 @@ ndarray = "0.16.1"
 word2vec = "0.3.3"
 rstest = "0.26.1"
 once_cell = "1.21.3"
+actix-cors = "0.7.1"
+gemini-rust = "1.5.1"
+reqwest = "0.12.24"
 
 [features]
 with-embeddings = []
