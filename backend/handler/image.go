@@ -23,24 +23,41 @@ func NewImageServer() *ImageServer {
 	return &ImageServer{}
 }
 
-// UploadImage: R2 にアップロードする署名付き URL を返す
-func (s *ImageServer) UploadImage(ctx context.Context, req *pd.UploadImageRequest) (*pd.UploadImageResponse, error) {
-	bucket := os.Getenv("R2_BUCKET_NAME")
-	r2AccessKey := os.Getenv("R2_ACCESS_KEY")
-	r2SecretKey := os.Getenv("R2_SECRET_KEY")
-	accountID := os.Getenv("CLOUDFLARE_ACCOUNT_ID")
+func requiredEnv(key string) (string, error) {
+	value := os.Getenv(key)
+	if value == "" {
+		return "", fmt.Errorf("%s is not configured", key)
+	}
+	return value, nil
+}
 
-	if bucket == "" || r2AccessKey == "" || r2SecretKey == "" || accountID == "" {
-		return nil, status.Error(codes.Internal, "R2 credentials not configured")
+// UploadImage: Cloudflare R2 にアップロードする署名付き URL を返す
+func (s *ImageServer) UploadImage(ctx context.Context, req *pd.UploadImageRequest) (*pd.UploadImageResponse, error) {
+	bucket, err := requiredEnv("R2_BUCKET_NAME")
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+	accessKey, err := requiredEnv("R2_ACCESS_KEY")
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+	secretKey, err := requiredEnv("R2_SECRET_KEY")
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+	accountID, err := requiredEnv("CLOUDFLARE_ACCOUNT_ID")
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	key := fmt.Sprintf("uploads/%d_%s", time.Now().Unix(), req.Filename)
 	endpoint := fmt.Sprintf("https://%s.r2.cloudflarestorage.com", accountID)
 
-	// AWS SDK 設定 (R2 は S3 互換)
+	key := fmt.Sprintf("uploads/%d_%s", time.Now().Unix(), req.Filename)
+
+	// AWS SDK 設定 (Cloudflare R2 は S3 互換)
 	cfg, err := config.LoadDefaultConfig(ctx,
 		config.WithRegion("auto"),
-		config.WithCredentialsProvider(credentials.NewStaticCredentialsProvider(r2AccessKey, r2SecretKey, "")),
+		config.WithCredentialsProvider(credentials.NewStaticCredentialsProvider(accessKey, secretKey, "")),
 		config.WithEndpointResolver(aws.EndpointResolverFunc(
 			func(service, region string) (aws.Endpoint, error) {
 				return aws.Endpoint{
@@ -69,6 +86,6 @@ func (s *ImageServer) UploadImage(ctx context.Context, req *pd.UploadImageReques
 	}
 
 	return &pd.UploadImageResponse{
-		ImageUrl: presigned.URL, // ← フロントはこの URL に直接 PUT する
+		ImageUrl: presigned.URL,
 	}, nil
 }
