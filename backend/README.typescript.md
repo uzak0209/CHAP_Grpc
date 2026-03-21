@@ -9,6 +9,7 @@
 - `src/config/env.ts`: `Zod` による環境変数検証
 - `src/domains/auth/*`: `auth` ドメインの最初の移植
 - `src/domains/comment/*`: `comment` の `create/get/edit/delete` 移植
+- `src/domains/event|post|thread|spot|user/*.repository.ts`: Go `infra/repository` 相当の先行移植
 - `src/middleware/auth.ts`: Bearer JWT 認証
 - `src/lib/*`: Postgres 接続と JWT 発行
 
@@ -21,6 +22,14 @@
 - `PUT /api/v1/comments/edit`
 - `DELETE /api/v1/comments/delete/:commentId`
 - `GET /health`
+
+## TypeScript 置換済みの範囲
+
+- 起動基盤: `src/index.ts`, `src/app.ts`
+- 設定/共通: `src/config/env.ts`, `src/lib/db.ts`, `src/lib/jwt.ts`, `src/middleware/auth.ts`
+- API まで移行済み: `auth`, `comment`
+- infra 相当まで移行済み: `auth`, `comment`, `event`, `post`, `thread`, `spot`, `user`
+- まだ Go が主実装: gRPC サーバー本体、handler 群、protobuf/gateway 連携
 
 レスポンス形式は Go 実装の `AuthResponse` に寄せています。
 
