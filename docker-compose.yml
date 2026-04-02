@@ -1,22 +1,21 @@
 services:
-  grpc-server:
+  backend-server:
     build:
       context: ./backend
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.typescript
     ports:
-      - "50051:50051"
       - "8081:8081"
     env_file:
       - ./backend/.env
     volumes:
-      - ./backend:/app:delegated  # ホストのbackendディレクトリをコンテナの/appにマウント
-      - /app/tmp                  # tmpディレクトリは除外
-      - go_mod_cache:/go/pkg/mod  # go modulesキャッシュ
+      - ./backend:/app:delegated
+      - /app/node_modules
     networks:
       - grpc-network
     restart: "no"
     environment:
-      - GOOS=linux
+      - PORT=8081
+      - DB_DSN=postgresql://postgres@postgres:5432/chapdb?sslmode=disable
   swagger-ui:
     build:
       context: ./docs
@@ -58,5 +57,4 @@ networks:
     driver: bridge
 
 volumes:
-  go_mod_cache:
   pgdata:

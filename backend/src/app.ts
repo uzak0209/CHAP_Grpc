@@ -7,6 +7,7 @@ import { posts } from "./domains/post/post.route.js";
 import { spots } from "./domains/spot/spot.route.js";
 import { threads } from "./domains/thread/thread.route.js";
 import { users } from "./domains/user/user.route.js";
+import { images } from "./domains/image/image.route.js";
 import { authMiddleware } from "./middleware/auth.js";
 import type { AppBindings } from "./types/hono.js";
 
@@ -27,3 +28,4 @@ app.route("/api/v1/posts", posts);
 app.route("/api/v1/spots", spots);
 app.route("/api/v1/threads", threads);
 app.route("/api/v1/users", users);
+app.route("/api/v1/images", images);

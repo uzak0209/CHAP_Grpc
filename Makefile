@@ -13,16 +13,16 @@ help:
 
 # Development with hot reload
 dev:
-	@echo "Starting development environment with hot reload..."
+	@echo "Starting TypeScript development environment with hot reload..."
 	docker compose -f docker-compose.dev.yml up --build
 
 dev-down:
 	@echo "Stopping development environment..."
-	docker compose -f docker-compose.yml down
+	docker compose -f docker-compose.dev.yml down
 
 dev-logs:
 	@echo "Showing development logs..."
-	docker compose -f docker-compose.yml logs -f grpc-server
+	docker compose -f docker-compose.dev.yml logs -f backend-server
 
 # Production
 prod:

@@ -18,12 +18,13 @@ make dev-down
 
 ### 開発時の機能
 
-- **ホットリロード**: Goファイルを変更すると自動で再ビルド・再起動
+- **ホットリロード**: TypeScript バックエンドを変更すると自動で再起動
 - **プロトバッファー自動生成**: `make generate`でprotoファイルから自動生成
 
 ### 使用技術
 
 - Go 
+- TypeScript / Hono
 - gRPC
 - Protocol Buffers
 - Docker & Docker Compose
@@ -48,3 +49,6 @@ make clean            # コンテナ・ボリューム削除
 make generate         # プロトバッファー生成
 ```
 <img src="./chap-app.drawio.png" alt="アーキテクチャ" width="600"/>
+Frontend local development expects the API at `http://localhost:8083` by default.
+If you need a different backend origin, set `NEXT_PUBLIC_API_ENDPOINT` for the frontend app.
+Docker Compose now starts the TypeScript backend on `http://localhost:8081`.

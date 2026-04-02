@@ -115,4 +115,70 @@ export class UserRepository {
       followings: followingsResult.rows.map((row) => String(row.following_id)),
     };
   }
+
+  async createFollowRelation(followerId: string, targetUserId: string): Promise<void> {
+    await this.database.query(
+      `insert into user_following_db_models (id, user_id, follower_id, following_id)
+       select $1, $2, $2, $3
+       where not exists (
+         select 1
+         from user_following_db_models
+         where follower_id = $2 and following_id = $3
+       )`,
+      [crypto.randomUUID(), followerId, targetUserId],
+    );
+
+    await this.database.query(
+      `insert into user_follower_db_models (id, user_id, following_id, follower_id)
+       select $1, $2, $2, $3
+       where not exists (
+         select 1
+         from user_follower_db_models
+         where following_id = $2 and follower_id = $3
+       )`,
+      [crypto.randomUUID(), targetUserId, followerId],
+    );
+  }
+
+  async deleteFollowRelation(followerId: string, targetUserId: string): Promise<void> {
+    await Promise.all([
+      this.database.query(
+        `delete from user_following_db_models
+         where follower_id = $1 and following_id = $2`,
+        [followerId, targetUserId],
+      ),
+      this.database.query(
+        `delete from user_follower_db_models
+         where following_id = $1 and follower_id = $2`,
+        [targetUserId, followerId],
+      ),
+    ]);
+  }
+
+  async updateFollowCounts(followerId: string, targetUserId: string): Promise<void> {
+    await Promise.all([
+      this.database.query(
+        `update user_db_models
+         set following_count = (
+           select count(*)
+           from user_following_db_models
+           where follower_id = $1
+         ),
+             updated_at = now()
+         where id = $1 and deleted_at is null`,
+        [followerId],
+      ),
+      this.database.query(
+        `update user_db_models
+         set follower_count = (
+           select count(*)
+           from user_follower_db_models
+           where following_id = $1
+         ),
+             updated_at = now()
+         where id = $1 and deleted_at is null`,
+        [targetUserId],
+      ),
+    ]);
+  }
 }

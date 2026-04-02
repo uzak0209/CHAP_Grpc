@@ -4,6 +4,10 @@ export const getUserByIdParamsSchema = z.object({
   userId: z.string().min(1),
 });
 
+export const followUserParamsSchema = z.object({
+  targetUserId: z.string().min(1),
+});
+
 export const editUserSchema = z.object({
   name: z.string().min(1),
   description: z.string().optional().default(""),
@@ -11,4 +15,5 @@ export const editUserSchema = z.object({
 });
 
 export type GetUserByIdParams = z.infer<typeof getUserByIdParamsSchema>;
+export type FollowUserParams = z.infer<typeof followUserParamsSchema>;
 export type EditUserInput = z.infer<typeof editUserSchema>;

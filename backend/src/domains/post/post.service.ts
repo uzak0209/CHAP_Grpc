@@ -1,8 +1,23 @@
 import { db } from "../../lib/db.js";
 import { UserLookupRepository } from "../shared/user-lookup.repository.js";
-import type { CreatePostInput, GetPostsQuery } from "./post.schema.js";
+import type {
+  CreatePostInput,
+  DeletePostParams,
+  EditPostInput,
+  GetPostsByUserIdParams,
+  GetPostsInput,
+} from "./post.schema.js";
 import type { PostRecord } from "./post.repository.js";
 import { PostRepository } from "./post.repository.js";
+
+export class PostError extends Error {
+  constructor(
+    message: string,
+    readonly status: 403 | 404,
+  ) {
+    super(message);
+  }
+}
 
 const toPostSummary = (post: PostRecord) => ({
   id: post.id,
@@ -49,10 +64,63 @@ export class PostService {
     };
   }
 
-  async getPosts(query: GetPostsQuery) {
-    const posts = await this.postRepository.findMany(query.lat, query.lng);
+  async getPosts(input: GetPostsInput) {
+    const posts = await this.postRepository.findMany(input.lat, input.lng);
     return {
       posts: posts.map((post) => toPostSummary(post)),
+    };
+  }
+
+  async getPostsByUserId(params: GetPostsByUserIdParams) {
+    const posts = await this.postRepository.findManyByUserId(params.userId);
+    return {
+      posts: posts.map((post) => toPostSummary(post)),
+    };
+  }
+
+  async editPost(userId: string, input: EditPostInput) {
+    const post = await this.postRepository.findById(input.post_id);
+    if (!post) {
+      throw new PostError("post not found", 404);
+    }
+    if (post.userId !== userId) {
+      throw new PostError("forbidden", 403);
+    }
+
+    await this.postRepository.update({
+      id: post.id,
+      userName: post.userName,
+      userImage: post.userImage,
+      content: input.content,
+      image: input.image,
+      likeCount: post.likeCount,
+      lat: post.lat,
+      lng: post.lng,
+      userId: post.userId,
+      contentType: post.contentType,
+      valid: post.valid,
+    });
+
+    return {
+      success: true,
+      message: "post updated successfully",
+    };
+  }
+
+  async deletePost(userId: string, params: DeletePostParams) {
+    const post = await this.postRepository.findById(params.postId);
+    if (!post) {
+      throw new PostError("post not found", 404);
+    }
+    if (post.userId !== userId) {
+      throw new PostError("forbidden", 403);
+    }
+
+    await this.postRepository.softDelete(params.postId);
+
+    return {
+      success: true,
+      message: "post deleted successfully",
     };
   }
 }

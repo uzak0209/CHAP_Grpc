@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const getThreadsQuerySchema = z.object({
+export const getThreadsSchema = z.object({
   lat: z.coerce.number(),
   lng: z.coerce.number(),
 });
@@ -17,6 +17,18 @@ export const createThreadSchema = z.object({
   content_type: z.string().optional().default(""),
 });
 
-export type GetThreadsQuery = z.infer<typeof getThreadsQuerySchema>;
+export const editThreadSchema = z.object({
+  thread_id: z.string().min(1),
+  content: z.string().min(1),
+  image: z.string().optional().default(""),
+});
+
+export const deleteThreadParamsSchema = z.object({
+  threadId: z.string().min(1),
+});
+
+export type GetThreadsInput = z.infer<typeof getThreadsSchema>;
 export type GetThreadByIdParams = z.infer<typeof getThreadByIdParamsSchema>;
 export type CreateThreadInput = z.infer<typeof createThreadSchema>;
+export type EditThreadInput = z.infer<typeof editThreadSchema>;
+export type DeleteThreadParams = z.infer<typeof deleteThreadParamsSchema>;

@@ -207,4 +207,29 @@ export class PostRepository {
 
     return result.rows.map((row) => mapPostRecord(row));
   }
+
+  async findManyByUserId(userId: string): Promise<PostRecord[]> {
+    const result = await this.database.query(
+      `select
+        id,
+        user_name,
+        user_image,
+        content,
+        image,
+        like_count,
+        lat,
+        lng,
+        user_id,
+        created_at,
+        updated_at,
+        content_type,
+        valid
+       from post_db_models
+       where user_id = $1 and deleted_at is null
+       order by created_at desc`,
+      [userId],
+    );
+
+    return result.rows.map((row) => mapPostRecord(row));
+  }
 }

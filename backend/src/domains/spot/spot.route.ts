@@ -9,8 +9,16 @@ const spotService = new SpotService();
 
 spots.get("/", async (c) => {
   try {
-    const result = await spotService.getSpots(c.get("userId"));
-    return c.json(result, 200);
+    return c.json(await spotService.getSpots(c.get("userId")), 200);
+  } catch (error) {
+    console.error(error);
+    return c.json({ success: false, message: "failed to get spots" }, 500);
+  }
+});
+
+spots.post("/", async (c) => {
+  try {
+    return c.json(await spotService.getSpots(c.get("userId")), 200);
   } catch (error) {
     console.error(error);
     return c.json({ success: false, message: "failed to get spots" }, 500);
@@ -20,20 +28,12 @@ spots.get("/", async (c) => {
 spots.post("/create", async (c) => {
   const body = await c.req.json();
   const parsed = createSpotSchema.safeParse(body);
-
   if (!parsed.success) {
-    return c.json(
-      {
-        success: false,
-        message: parsed.error.issues[0]?.message ?? "invalid request",
-      },
-      400,
-    );
+    return c.json({ success: false, message: parsed.error.issues[0]?.message ?? "invalid request" }, 400);
   }
 
   try {
-    const result = await spotService.createSpot(c.get("userId"), parsed.data);
-    return c.json(result, 200);
+    return c.json(await spotService.createSpot(c.get("userId"), parsed.data), 200);
   } catch (error) {
     console.error(error);
     return c.json({ success: false, message: "failed to create spot" }, 500);
@@ -43,25 +43,16 @@ spots.post("/create", async (c) => {
 spots.put("/edit", async (c) => {
   const body = await c.req.json();
   const parsed = editSpotSchema.safeParse(body);
-
   if (!parsed.success) {
-    return c.json(
-      {
-        success: false,
-        message: parsed.error.issues[0]?.message ?? "invalid request",
-      },
-      400,
-    );
+    return c.json({ success: false, message: parsed.error.issues[0]?.message ?? "invalid request" }, 400);
   }
 
   try {
-    const result = await spotService.editSpot(c.get("userId"), parsed.data);
-    return c.json(result, 200);
+    return c.json(await spotService.editSpot(c.get("userId"), parsed.data), 200);
   } catch (error) {
     if (error instanceof SpotError) {
       return c.json({ success: false, message: error.message }, error.status);
     }
-
     console.error(error);
     return c.json({ success: false, message: "failed to update spot" }, 500);
   }
@@ -69,25 +60,16 @@ spots.put("/edit", async (c) => {
 
 spots.delete("/delete/:spotId", async (c) => {
   const parsed = deleteSpotParamsSchema.safeParse(c.req.param());
-
   if (!parsed.success) {
-    return c.json(
-      {
-        success: false,
-        message: parsed.error.issues[0]?.message ?? "invalid request",
-      },
-      400,
-    );
+    return c.json({ success: false, message: parsed.error.issues[0]?.message ?? "invalid request" }, 400);
   }
 
   try {
-    const result = await spotService.deleteSpot(c.get("userId"), parsed.data);
-    return c.json(result, 200);
+    return c.json(await spotService.deleteSpot(c.get("userId"), parsed.data), 200);
   } catch (error) {
     if (error instanceof SpotError) {
       return c.json({ success: false, message: error.message }, error.status);
     }
-
     console.error(error);
     return c.json({ success: false, message: "failed to delete spot" }, 500);
   }

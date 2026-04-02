@@ -1,13 +1,19 @@
 import { db } from "../../lib/db.js";
 import { UserLookupRepository } from "../shared/user-lookup.repository.js";
-import type { CreateEventInput, GetEventByIdParams, GetEventsQuery } from "./event.schema.js";
+import type {
+  CreateEventInput,
+  DeleteEventParams,
+  EditEventInput,
+  GetEventByIdParams,
+  GetEventsInput,
+} from "./event.schema.js";
 import type { EventRecord } from "./event.repository.js";
 import { EventRepository } from "./event.repository.js";
 
 export class EventError extends Error {
   constructor(
     message: string,
-    readonly status: 404,
+    readonly status: 403 | 404,
   ) {
     super(message);
   }
@@ -51,7 +57,7 @@ export class EventService {
       lat: input.lat,
       lng: input.lng,
       contentType: input.content_type,
-      eventDate: new Date(),
+      eventDate: input.event_date ? new Date(input.event_date) : new Date(),
       title: input.content,
     });
 
@@ -61,8 +67,8 @@ export class EventService {
     };
   }
 
-  async getEvents(query: GetEventsQuery) {
-    const events = await this.eventRepository.findMany(query.lat, query.lng);
+  async getEvents(input: GetEventsInput) {
+    const events = await this.eventRepository.findMany(input.lat, input.lng);
     return {
       events: events.map((event) => toEventSummary(event)),
     };
@@ -79,6 +85,55 @@ export class EventService {
         ...toEventSummary(event),
         title: event.title,
       },
+      comment: [],
+    };
+  }
+
+  async editEvent(userId: string, input: EditEventInput) {
+    const event = await this.eventRepository.findById(input.event_id);
+    if (!event) {
+      throw new EventError("event not found", 404);
+    }
+    if (event.userId !== userId) {
+      throw new EventError("forbidden", 403);
+    }
+
+    await this.eventRepository.update({
+      id: event.id,
+      userName: event.userName,
+      userId: event.userId,
+      userImage: event.userImage,
+      content: input.content,
+      image: input.image,
+      likeCount: event.likeCount,
+      lat: event.lat,
+      lng: event.lng,
+      eventDate: input.event_date ? new Date(input.event_date) : event.eventDate,
+      contentType: event.contentType,
+      title: event.title,
+      valid: event.valid,
+    });
+
+    return {
+      success: true,
+      message: "event updated successfully",
+    };
+  }
+
+  async deleteEvent(userId: string, params: DeleteEventParams) {
+    const event = await this.eventRepository.findById(params.eventId);
+    if (!event) {
+      throw new EventError("event not found", 404);
+    }
+    if (event.userId !== userId) {
+      throw new EventError("forbidden", 403);
+    }
+
+    await this.eventRepository.softDelete(params.eventId);
+
+    return {
+      success: true,
+      message: "event deleted successfully",
     };
   }
 }
