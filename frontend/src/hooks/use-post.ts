@@ -5,13 +5,15 @@ import type { V1GetPostsResponse } from "@/api/post.schemas.ts/v1GetPostsRespons
 import type { V1CreatePostRequest } from "@/api/post.schemas.ts/v1CreatePostRequest";
 
 export function useGetPosts(params:V1GetPostsRequest)  {
+  const enabled = params.lat !== undefined && params.lng !== undefined;
+
   return useQuery<V1GetPostsResponse | undefined>({
     queryKey: ["posts", params ?? null],
     queryFn: async () => {
       const response = await postServiceGetPosts(params);
       return response.data;
     },
-    enabled: !!params,
+    enabled,
     staleTime: 1000 * 30, // キャッシュの有効期限を30秒に設定
     refetchOnWindowFocus: false, // ウィンドウフォーカス時の再フェッチを無効化
   });

@@ -14,9 +14,15 @@ export const createEventSchema = z.object({
   image: z.string().optional().default(""),
   lat: z.coerce.number(),
   lng: z.coerce.number(),
+  eventDate: z.string().optional(),
   event_date: z.string().optional().default(""),
+  contentType: z.string().optional(),
   content_type: z.string().optional().default(""),
-});
+}).transform(({ eventDate, event_date, contentType, content_type, ...rest }) => ({
+  ...rest,
+  event_date: event_date || eventDate || "",
+  content_type: content_type || contentType || "",
+}));
 
 export const editEventSchema = z.object({
   event_id: z.string().min(1),

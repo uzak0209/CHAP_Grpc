@@ -21,18 +21,18 @@ export class EventError extends Error {
 
 const toEventSummary = (event: EventRecord) => ({
   id: event.id,
-  user_name: event.userName,
-  user_id: event.userId,
-  user_image: event.userImage,
+  userName: event.userName,
+  userId: event.userId,
+  userImage: event.userImage,
   content: event.content,
   image: event.image,
-  like_count: event.likeCount,
-  created_at: event.createdAt.toISOString(),
-  updated_at: event.updatedAt.toISOString(),
+  likeCount: event.likeCount,
+  createdAt: event.createdAt.toISOString(),
+  updatedAt: event.updatedAt.toISOString(),
   lat: event.lat,
   lng: event.lng,
-  event_date: event.eventDate.toISOString(),
-  content_type: event.contentType,
+  eventDate: event.eventDate.toISOString(),
+  contentType: event.contentType,
 });
 
 export class EventService {

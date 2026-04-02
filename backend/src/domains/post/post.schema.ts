@@ -14,8 +14,12 @@ export const createPostSchema = z.object({
   image: z.string().optional().default(""),
   lat: z.coerce.number(),
   lng: z.coerce.number(),
+  contentType: z.string().optional(),
   content_type: z.string().optional().default(""),
-});
+}).transform(({ contentType, content_type, ...rest }) => ({
+  ...rest,
+  content_type: content_type || contentType || "",
+}));
 
 export const editPostSchema = z.object({
   post_id: z.string().min(1),

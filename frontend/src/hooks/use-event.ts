@@ -5,13 +5,15 @@ import type { V1GetEventsResponse } from "@/api/event.schemas.ts/v1GetEventsResp
 import type { V1CreateEventRequest } from "@/api/event.schemas.ts";
 
 export function useGetEvents(params: V1GetEventsRequest) {
+  const enabled = params.lat !== undefined && params.lng !== undefined;
+
   return useQuery<V1GetEventsResponse | undefined>({
     queryKey: ["events", params ?? null],
     queryFn: async () => {
       const response = await eventServiceGetEvents(params);
       return response.data;
     },
-    enabled: !!params,
+    enabled,
     staleTime: 1000 * 30, // キャッシュの有効期限を30秒に設定
     refetchOnWindowFocus: false, // ウィンドウフォーカス時の再フェッチを無効化
   });

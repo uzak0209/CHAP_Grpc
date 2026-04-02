@@ -22,16 +22,16 @@ export class ThreadError extends Error {
 
 const toThreadSummary = (thread: ThreadRecord) => ({
   id: thread.id,
-  user_id: thread.userId,
-  user_image: thread.userImage,
-  like_count: thread.likeCount,
-  user_name: thread.userName,
+  userId: thread.userId,
+  userImage: thread.userImage,
+  likeCount: thread.likeCount,
+  userName: thread.userName,
   content: thread.content,
-  created_at: thread.createdAt.toISOString(),
-  updated_at: thread.updatedAt.toISOString(),
+  createdAt: thread.createdAt.toISOString(),
+  updatedAt: thread.updatedAt.toISOString(),
   lat: thread.lat,
   lng: thread.lng,
-  content_type: thread.contentType,
+  contentType: thread.contentType,
   image: thread.image,
 });
 
@@ -84,22 +84,22 @@ export class ThreadService {
     return {
       thread: {
         id: thread.id,
-        user_id: thread.userId,
-        user_image: thread.userImage,
-        like_count: thread.likeCount,
-        user_name: thread.userName,
+        userId: thread.userId,
+        userImage: thread.userImage,
+        likeCount: thread.likeCount,
+        userName: thread.userName,
         content: thread.content,
-        created_at: thread.createdAt.toISOString(),
-        updated_at: thread.updatedAt.toISOString(),
+        createdAt: thread.createdAt.toISOString(),
+        updatedAt: thread.updatedAt.toISOString(),
         image: thread.image,
       },
       comment: comments.map((comment) => ({
         id: comment.id,
-        user_id: comment.userId,
-        user_name: comment.userName,
+        userId: comment.userId,
+        userName: comment.userName,
         content: comment.content,
-        created_at: comment.createdAt.toISOString(),
-        updated_at: comment.updatedAt.toISOString(),
+        createdAt: comment.createdAt.toISOString(),
+        updatedAt: comment.updatedAt.toISOString(),
       })),
     };
   }

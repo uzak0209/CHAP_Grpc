@@ -59,7 +59,7 @@ export class ImageService {
     });
 
     return {
-      image_url: imageUrl,
+      imageUrl,
     };
   }
 }

@@ -9,8 +9,8 @@ const toSpotResponse = (spot: SpotRecord) => ({
   description: spot.description,
   lat: spot.lat,
   lng: spot.lng,
-  created_at: spot.createdAt.toISOString(),
-  updated_at: spot.updatedAt.toISOString(),
+  createdAt: spot.createdAt.toISOString(),
+  updatedAt: spot.updatedAt.toISOString(),
 });
 
 export class SpotError extends Error {

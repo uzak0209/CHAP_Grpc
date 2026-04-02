@@ -21,17 +21,17 @@ export class PostError extends Error {
 
 const toPostSummary = (post: PostRecord) => ({
   id: post.id,
-  user_name: post.userName,
-  user_id: post.userId,
-  user_image: post.userImage,
+  userName: post.userName,
+  userId: post.userId,
+  userImage: post.userImage,
   content: post.content,
   image: post.image,
-  like_count: post.likeCount,
-  created_at: post.createdAt.toISOString(),
-  updated_at: post.updatedAt.toISOString(),
+  likeCount: post.likeCount,
+  createdAt: post.createdAt.toISOString(),
+  updatedAt: post.updatedAt.toISOString(),
   lat: post.lat,
   lng: post.lng,
-  content_type: post.contentType,
+  contentType: post.contentType,
 });
 
 export class PostService {

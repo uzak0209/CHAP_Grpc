@@ -5,13 +5,15 @@ import { threadServiceCreateThread, threadServiceGetThreads } from "@/api/thread
 import type { V1CreateThreadRequest } from "@/api/thread.schemas.ts";
 
 export function useGetThreads(params: V1GetThreadsRequest) {
+  const enabled = params.lat !== undefined && params.lng !== undefined;
+
   return useQuery<V1GetThreadsResponse | undefined>({
     queryKey: ["threads", params ?? null], // params を queryKey に含める
     queryFn: async () => {
       const response = await threadServiceGetThreads(params); // params をリクエストに渡す
       return response.data;
     },
-    enabled: !!params,
+    enabled,
     staleTime: 1000 * 30, // キャッシュの有効期限を5分に設定
     refetchOnWindowFocus: false, // ウィンドウフォーカス時の再フェッチを無効化
   });
