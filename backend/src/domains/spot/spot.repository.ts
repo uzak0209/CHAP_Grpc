@@ -1,5 +1,3 @@
-import { randomUUID } from "node:crypto";
-
 import type { Pool, PoolClient } from "pg";
 
 type DbClient = Pool | PoolClient;
@@ -42,7 +40,7 @@ export class SpotRepository {
     createdAt?: Date;
     updatedAt?: Date;
   }): Promise<string> {
-    const id = input.id ?? randomUUID();
+    const id = input.id ?? crypto.randomUUID();
     const now = input.createdAt ?? new Date();
     const updatedAt = input.updatedAt ?? now;
 

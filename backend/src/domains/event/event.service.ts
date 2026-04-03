@@ -1,4 +1,4 @@
-import { db } from "../../lib/db.js";
+import { getDb } from "../../lib/db.js";
 import { UserLookupRepository } from "../shared/user-lookup.repository.js";
 import type {
   CreateEventInput,
@@ -36,11 +36,12 @@ const toEventSummary = (event: EventRecord) => ({
 });
 
 export class EventService {
-  private readonly eventRepository = new EventRepository(db);
-  private readonly userLookupRepository = new UserLookupRepository(db);
-
   async createEvent(userId: string, input: CreateEventInput) {
-    const user = await this.userLookupRepository.findById(userId);
+    const database = getDb();
+    const userLookupRepository = new UserLookupRepository(database);
+    const eventRepository = new EventRepository(database);
+
+    const user = await userLookupRepository.findById(userId);
     if (!user) {
       return {
         success: false,
@@ -48,7 +49,7 @@ export class EventService {
       };
     }
 
-    await this.eventRepository.create({
+    await eventRepository.create({
       userName: user.name,
       userId,
       userImage: user.image,
@@ -68,14 +69,15 @@ export class EventService {
   }
 
   async getEvents(input: GetEventsInput) {
-    const events = await this.eventRepository.findMany(input.lat, input.lng);
+    const events = await new EventRepository(getDb()).findMany(input.lat, input.lng);
     return {
       events: events.map((event) => toEventSummary(event)),
     };
   }
 
   async getEventById(params: GetEventByIdParams) {
-    const event = await this.eventRepository.findById(params.eventId);
+    const eventRepository = new EventRepository(getDb());
+    const event = await eventRepository.findById(params.eventId);
     if (!event) {
       throw new EventError("event not found", 404);
     }
@@ -90,7 +92,8 @@ export class EventService {
   }
 
   async editEvent(userId: string, input: EditEventInput) {
-    const event = await this.eventRepository.findById(input.event_id);
+    const eventRepository = new EventRepository(getDb());
+    const event = await eventRepository.findById(input.event_id);
     if (!event) {
       throw new EventError("event not found", 404);
     }
@@ -98,7 +101,7 @@ export class EventService {
       throw new EventError("forbidden", 403);
     }
 
-    await this.eventRepository.update({
+    await eventRepository.update({
       id: event.id,
       userName: event.userName,
       userId: event.userId,
@@ -121,7 +124,8 @@ export class EventService {
   }
 
   async deleteEvent(userId: string, params: DeleteEventParams) {
-    const event = await this.eventRepository.findById(params.eventId);
+    const eventRepository = new EventRepository(getDb());
+    const event = await eventRepository.findById(params.eventId);
     if (!event) {
       throw new EventError("event not found", 404);
     }
@@ -129,7 +133,7 @@ export class EventService {
       throw new EventError("forbidden", 403);
     }
 
-    await this.eventRepository.softDelete(params.eventId);
+    await eventRepository.softDelete(params.eventId);
 
     return {
       success: true,

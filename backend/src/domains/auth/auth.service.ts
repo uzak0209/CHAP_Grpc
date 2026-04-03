@@ -1,6 +1,4 @@
-import { randomUUID } from "node:crypto";
-
-import { db } from "../../lib/db.js";
+import { getDb } from "../../lib/db.js";
 import { signUserToken } from "../../lib/jwt.js";
 import type { SignInInput, SignUpInput } from "./auth.schema.js";
 import { AuthRepository } from "./auth.repository.js";
@@ -16,10 +14,9 @@ export class AuthError extends Error {
 }
 
 export class AuthService {
-  private readonly authRepository = new AuthRepository(db);
-
   async signIn(input: SignInInput) {
-    const auth = await this.authRepository.findByEmail(input.email);
+    const authRepository = new AuthRepository(getDb());
+    const auth = await authRepository.findByEmail(input.email);
     if (!auth || !auth.valid || auth.password !== input.password) {
       throw new AuthError("invalid credentials", 401);
     }
@@ -27,22 +24,24 @@ export class AuthService {
     return {
       success: true,
       message: "signed in successfully",
-      token: signUserToken(auth.userId),
+      token: await signUserToken(auth.userId),
     };
   }
 
   async signUp(input: SignUpInput) {
-    const existing = await this.authRepository.findByEmail(input.email);
+    const database = getDb();
+    const authRepository = new AuthRepository(database);
+    const existing = await authRepository.findByEmail(input.email);
     if (existing) {
       throw new AuthError("email already exists", 409);
     }
 
-    const client = await db.connect();
+    const client = await database.connect();
 
     try {
       await client.query("begin");
 
-      const userId = randomUUID();
+      const userId = crypto.randomUUID();
       const now = new Date();
 
       const userRepository = new UserRepository(client);
@@ -69,7 +68,7 @@ export class AuthService {
       return {
         success: true,
         message: "signed up successfully",
-        token: signUserToken(userId),
+        token: await signUserToken(userId),
       };
     } catch (error) {
       await client.query("rollback");

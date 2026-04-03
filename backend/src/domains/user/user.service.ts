@@ -1,4 +1,4 @@
-import { db } from "../../lib/db.js";
+import { getDb } from "../../lib/db.js";
 import type { FollowUserParams, GetUserByIdParams } from "./user.schema.js";
 import { UserRepository } from "./user.repository.js";
 
@@ -25,10 +25,8 @@ const toUserResponse = (user: NonNullable<Awaited<ReturnType<UserRepository["fin
 });
 
 export class UserService {
-  private readonly userRepository = new UserRepository(db);
-
   async getUser(params: GetUserByIdParams) {
-    const user = await this.userRepository.findWithRelations(params.userId);
+    const user = await new UserRepository(getDb()).findWithRelations(params.userId);
     if (!user) {
       throw new UserError("user not found", 404);
     }
@@ -39,7 +37,7 @@ export class UserService {
   }
 
   async getMe(userId: string) {
-    const user = await this.userRepository.findWithRelations(userId);
+    const user = await new UserRepository(getDb()).findWithRelations(userId);
     if (!user) {
       throw new UserError("user not found", 404);
     }
@@ -50,7 +48,7 @@ export class UserService {
   }
 
   async editUser(userId: string, input: { name: string; description: string; image: string }) {
-    await this.userRepository.updateProfile({
+    await new UserRepository(getDb()).updateProfile({
       id: userId,
       name: input.name,
       description: input.description,
@@ -63,7 +61,7 @@ export class UserService {
   }
 
   async deleteUser(userId: string) {
-    await this.userRepository.softDelete(userId);
+    await new UserRepository(getDb()).softDelete(userId);
 
     return {
       success: true,
@@ -71,21 +69,23 @@ export class UserService {
   }
 
   async followUser(userId: string, params: FollowUserParams) {
+    const userRepository = new UserRepository(getDb());
+
     if (userId === params.targetUserId) {
       throw new UserError("cannot follow yourself", 400);
     }
 
     const [user, targetUser] = await Promise.all([
-      this.userRepository.findById(userId),
-      this.userRepository.findById(params.targetUserId),
+      userRepository.findById(userId),
+      userRepository.findById(params.targetUserId),
     ]);
 
     if (!user || !targetUser) {
       throw new UserError("user not found", 404);
     }
 
-    await this.userRepository.createFollowRelation(userId, params.targetUserId);
-    await this.userRepository.updateFollowCounts(userId, params.targetUserId);
+    await userRepository.createFollowRelation(userId, params.targetUserId);
+    await userRepository.updateFollowCounts(userId, params.targetUserId);
 
     return {
       success: true,
@@ -93,21 +93,23 @@ export class UserService {
   }
 
   async unfollowUser(userId: string, params: FollowUserParams) {
+    const userRepository = new UserRepository(getDb());
+
     if (userId === params.targetUserId) {
       throw new UserError("cannot unfollow yourself", 400);
     }
 
     const [user, targetUser] = await Promise.all([
-      this.userRepository.findById(userId),
-      this.userRepository.findById(params.targetUserId),
+      userRepository.findById(userId),
+      userRepository.findById(params.targetUserId),
     ]);
 
     if (!user || !targetUser) {
       throw new UserError("user not found", 404);
     }
 
-    await this.userRepository.deleteFollowRelation(userId, params.targetUserId);
-    await this.userRepository.updateFollowCounts(userId, params.targetUserId);
+    await userRepository.deleteFollowRelation(userId, params.targetUserId);
+    await userRepository.updateFollowCounts(userId, params.targetUserId);
 
     return {
       success: true,

@@ -1,4 +1,4 @@
-import { db } from "../../lib/db.js";
+import { getDb } from "../../lib/db.js";
 import type { CreateSpotInput, DeleteSpotParams, EditSpotInput } from "./spot.schema.js";
 import type { SpotRecord } from "./spot.repository.js";
 import { SpotRepository } from "./spot.repository.js";
@@ -23,10 +23,8 @@ export class SpotError extends Error {
 }
 
 export class SpotService {
-  private readonly spotRepository = new SpotRepository(db);
-
   async createSpot(userId: string, input: CreateSpotInput) {
-    await this.spotRepository.create({
+    await new SpotRepository(getDb()).create({
       userId,
       title: input.title,
       description: input.description,
@@ -41,19 +39,20 @@ export class SpotService {
   }
 
   async getSpots(userId: string) {
-    const spots = await this.spotRepository.findManyByUserId(userId);
+    const spots = await new SpotRepository(getDb()).findManyByUserId(userId);
     return {
       spots: spots.map((spot) => toSpotResponse(spot)),
     };
   }
 
   async editSpot(userId: string, input: EditSpotInput) {
-    const current = (await this.spotRepository.findManyByUserId(userId)).find((spot) => spot.id === input.id);
+    const spotRepository = new SpotRepository(getDb());
+    const current = (await spotRepository.findManyByUserId(userId)).find((spot) => spot.id === input.id);
     if (!current) {
       throw new SpotError("spot not found", 404);
     }
 
-    await this.spotRepository.update({
+    await spotRepository.update({
       id: current.id,
       userId,
       title: input.title,
@@ -70,12 +69,13 @@ export class SpotService {
   }
 
   async deleteSpot(userId: string, params: DeleteSpotParams) {
-    const current = (await this.spotRepository.findManyByUserId(userId)).find((spot) => spot.id === params.spotId);
+    const spotRepository = new SpotRepository(getDb());
+    const current = (await spotRepository.findManyByUserId(userId)).find((spot) => spot.id === params.spotId);
     if (!current) {
       throw new SpotError("spot not found", 404);
     }
 
-    await this.spotRepository.softDelete(params.spotId);
+    await spotRepository.softDelete(params.spotId);
 
     return {
       success: true,

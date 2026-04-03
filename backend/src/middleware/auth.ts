@@ -1,7 +1,6 @@
 import { createMiddleware } from "hono/factory";
-import jwt from "jsonwebtoken";
+import { verify } from "hono/jwt";
 
-import { env } from "../config/env.js";
 import type { AppBindings } from "../types/hono.js";
 
 const publicPaths = new Set([
@@ -28,7 +27,7 @@ export const authMiddleware = createMiddleware<AppBindings>(async (c, next) => {
   const token = authorization.slice("Bearer ".length);
 
   try {
-    const payload = jwt.verify(token, env.JWT_SECRET) as JwtPayload;
+    const payload = (await verify(token, c.get("env").JWT_SECRET, "HS256")) as JwtPayload;
     if (!payload.user_id) {
       return c.json({ success: false, message: "authentication required" }, 401);
     }

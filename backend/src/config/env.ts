@@ -13,4 +13,35 @@ const envSchema = z.object({
   CLOUDFLARE_ACCOUNT_ID: z.string().optional(),
 });
 
-export const env = envSchema.parse(process.env);
+export type RuntimeEnv = z.infer<typeof envSchema>;
+
+export type RuntimeEnvSource = Partial<
+  Record<keyof RuntimeEnv, string | number | undefined>
+>;
+
+let cachedEnv: RuntimeEnv | null = null;
+
+export const setEnv = (source: RuntimeEnvSource): RuntimeEnv => {
+  cachedEnv = envSchema.parse(source);
+  return cachedEnv;
+};
+
+export const getEnv = (): RuntimeEnv => {
+  if (cachedEnv) {
+    return cachedEnv;
+  }
+
+  if (typeof process !== "undefined") {
+    return setEnv(process.env);
+  }
+
+  throw new Error("runtime environment is not configured");
+};
+
+export const initializeEnv = (source?: RuntimeEnvSource): RuntimeEnv => {
+  if (source && Object.keys(source).length > 0) {
+    return setEnv(source);
+  }
+
+  return getEnv();
+};

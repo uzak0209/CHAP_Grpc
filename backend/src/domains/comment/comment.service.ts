@@ -1,4 +1,4 @@
-import { db } from "../../lib/db.js";
+import { getDb } from "../../lib/db.js";
 import { UserLookupRepository } from "../shared/user-lookup.repository.js";
 import type {
   CreateCommentInput,
@@ -18,11 +18,12 @@ export class CommentError extends Error {
 }
 
 export class CommentService {
-  private readonly commentRepository = new CommentRepository(db);
-  private readonly userLookupRepository = new UserLookupRepository(db);
-
   async createComment(userId: string, input: CreateCommentInput) {
-    const user = await this.userLookupRepository.findById(userId);
+    const database = getDb();
+    const userLookupRepository = new UserLookupRepository(database);
+    const commentRepository = new CommentRepository(database);
+
+    const user = await userLookupRepository.findById(userId);
     if (!user) {
       return {
         success: false,
@@ -30,7 +31,7 @@ export class CommentService {
       };
     }
 
-    await this.commentRepository.create({
+    await commentRepository.create({
       threadId: input.thread_id,
       userId,
       userName: user.name,
@@ -45,7 +46,7 @@ export class CommentService {
   }
 
   async getCommentsByThreadId(params: GetCommentsByThreadIdParams) {
-    const comments = await this.commentRepository.findByThreadId(params.threadId);
+    const comments = await new CommentRepository(getDb()).findByThreadId(params.threadId);
 
     return {
       comments: comments.map((comment) => ({
@@ -69,7 +70,8 @@ export class CommentService {
   }
 
   async editComment(userId: string, input: EditCommentInput) {
-    const comment = await this.commentRepository.findById(input.comment_id);
+    const commentRepository = new CommentRepository(getDb());
+    const comment = await commentRepository.findById(input.comment_id);
     if (!comment) {
       throw new CommentError("comment not found", 404);
     }
@@ -77,7 +79,7 @@ export class CommentService {
       throw new CommentError("forbidden", 403);
     }
 
-    await this.commentRepository.update({
+    await commentRepository.update({
       id: input.comment_id,
       content: input.content,
     });
@@ -89,7 +91,8 @@ export class CommentService {
   }
 
   async deleteComment(userId: string, params: DeleteCommentParams) {
-    const comment = await this.commentRepository.findById(params.commentId);
+    const commentRepository = new CommentRepository(getDb());
+    const comment = await commentRepository.findById(params.commentId);
     if (!comment) {
       throw new CommentError("comment not found", 404);
     }
@@ -97,7 +100,7 @@ export class CommentService {
       throw new CommentError("forbidden", 403);
     }
 
-    await this.commentRepository.softDelete(params.commentId);
+    await commentRepository.softDelete(params.commentId);
 
     return {
       success: true,

@@ -1,5 +1,3 @@
-import { randomUUID } from "node:crypto";
-
 import type { Pool } from "pg";
 
 type DbClient = Pool;
@@ -61,7 +59,7 @@ export class CommentRepository {
         valid
       ) values ($1, $2, $3, $4, $5, $6, '', null, $7, $8, null, true)`,
       [
-        randomUUID(),
+        crypto.randomUUID(),
         input.threadId,
         input.userName,
         input.userId,

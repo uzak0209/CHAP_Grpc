@@ -9,10 +9,12 @@ import { threads } from "./domains/thread/thread.route.js";
 import { users } from "./domains/user/user.route.js";
 import { images } from "./domains/image/image.route.js";
 import { authMiddleware } from "./middleware/auth.js";
+import { runtimeEnvMiddleware } from "./middleware/runtime-env.js";
 import type { AppBindings } from "./types/hono.js";
 
 export const app = new Hono<AppBindings>();
 
+app.use("*", runtimeEnvMiddleware);
 app.use("*", authMiddleware);
 
 app.get("/health", (c) =>

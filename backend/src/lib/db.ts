@@ -1,7 +1,21 @@
 import { Pool } from "pg";
 
-import { env } from "../config/env.js";
+import { getEnv } from "../config/env.js";
 
-export const db = new Pool({
-  connectionString: env.DB_DSN,
-});
+const pools = new Map<string, Pool>();
+
+export const getDb = () => {
+  const { DB_DSN } = getEnv();
+  const existing = pools.get(DB_DSN);
+  if (existing) {
+    return existing;
+  }
+
+  const pool = new Pool({
+    connectionString: DB_DSN,
+  });
+
+  pools.set(DB_DSN, pool);
+
+  return pool;
+};

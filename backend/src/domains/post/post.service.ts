@@ -1,4 +1,4 @@
-import { db } from "../../lib/db.js";
+import { getDb } from "../../lib/db.js";
 import { UserLookupRepository } from "../shared/user-lookup.repository.js";
 import type {
   CreatePostInput,
@@ -35,11 +35,12 @@ const toPostSummary = (post: PostRecord) => ({
 });
 
 export class PostService {
-  private readonly postRepository = new PostRepository(db);
-  private readonly userLookupRepository = new UserLookupRepository(db);
-
   async createPost(userId: string, input: CreatePostInput) {
-    const user = await this.userLookupRepository.findById(userId);
+    const database = getDb();
+    const userLookupRepository = new UserLookupRepository(database);
+    const postRepository = new PostRepository(database);
+
+    const user = await userLookupRepository.findById(userId);
     if (!user) {
       return {
         success: false,
@@ -47,7 +48,7 @@ export class PostService {
       };
     }
 
-    await this.postRepository.create({
+    await postRepository.create({
       userName: user.name,
       userImage: user.image,
       userId,
@@ -65,21 +66,22 @@ export class PostService {
   }
 
   async getPosts(input: GetPostsInput) {
-    const posts = await this.postRepository.findMany(input.lat, input.lng);
+    const posts = await new PostRepository(getDb()).findMany(input.lat, input.lng);
     return {
       posts: posts.map((post) => toPostSummary(post)),
     };
   }
 
   async getPostsByUserId(params: GetPostsByUserIdParams) {
-    const posts = await this.postRepository.findManyByUserId(params.userId);
+    const posts = await new PostRepository(getDb()).findManyByUserId(params.userId);
     return {
       posts: posts.map((post) => toPostSummary(post)),
     };
   }
 
   async editPost(userId: string, input: EditPostInput) {
-    const post = await this.postRepository.findById(input.post_id);
+    const postRepository = new PostRepository(getDb());
+    const post = await postRepository.findById(input.post_id);
     if (!post) {
       throw new PostError("post not found", 404);
     }
@@ -87,7 +89,7 @@ export class PostService {
       throw new PostError("forbidden", 403);
     }
 
-    await this.postRepository.update({
+    await postRepository.update({
       id: post.id,
       userName: post.userName,
       userImage: post.userImage,
@@ -108,7 +110,8 @@ export class PostService {
   }
 
   async deletePost(userId: string, params: DeletePostParams) {
-    const post = await this.postRepository.findById(params.postId);
+    const postRepository = new PostRepository(getDb());
+    const post = await postRepository.findById(params.postId);
     if (!post) {
       throw new PostError("post not found", 404);
     }
@@ -116,7 +119,7 @@ export class PostService {
       throw new PostError("forbidden", 403);
     }
 
-    await this.postRepository.softDelete(params.postId);
+    await postRepository.softDelete(params.postId);
 
     return {
       success: true,
