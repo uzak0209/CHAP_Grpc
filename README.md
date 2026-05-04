@@ -1,7 +1,6 @@
 # CHAP_Grpc
 
-gRPCベースのコミュニケーションプラットフォーム
-
+位置情報共有型コミュニケーションアプリ
 ## 開発環境
 
 ### クイックスタート
@@ -17,40 +16,21 @@ make dev-logs
 make dev-down
 ```
 
-### 利用可能なエンドポイント
-
-- **gRPCサーバー**: `localhost:50051`
-- **HTTP API (Envoy)**: `http://localhost:8080`
-- **Swagger UI**: `http://localhost:3000`
-
 ### 開発時の機能
 
-- **ホットリロード**: Goファイルを変更すると自動で再ビルド・再起動
+- **ホットリロード**: TypeScript バックエンドを変更すると自動で再起動
 - **プロトバッファー自動生成**: `make generate`でprotoファイルから自動生成
 
 ### 使用技術
 
 - Go 
+- TypeScript / Hono
 - gRPC
 - Protocol Buffers
 - Docker & Docker Compose
 - PostgreSQL
+- Rust
 
-
-## プロジェクト構成
-
-```
-CHAP_Grpc/
-├── backend/           # Goサーバー
-│   ├── api/          # Protocol Buffers定義と生成コード
-│   ├── handler/      # gRPCハンドラー
-│   ├── infra/        # インフラ層（DB、リポジトリ）
-│   ├── middleware/   # ミドルウェア
-│   └── utils/        # ユーティリティ
-├── envoy/            # Envoyプロキシ設定
-├── docs/             # Swagger UI
-└── scripts/          # 開発用スクリプト
-```
 
 ## 開発コマンド
 
@@ -69,3 +49,6 @@ make clean            # コンテナ・ボリューム削除
 make generate         # プロトバッファー生成
 ```
 <img src="./chap-app.drawio.png" alt="アーキテクチャ" width="600"/>
+Frontend local development expects the API at `http://localhost:8083` by default.
+If you need a different backend origin, set `NEXT_PUBLIC_API_ENDPOINT` for the frontend app.
+Docker Compose now starts the TypeScript backend on `http://localhost:8081`.

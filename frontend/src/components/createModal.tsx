@@ -133,12 +133,12 @@ export function CreateModal({
           return;
         }
       }
-      const upLoadUrl = await getUploadURLMutation.mutateAsync({
-        filename: imageFile?.name,
-      });
-      console.log("Obtained upload URL:", upLoadUrl);
-
       if (processedImageFile) {
+        const upLoadUrl = await getUploadURLMutation.mutateAsync({
+          filename: processedImageFile.name,
+        });
+        console.log("Obtained upload URL:", upLoadUrl);
+
         if (typeof upLoadUrl.imageUrl === "string" && upLoadUrl.imageUrl) {
           const uploadResponse = await fetch(upLoadUrl.imageUrl, {
             method: "PUT",

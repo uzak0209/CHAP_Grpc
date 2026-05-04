@@ -1,6 +1,6 @@
 use crate::domain::validate::{Validate, ValidationError};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Title(String);
 impl Title {
     pub fn new(value: String) -> Result<Self, ValidationError> {
@@ -20,6 +20,7 @@ impl std::fmt::Display for Title {
         write!(f, "{}", self.0)
     }
 }
+
 impl Validate for Title {
     fn validate(&self) -> Result<(), ValidationError> {
         if self.0.trim().is_empty() {

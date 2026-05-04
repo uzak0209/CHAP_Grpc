@@ -3,7 +3,6 @@ import { Providers } from './Providers';
 
 import GlobalSidebar from '@/components/GlobalSidebar';
 import SidebarToggle from '@/components/SidebarToggle';
-import { Sidebar } from 'lucide-react';
 // Note: do not call useUIState directly in this server component — use GlobalSidebar (client) to read state.
 
 export const metadata = {

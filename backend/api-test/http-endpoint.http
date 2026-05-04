@@ -1,0 +1,52 @@
+### CHAP HTTP API Test Endpoints
+### TypeScript backend: http://localhost:8083
+### Docker Compose backend: http://localhost:8081
+
+@baseUrl = http://localhost:8083
+@email = ts-user@example.com
+@password = testpassword123
+@jwt = REPLACE_WITH_JWT
+@targetUserId = REPLACE_WITH_TARGET_USER_ID
+
+### Health
+GET {{baseUrl}}/health
+
+### Sign Up
+POST {{baseUrl}}/api/v1/auth/signup
+Content-Type: application/json
+
+{
+  "email": "{{email}}",
+  "password": "{{password}}",
+  "name": "TypeScript User"
+}
+
+### Sign In
+POST {{baseUrl}}/api/v1/auth/signin
+Content-Type: application/json
+
+{
+  "email": "{{email}}",
+  "password": "{{password}}"
+}
+
+### Get Me
+GET {{baseUrl}}/api/v1/users/me
+Authorization: Bearer {{jwt}}
+
+### Follow User
+POST {{baseUrl}}/api/v1/users/{{targetUserId}}/follow
+Authorization: Bearer {{jwt}}
+
+### Unfollow User
+DELETE {{baseUrl}}/api/v1/users/{{targetUserId}}/follow
+Authorization: Bearer {{jwt}}
+
+### Upload Image URL
+POST {{baseUrl}}/api/v1/images/upload
+Authorization: Bearer {{jwt}}
+Content-Type: application/json
+
+{
+  "filename": "sample.png"
+}

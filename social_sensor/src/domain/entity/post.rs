@@ -1,5 +1,5 @@
-use crate::domain::{composite::coordinate, value_object::uuid_v0};
 use crate::domain::validate::ValidationError;
+use crate::domain::{composite::coordinate, value_object::uuid_v0};
 
 #[derive(Debug, Clone)]
 pub struct Post {
@@ -15,7 +15,11 @@ impl Post {
         coordinate: Option<coordinate::Coordinate>,
     ) -> Result<Self, ValidationError> {
         // Domain-level validation can be added here if needed. For now rely on value object validation.
-        Ok(Self { id, content, coordinate })
+        Ok(Self {
+            id,
+            content,
+            coordinate,
+        })
     }
 
     pub fn id(&self) -> &uuid_v0::UUID {

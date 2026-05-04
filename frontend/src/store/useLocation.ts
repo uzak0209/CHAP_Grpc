@@ -47,23 +47,45 @@ export function setCurrentLocation(location: Option<Coordinate>): void {
   useLocationStore.setState({ currentLocation: location });
 }
 
+function applyCurrentLocation(location: Coordinate): void {
+  useLocationStore.setState({
+    currentLocation: Some(location),
+    mapCenter: Some(location),
+    viewCenter: Some(location),
+  });
+}
+
 export async function captureCurrentLocation(): Promise<Result<void, string>> {
   if (typeof navigator === "undefined" || !navigator.geolocation) {
     setCurrentLocation(None);
     return Promise.resolve(Err('geolocation-not-supported'));
   }
 
-  return new Promise((resolve) => {
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        setCurrentLocation(Some({ lat: pos.coords.latitude, lng: pos.coords.longitude }));
-        resolve(Ok(undefined)); // ✅ resolve で Promise に返す
-      },
-      (err) => {
-        setCurrentLocation(None);
-        resolve(Err(err?.message ?? 'geolocation-error')); // ✅ resolve で返す
-      },
-      { enableHighAccuracy: true, timeout: 5000 }
-    );
-  });
+  const getPosition = (options: PositionOptions) =>
+    new Promise<GeolocationPosition>((resolve, reject) => {
+      navigator.geolocation.getCurrentPosition(resolve, reject, options);
+    });
+
+  try {
+    const pos = await getPosition({
+      enableHighAccuracy: true,
+      timeout: 15000,
+      maximumAge: 30000,
+    });
+    applyCurrentLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+    return Ok(undefined);
+  } catch (firstError: any) {
+    try {
+      const pos = await getPosition({
+        enableHighAccuracy: false,
+        timeout: 20000,
+        maximumAge: 300000,
+      });
+      applyCurrentLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+      return Ok(undefined);
+    } catch (secondError: any) {
+      setCurrentLocation(None);
+      return Err(secondError?.message ?? firstError?.message ?? 'geolocation-error');
+    }
+  }
 }

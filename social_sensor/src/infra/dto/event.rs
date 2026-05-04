@@ -1,5 +1,6 @@
 use crate::domain::entity::event;
 use crate::domain::validate::ValidationError;
+use crate::domain::value_object::title::Title;
 use crate::domain::{
     composite::coordinate::Coordinate,
     entity::event::Event,
@@ -15,7 +16,7 @@ impl TryFrom<event_db_models::Model> for Event {
 
     fn try_from(model: event_db_models::Model) -> Result<Event, ValidationError> {
         let id = uuid_v0::UUID::new(model.id)?;
-        let content = model.content;
+        let content = Title::new(model.content)?;
         // build optional coordinate only if both lat and lng present
         let coordinate = match (model.lat, model.lng) {
             (Some(la), Some(lo)) => {
@@ -34,7 +35,7 @@ impl TryFrom<event_db_models::Model> for Event {
             }
             _ => None,
         };
-
+        
         event::Event::new(id, content, coordinate)
     }
 }
